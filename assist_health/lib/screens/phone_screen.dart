@@ -1,0 +1,171 @@
+import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:assist_health/screens/otp_screen.dart';
+
+class PhoneScreen extends StatefulWidget {
+  const PhoneScreen({super.key});
+
+  static String verify = "";
+
+  @override
+  State<PhoneScreen> createState() => _PhoneScreenState();
+}
+
+class _PhoneScreenState extends State<PhoneScreen> {
+  final TextEditingController phoneController = TextEditingController();
+  String phoneNumber = "";
+
+  Country selectedCountry = Country(
+    phoneCode: "84",
+    countryCode: "VN",
+    e164Sc: 0,
+    geographic: true,
+    level: 1,
+    name: "Vietnam",
+    example: "Vietnam",
+    displayName: "Vietnam",
+    displayNameNoCountryCode: "VN",
+    e164Key: "",
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        margin: const EdgeInsets.only(left: 25, right: 25),
+        alignment: Alignment.center,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/doctors.png',
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 25),
+              const Text(
+                "Phone Verification",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Add your phone number. We'll send you a verification code",
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              TextFormField(
+                cursorColor: Colors.purple,
+                controller: phoneController,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  setState(() {
+                    phoneController.text = value;
+                    phoneNumber = phoneController.text.trim();
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: "Enter phone number",
+                  hintStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                    color: Colors.grey.shade600,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.black12),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: Colors.black12),
+                  ),
+                  prefixIcon: Container(
+                    padding: const EdgeInsets.fromLTRB(8,13,8,15),
+                    child: InkWell(
+                      onTap: () {
+                        showCountryPicker(
+                            context: context,
+                            countryListTheme: const CountryListThemeData(
+                              bottomSheetHeight: 550,
+                            ),
+                            onSelect: (value) {
+                              setState(() {
+                                selectedCountry = value;
+                              });
+                            });
+                      },
+                      child: Text(
+                        "${selectedCountry.flagEmoji} +${selectedCountry.phoneCode}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  suffixIcon: phoneController.text.length > 9 ? Container(
+                    height: 30,
+                    width: 30,
+                    margin: const EdgeInsets.all(10.0),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF7165D6),
+                    ),
+                    child: const Icon(
+                      Icons.done,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ) : null,
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7165D6),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)
+                        )
+                    ),
+                    onPressed: () async {
+                      await FirebaseAuth.instance.verifyPhoneNumber(
+                        phoneNumber: "+${selectedCountry.phoneCode}$phoneNumber",
+                        verificationCompleted: (PhoneAuthCredential credential) {},
+                        verificationFailed: (FirebaseAuthException e) {},
+                        codeSent: (String verificationID, int? resendToken) {
+                          PhoneScreen.verify = verificationID;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const OtpVerificationScreen(),
+                            ),
+                          );
+                        },
+                        codeAutoRetrievalTimeout: (String verificationId) {},
+                      );
+                    },
+                    child: const Text(
+                      "Send the code",
+                      style: TextStyle(fontSize: 16),
+                    )
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

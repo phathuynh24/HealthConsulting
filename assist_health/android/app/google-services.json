@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310244111218",
+    "project_id": "assist-health",
+    "storage_bucket": "assist-health.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310244111218:android:8526fc6b9fe8f2a525e3eb",
+        "android_client_info": {
+          "package_name": "com.example.assist_health"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU6A-ArV__oX46nKaUEEEipKMdy5TWYdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
