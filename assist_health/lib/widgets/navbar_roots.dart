@@ -10,7 +10,6 @@ class NavBarRoots extends StatefulWidget {
 }
 
 class _NavBarRootsState extends State<NavBarRoots> {
-
   int _selectedIndex = 0;
   final _screens = [
     // Home Screen
@@ -40,7 +39,7 @@ class _NavBarRootsState extends State<NavBarRoots> {
             fontSize: 15,
           ),
           currentIndex: _selectedIndex,
-          onTap: (index){
+          onTap: (index) {
             setState(() {
               _selectedIndex = index;
             });
@@ -59,7 +58,7 @@ class _NavBarRootsState extends State<NavBarRoots> {
               label: "Schedule",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
+              icon: Icon(Icons.settings),
               label: "Settings",
             ),
           ],

@@ -1,3 +1,4 @@
+import 'package:assist_health/screens/appointment_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -32,7 +33,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Hello Alex",
+                    "Hello",
                     style: TextStyle(
                       fontSize: 35,
                       fontWeight: FontWeight.w500,
@@ -171,7 +172,8 @@ class HomeScreen extends StatelessWidget {
                 itemCount: symptoms.length,
                 itemBuilder: (context, index) {
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
                     padding: const EdgeInsets.symmetric(horizontal: 25),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF4F6FA),
@@ -223,7 +225,7 @@ class HomeScreen extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Container(),
+                          builder: (context) => AppointmentScreen(),
                         ));
                   },
                   child: Container(
@@ -245,8 +247,7 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 35,
-                          backgroundImage:
-                          AssetImage("assets/${imgs[index]}"),
+                          backgroundImage: AssetImage("assets/${imgs[index]}"),
                         ),
                         const Text(
                           "Dr. Doctor Name",
