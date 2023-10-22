@@ -1,6 +1,9 @@
+import 'package:assist_health/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/screens/sign_up_screen.dart';
+import 'package:assist_health/functions/Methods.dart';
+import 'package:assist_health/widgets/navbar_roots.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +14,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool passToggle = true;
+  bool isLoading = false;
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _password = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -27,10 +33,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(12),
                 child: TextField(
-                  decoration: InputDecoration(
+                  controller: _name,
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     label: Text("Enter Username"),
                     prefixIcon: Icon(Icons.person),
@@ -40,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: TextField(
+                  controller: _password,
                   obscureText: passToggle ? true : false,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
@@ -66,11 +74,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.all(15),
                 child: InkWell(
                   onTap: () {
-                    //  Navigator.push(
-                    // context,
-                    // MaterialPageRoute(
-                    // builder: (context) => NavBarRoots(),
-                    // ));
+                    //login function
+                    if (_name.text.isNotEmpty && _password.text.isNotEmpty) {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      logIn(_name.text, _password.text).then((user) {
+                        if (user != null) {
+                          print("Login Successfull");
+                          setState(() {
+                            isLoading = false;
+                          });
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (_) => HomeScreen()));
+                        } else {
+                          print("Login failed");
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      });
+                    } else {
+                      print("Please fill");
+                    }
+                    //nav
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NavBarRoots(),
+                        ));
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -116,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SignUpScreen(),
+                            builder: (context) => SignUpScreen(),
                           ));
                     },
                     child: const Text(

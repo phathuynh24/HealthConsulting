@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:assist_health/functions/Methods.dart';
 
 class SettingScreen extends StatelessWidget {
   @override
@@ -153,7 +154,9 @@ class SettingScreen extends StatelessWidget {
           ),
           const Divider(height: 40),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              logOut(context);
+            },
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
