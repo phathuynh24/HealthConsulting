@@ -1,6 +1,5 @@
-//import 'package:chat_app/Screens/ChatRoom.dart';
-//import 'package:chat_app/group_chats/group_chat_screen.dart';
 import 'package:assist_health/functions/Methods.dart';
+import 'package:assist_health/screens/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,38 +17,38 @@ class _MessageScreenState extends State<MessageScreen>
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance!.addObserver(this);
-  //   setStatus("Online");
-  // }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+    setStatus("Online");
+  }
 
-  // void setStatus(String status) async {
-  //   await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
-  //     "status": status,
-  //   });
-  // }
+  void setStatus(String status) async {
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      "status": status,
+    });
+  }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     // online
-  //     setStatus("Online");
-  //   } else {
-  //     // offline
-  //     setStatus("Offline");
-  //   }
-  // }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // online
+      setStatus("Online");
+    } else {
+      // offline
+      setStatus("Offline");
+    }
+  }
 
-  // String chatRoomId(String user1, String user2) {
-  //   if (user1[0].toLowerCase().codeUnits[0] >
-  //       user2.toLowerCase().codeUnits[0]) {
-  //     return "$user1$user2";
-  //   } else {
-  //     return "$user2$user1";
-  //   }
-  // }
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2.toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    } else {
+      return "$user2$user1";
+    }
+  }
 
   void onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -77,7 +76,7 @@ class _MessageScreenState extends State<MessageScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Message"),
+        title: Text("Messages"),
         actions: [
           IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
         ],
@@ -126,18 +125,18 @@ class _MessageScreenState extends State<MessageScreen>
                 userMap != null
                     ? ListTile(
                         onTap: () {
-                          //    String roomId = chatRoomId(
-                          //     _auth.currentUser!.displayName!,
-                          //     userMap!['name']);
+                          String roomId = chatRoomId(
+                              _auth.currentUser!.displayName!,
+                              userMap!['name']);
 
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (_) => ChatRoom(
-                          //       chatRoomId: roomId,
-                          //       userMap: userMap!,
-                          //     ),
-                          //   ),
-                          // );
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ChatRoom(
+                                chatRoomId: roomId,
+                                userMap: userMap!,
+                              ),
+                            ),
+                          );
                         },
                         leading: Icon(Icons.account_box, color: Colors.black),
                         title: Text(
@@ -154,14 +153,6 @@ class _MessageScreenState extends State<MessageScreen>
                     : Container(),
               ],
             ),
-      // floatingActionButton: FloatingActionButton(
-      //   child: Icon(Icons.group),
-      //   onPressed: () => Navigator.of(context).push(
-      //     MaterialPageRoute(
-      //       builder: (_) => GroupChatHomeScreen(),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }
