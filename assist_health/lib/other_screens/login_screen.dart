@@ -1,9 +1,13 @@
-import 'package:assist_health/screens/home_screen.dart';
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: avoid_print, use_build_context_synchronously
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/screens/sign_up_screen.dart';
-import 'package:assist_health/functions/Methods.dart';
-import 'package:assist_health/widgets/navbar_roots.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/user_screens/phone_screen.dart';
+import 'package:assist_health/widgets/user_navbar.dart';
+import 'package:assist_health/widgets/doctor_navbar.dart';
+import 'package:assist_health/widgets/admin_navbar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +17,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   bool passToggle = true;
   bool isLoading = false;
   final TextEditingController _name = TextEditingController();
@@ -34,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 10),
               Padding(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 child: TextField(
                   controller: _name,
                   decoration: const InputDecoration(
@@ -79,30 +85,49 @@ class _LoginScreenState extends State<LoginScreen> {
                       setState(() {
                         isLoading = true;
                       });
-                      logIn(_name.text, _password.text).then((user) {
-                        if (user != null) {
-                          print("Login Successfull");
-                          setState(() {
-                            isLoading = false;
-                          });
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => HomeScreen()));
-                        } else {
+                      logIn(_name.text, _password.text).then((user) async {
+                        if (user == null) {
                           print("Login failed");
                           setState(() {
                             isLoading = false;
                           });
+                          return;
+                        }
+
+                        print("Login Successfull");
+                        setState(() {
+                          isLoading = false;
+                        });
+
+                        DocumentReference documentReference =
+                            firestore.collection('users').doc(user.uid);
+                        DocumentSnapshot document =
+                            await documentReference.get();
+                        String role = document['role'];
+                        switch (role) {
+                          case 'user':
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const UserNavBar()));
+                            break;
+                          case 'doctor':
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const DoctorNavBar()));
+                            break;
+                          case 'admin':
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const AdminNavBar()));
+                            break;
                         }
                       });
                     } else {
                       print("Please fill");
                     }
-                    //nav
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NavBarRoots(),
-                        ));
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 15),
@@ -148,11 +173,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SignUpScreen(),
+                            builder: (context) => const PhoneScreen(),
                           ));
                     },
                     child: const Text(
-                      "Create Account",
+                      "Sign up",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

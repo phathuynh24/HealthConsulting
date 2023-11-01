@@ -1,28 +1,24 @@
-import 'package:assist_health/screens/home_screen.dart';
-import 'package:assist_health/screens/message_screen.dart';
-import 'package:assist_health/screens/schedule_screen.dart';
-import 'package:assist_health/screens/settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class NavBarRoots extends StatefulWidget {
-  const NavBarRoots({super.key});
+class DoctorNavBar extends StatefulWidget {
+  const DoctorNavBar({super.key});
 
   @override
-  State<StatefulWidget> createState() => _NavBarRootsState();
+  State<StatefulWidget> createState() => _DoctorNavBarState();
 }
 
-class _NavBarRootsState extends State<NavBarRoots> {
+class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
-    // Home Screen
-    HomeScreen(),
-    // Messages Screen
-    MessageScreen(),
-    // Schedule Screen
-    ScheduleScreen(),
-    // Settings Screen
-    SettingScreen(),
+    // Screen 1
+    Container(),
+    // Screen 2
+    Container(),
+    // Screen 3
+    Container(),
+    // Screen 4
+    Container(),
   ];
 
   @override
@@ -30,7 +26,7 @@ class _NavBarRootsState extends State<NavBarRoots> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SizedBox(
         height: 80,
         child: BottomNavigationBar(
           backgroundColor: Colors.white,

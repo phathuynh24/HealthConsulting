@@ -1,7 +1,7 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/screens/otp_screen.dart';
+import 'package:assist_health/user_screens/otp_screen.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});
@@ -88,7 +88,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     borderSide: const BorderSide(color: Colors.black12),
                   ),
                   prefixIcon: Container(
-                    padding: const EdgeInsets.fromLTRB(8,13,8,15),
+                    padding: const EdgeInsets.fromLTRB(8, 13, 8, 15),
                     child: InkWell(
                       onTap: () {
                         showCountryPicker(
@@ -112,20 +112,22 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       ),
                     ),
                   ),
-                  suffixIcon: phoneController.text.length > 9 ? Container(
-                    height: 30,
-                    width: 30,
-                    margin: const EdgeInsets.all(10.0),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF7165D6),
-                    ),
-                    child: const Icon(
-                      Icons.done,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ) : null,
+                  suffixIcon: phoneController.text.length > 9
+                      ? Container(
+                          height: 30,
+                          width: 30,
+                          margin: const EdgeInsets.all(10.0),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF7165D6),
+                          ),
+                          child: const Icon(
+                            Icons.done,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        )
+                      : null,
                 ),
               ),
               const SizedBox(height: 20),
@@ -136,20 +138,21 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7165D6),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)
-                        )
-                    ),
+                            borderRadius: BorderRadius.circular(10))),
                     onPressed: () async {
                       await FirebaseAuth.instance.verifyPhoneNumber(
-                        phoneNumber: "+${selectedCountry.phoneCode}$phoneNumber",
-                        verificationCompleted: (PhoneAuthCredential credential) {},
+                        phoneNumber:
+                            "+${selectedCountry.phoneCode}$phoneNumber",
+                        verificationCompleted:
+                            (PhoneAuthCredential credential) {},
                         verificationFailed: (FirebaseAuthException e) {},
                         codeSent: (String verificationID, int? resendToken) {
                           PhoneScreen.verify = verificationID;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const OtpVerificationScreen(),
+                              builder: (context) =>
+                                  const OtpVerificationScreen(),
                             ),
                           );
                         },
@@ -159,8 +162,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     child: const Text(
                       "Send the code",
                       style: TextStyle(fontSize: 16),
-                    )
-                ),
+                    )),
               )
             ],
           ),

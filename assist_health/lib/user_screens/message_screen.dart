@@ -1,10 +1,14 @@
-import 'package:assist_health/functions/Methods.dart';
-import 'package:assist_health/screens/chatroom.dart';
+// ignore_for_file: library_private_types_in_public_api, avoid_print
+
+import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/user_screens/chatroom_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessageScreen extends StatefulWidget {
+  const MessageScreen({super.key});
+
   @override
   _MessageScreenState createState() => _MessageScreenState();
 }
@@ -20,8 +24,8 @@ class _MessageScreenState extends State<MessageScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-    setStatus("Online");
+    WidgetsBinding.instance.addObserver(this);
+    setStatus("online");
   }
 
   void setStatus(String status) async {
@@ -34,10 +38,10 @@ class _MessageScreenState extends State<MessageScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // online
-      setStatus("Online");
+      setStatus("online");
     } else {
       // offline
-      setStatus("Offline");
+      setStatus("offline");
     }
   }
 
@@ -51,13 +55,13 @@ class _MessageScreenState extends State<MessageScreen>
   }
 
   void onSearch() async {
-    FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     setState(() {
       isLoading = true;
     });
 
-    await _firestore
+    await firestore
         .collection('users')
         .where("email", isEqualTo: _search.text)
         .get()
@@ -67,6 +71,7 @@ class _MessageScreenState extends State<MessageScreen>
         isLoading = false;
       });
       print(userMap);
+      print(_auth.currentUser);
     });
   }
 
@@ -76,17 +81,18 @@ class _MessageScreenState extends State<MessageScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Messages"),
+        title: const Text("Messages"),
         actions: [
-          IconButton(icon: Icon(Icons.logout), onPressed: () => logOut(context))
+          IconButton(
+              icon: const Icon(Icons.logout), onPressed: () => logOut(context))
         ],
       ),
       body: isLoading
           ? Center(
-              child: Container(
+              child: SizedBox(
                 height: size.height / 20,
                 width: size.height / 20,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               ),
             )
           : Column(
@@ -98,7 +104,7 @@ class _MessageScreenState extends State<MessageScreen>
                   height: size.height / 14,
                   width: size.width,
                   alignment: Alignment.center,
-                  child: Container(
+                  child: SizedBox(
                     height: size.height / 14,
                     width: size.width / 1.15,
                     child: TextField(
@@ -117,7 +123,7 @@ class _MessageScreenState extends State<MessageScreen>
                 ),
                 ElevatedButton(
                   onPressed: onSearch,
-                  child: Text("Search"),
+                  child: const Text("Search"),
                 ),
                 SizedBox(
                   height: size.height / 30,
@@ -128,6 +134,7 @@ class _MessageScreenState extends State<MessageScreen>
                           String roomId = chatRoomId(
                               _auth.currentUser!.displayName!,
                               userMap!['name']);
+                          print(roomId);
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -138,17 +145,18 @@ class _MessageScreenState extends State<MessageScreen>
                             ),
                           );
                         },
-                        leading: Icon(Icons.account_box, color: Colors.black),
+                        leading:
+                            const Icon(Icons.account_box, color: Colors.black),
                         title: Text(
                           userMap!['name'],
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         subtitle: Text(userMap!['email']),
-                        trailing: Icon(Icons.chat, color: Colors.black),
+                        trailing: const Icon(Icons.chat, color: Colors.black),
                       )
                     : Container(),
               ],

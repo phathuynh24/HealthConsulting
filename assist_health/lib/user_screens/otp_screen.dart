@@ -1,5 +1,7 @@
-import 'package:assist_health/screens/home_screen.dart';
-import 'package:assist_health/screens/phone_screen.dart';
+// ignore_for_file: unused_local_variable, avoid_print
+
+import 'package:assist_health/user_screens/phone_screen.dart';
+import 'package:assist_health/user_screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
@@ -12,7 +14,6 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
@@ -100,19 +101,25 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         backgroundColor: const Color(0xFF7165D6),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    onPressed: () async{
+                    onPressed: () async {
                       try {
-                        PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                            verificationId: PhoneScreen.verify, smsCode: code);
+                        PhoneAuthCredential credential =
+                            PhoneAuthProvider.credential(
+                                verificationId: PhoneScreen.verify,
+                                smsCode: code);
                         await auth.signInWithCredential(credential);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomeScreen(),
-                          ),
-                        );
-                      }
-                      catch(e) {
+                        await auth.currentUser!.delete();
+
+                        String? phoneNumber = auth.currentUser!.phoneNumber;
+                        // ignore: use_build_context_synchronously
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen(),
+                                settings:
+                                    RouteSettings(arguments: phoneNumber)),
+                            (route) => false);
+                      } catch (e) {
                         print("Wrong otp");
                       }
                     },
@@ -122,15 +129,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 children: [
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          'phone',
-                              (route) => false,
-                        );
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const PhoneScreen()),
+                            (route) => false);
                       },
                       child: const Text(
                         "Edit Phone Number ?",
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(color: Color(0xFF7165D6)),
                       ))
                 ],
               )

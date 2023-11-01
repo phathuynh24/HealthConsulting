@@ -1,8 +1,10 @@
-import 'package:assist_health/screens/phone_screen.dart';
+// ignore_for_file: avoid_print
+
+import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/widgets/user_navbar.dart';
+import 'package:assist_health/user_screens/phone_screen.dart';
+import 'package:assist_health/other_screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/screens/login_screen.dart';
-import 'package:assist_health/screens/sign_up_screen.dart';
-import 'package:assist_health/widgets/navbar_roots.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -23,9 +25,14 @@ class WelcomeScreen extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => const NavBarRoots(),
-                  ));
+                  logIn('huynhphat2405@gmail.com', '123456').then((user) {
+                    print("Login Successfull");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const UserNavBar(),
+                        ));
+                  });
                 },
                 child: const Text(
                   "SKIP",
@@ -79,7 +86,8 @@ class WelcomeScreen extends StatelessWidget {
                           ));
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 40),
                       child: const Text(
                         "Log In",
                         style: TextStyle(
@@ -103,7 +111,8 @@ class WelcomeScreen extends StatelessWidget {
                           ));
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 40),
                       child: const Text(
                         "Sign Up",
                         style: TextStyle(
