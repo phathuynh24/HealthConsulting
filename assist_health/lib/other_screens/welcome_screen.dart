@@ -19,7 +19,7 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(
-              height: 15,
+              height: 40,
             ),
             Align(
               alignment: Alignment.centerRight,

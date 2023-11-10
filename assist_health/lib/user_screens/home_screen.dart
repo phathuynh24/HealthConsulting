@@ -1,6 +1,6 @@
-import 'dart:ffi';
+import 'dart:async';
 
-import 'package:assist_health/models/doctor_info.dart';
+import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/user_screens/appointment_screen.dart';
 import 'package:assist_health/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:pinput/pinput.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -87,6 +86,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                               child: GridView.count(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
                                 crossAxisCount: 4,
                                 crossAxisSpacing: 0,
                                 mainAxisSpacing: 20,
@@ -187,71 +187,79 @@ class _MyHomeScreen extends State<HomeScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 290,
-                child: ListView.builder(
-                  itemCount: 3,
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.only(left: 7),
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //       builder: (context) => const AppointmentScreen(),
-                        //     ));
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 15),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            FutureBuilder<List<DoctorInfo>>(
-                              future: getInfoDoctors(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return DoctorPopularCardWidget(
+              FutureBuilder<List<DoctorInfo>>(
+                future: getInfoDoctors(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const SizedBox(
+                        height: 290,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Something went wrong'),
+                        ));
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                        height: 290,
+                        width: double.infinity,
+                        child: Center(
+                          child: SizedBox(
+                            height: 40,
+                            width: 40,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ));
+                  }
+
+                  return SizedBox(
+                    height: 290,
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(left: 7),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AppointmentScreen(
+                                          snapshot.data![index])));
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 15),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  DoctorPopularCardWidget(
                                     image: snapshot.data![index].image,
                                     name: snapshot.data![index].name,
                                     expert: snapshot.data![index].expert,
-                                    rating: snapshot.data![index].rating,
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  return const SizedBox(
-                                      height: 290,
-                                      width: 160,
-                                      child: Center(
-                                        child: SizedBox(
-                                          height: 40,
-                                          width: 40,
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ));
-                                }
-                              },
+                                    rating:
+                                        snapshot.data![index].rating.toDouble(),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                          );
+                        }),
+                  );
+                },
               ),
             ],
           ),
@@ -296,44 +304,22 @@ class _MyHomeScreen extends State<HomeScreen> {
   }
 
   Future<List<DoctorInfo>> getInfoDoctors() async {
-    String name;
-    String desc;
-    int avgTime;
-    int count;
-    String expert;
-    String image;
-    int rating;
-    String workplace;
-    String address;
-    List<DoctorInfo> doctorInfos = [];
     final doctorDocs = await firestore
         .collection('users')
         .where('role', isEqualTo: 'doctor')
         .get();
-
-    for (final doctorDoc in doctorDocs.docs) {
-      final infoRef =
-          firestore.collection('users').doc(doctorDoc.id).collection('info');
-
-      name = doctorDoc.data()['name'];
-      desc = await infoRef.get().then((value) => value.docs.first['desc']);
-      avgTime =
-          await infoRef.get().then((value) => value.docs.first['avgTime']);
-      count = await infoRef.get().then((value) => value.docs.first['count']);
-      expert = await infoRef.get().then((value) => value.docs.first['expert']);
-      image = await getUrl(await infoRef
-          .get()
-          .then((value) => value.docs.first['image'].toString()));
-      rating = await infoRef.get().then((value) => value.docs.first['rating']);
-      workplace =
-          await infoRef.get().then((value) => value.docs.first['workplace']);
-      address =
-          await infoRef.get().then((value) => value.docs.first['address']);
-
-      DoctorInfo doctorInfo = DoctorInfo(name, desc, avgTime, count, expert,
-          image, rating, workplace, address);
-      doctorInfos.add(doctorInfo);
-    }
+    final doctorInfos =
+        await Future.wait(doctorDocs.docs.map((doctorDoc) async {
+      final infoRef = firestore
+          .collection('users')
+          .doc(doctorDoc.id)
+          .collection('info')
+          .get();
+      final doctorInfo = await infoRef
+          .then((value) => DoctorInfo.fromJson(value.docs.first.data()));
+      doctorInfo.image = await getUrl(doctorInfo.image);
+      return doctorInfo;
+    }));
     return doctorInfos;
   }
 }

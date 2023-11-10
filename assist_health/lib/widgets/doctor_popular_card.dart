@@ -4,7 +4,7 @@ class DoctorPopularCardWidget extends StatelessWidget {
   final String image;
   final String name;
   final String expert;
-  final int rating;
+  final double rating;
 
   const DoctorPopularCardWidget({
     super.key,
