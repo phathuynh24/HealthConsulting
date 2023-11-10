@@ -22,9 +22,10 @@ class _UserNavBarState extends State<UserNavBar> {
     const MessageScreen(),
     // Schedule Screen
     const ScheduleScreen(),
-    // Settings Screen
-    // const SettingScreen(),
+    // Community Screen
      CommunityScreen(),
+     //Setting Screen
+     const SettingScreen(),
   ];
 
   @override
@@ -61,6 +62,10 @@ class _UserNavBarState extends State<UserNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
               label: "Schedule",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.question_answer),
+              label: "Community",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
