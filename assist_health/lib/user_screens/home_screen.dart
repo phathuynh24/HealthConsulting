@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'package:assist_health/models/doctor_info.dart';
 import 'package:assist_health/user_screens/appointment_screen.dart';
 import 'package:assist_health/widgets/doctor_popular_card.dart';
