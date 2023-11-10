@@ -1,3 +1,4 @@
+import 'package:assist_health/user_screens/community_screen.dart';
 import 'package:assist_health/user_screens/home_screen.dart';
 import 'package:assist_health/user_screens/message_screen.dart';
 import 'package:assist_health/user_screens/schedule_screen.dart';
@@ -22,7 +23,8 @@ class _UserNavBarState extends State<UserNavBar> {
     // Schedule Screen
     const ScheduleScreen(),
     // Settings Screen
-    const SettingScreen(),
+    // const SettingScreen(),
+     CommunityScreen(),
   ];
 
   @override

@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print
-
 import 'package:assist_health/functions/methods.dart';
 import 'package:assist_health/user_screens/chatroom_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessageScreen extends StatefulWidget {
-  const MessageScreen({super.key});
+  const MessageScreen({Key? key}) : super(key: key);
 
   @override
   _MessageScreenState createState() => _MessageScreenState();
@@ -15,8 +13,9 @@ class MessageScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessageScreen>
     with WidgetsBindingObserver {
-  Map<String, dynamic>? userMap;
+  List<Map<String, dynamic>> doctorList = [];
   bool isLoading = false;
+  Map<String, dynamic>? userMap;
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -26,10 +25,14 @@ class _MessageScreenState extends State<MessageScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     setStatus("online");
+    onLoadDoctors();
   }
 
   void setStatus(String status) async {
-    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+    await _firestore
+        .collection('users')
+        .doc(_auth.currentUser!.uid)
+        .update({
       "status": status,
     });
   }
@@ -47,7 +50,7 @@ class _MessageScreenState extends State<MessageScreen>
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
-        user2.toLowerCase().codeUnits[0]) {
+        user2[0].toLowerCase().codeUnits[0]) {
       return "$user1$user2";
     } else {
       return "$user2$user1";
@@ -60,18 +63,57 @@ class _MessageScreenState extends State<MessageScreen>
     setState(() {
       isLoading = true;
     });
-
+    String searchText=_search.text.trim();
+    if(searchText.isEmpty){
+      setState(() {
+      onLoadDoctors();
+      isLoading = false;
+    });
+    return;
+    }
     await firestore
         .collection('users')
-        .where("email", isEqualTo: _search.text)
+        .where("email", isEqualTo: searchText)
         .get()
         .then((value) {
       setState(() {
-        userMap = value.docs[0].data();
+        if (value.docs.isNotEmpty) {
+          userMap = value.docs[0].data();
+          doctorList = [userMap!];
+        } else {
+          userMap = null;
+          doctorList = [];
+        }
         isLoading = false;
       });
       print(userMap);
       print(_auth.currentUser);
+    });
+  }
+
+  void onLoadDoctors() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    await firestore
+        .collection('users')
+        .where("role", isEqualTo: "doctor")
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        setState(() {
+          doctorList = value.docs.map((doc) => doc.data()).toList();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          doctorList = [];
+          isLoading = false;
+        });
+      }
     });
   }
 
@@ -84,7 +126,8 @@ class _MessageScreenState extends State<MessageScreen>
         title: const Text("Messages"),
         actions: [
           IconButton(
-              icon: const Icon(Icons.logout), onPressed: () => logOut(context))
+              icon: const Icon(Icons.logout),
+              onPressed: () => logOut(context))
         ],
       ),
       body: isLoading
@@ -109,6 +152,9 @@ class _MessageScreenState extends State<MessageScreen>
                     width: size.width / 1.15,
                     child: TextField(
                       controller: _search,
+                      onSubmitted: (value){
+                        onSearch();
+                      },
                       decoration: InputDecoration(
                         hintText: "Search",
                         border: OutlineInputBorder(
@@ -128,37 +174,42 @@ class _MessageScreenState extends State<MessageScreen>
                 SizedBox(
                   height: size.height / 30,
                 ),
-                userMap != null
-                    ? ListTile(
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: doctorList.length,
+                    itemBuilder: (context, index) {
+                      Map<String, dynamic> doctor = doctorList[index];
+                      return ListTile(
                         onTap: () {
                           String roomId = chatRoomId(
                               _auth.currentUser!.displayName!,
-                              userMap!['name']);
+                              doctor['name']);
                           print(roomId);
 
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => ChatRoom(
                                 chatRoomId: roomId,
-                                userMap: userMap!,
+                                userMap: doctor,
                               ),
                             ),
                           );
                         },
-                        leading:
-                            const Icon(Icons.account_box, color: Colors.black),
+                        leading: const Icon(Icons.account_box, color: Colors.black),
                         title: Text(
-                          userMap!['name'],
+                          doctor['name'],
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 17,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        subtitle: Text(userMap!['email']),
+                        subtitle: Text(doctor['email']),
                         trailing: const Icon(Icons.chat, color: Colors.black),
-                      )
-                    : Container(),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
     );
