@@ -3,6 +3,7 @@ import 'package:assist_health/user_screens/home_screen.dart';
 import 'package:assist_health/user_screens/message_screen.dart';
 import 'package:assist_health/user_screens/schedule_screen.dart';
 import 'package:assist_health/user_screens/settings_screen.dart';
+import 'package:assist_health/user_screens/health_profile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +25,9 @@ class _UserNavBarState extends State<UserNavBar> {
     const CommunityScreen(),
     // Schedule Screen
     const ScheduleScreen(),
-    //Settings Screen
+    //Profile
+    HealthProfileScreen(),
+    //Setting Screen
     const SettingScreen(),
   ];
 
@@ -66,6 +69,10 @@ class _UserNavBarState extends State<UserNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
               label: "Lịch khám",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.health_and_safety),
+              label: "Hồ sơ",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
