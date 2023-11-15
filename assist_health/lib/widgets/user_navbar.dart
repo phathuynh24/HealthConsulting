@@ -10,7 +10,7 @@ class UserNavBar extends StatefulWidget {
   const UserNavBar({super.key});
 
   @override
-  State<StatefulWidget> createState() => _UserNavBarState();
+  State<UserNavBar> createState() => _UserNavBarState();
 }
 
 class _UserNavBarState extends State<UserNavBar> {
@@ -20,11 +20,12 @@ class _UserNavBarState extends State<UserNavBar> {
     const HomeScreen(),
     // Messages Screen
     const MessageScreen(),
+    // Public Chat Screen
+    const CommunityScreen(),
     // Schedule Screen
     const ScheduleScreen(),
-    // Settings Screen
-    // const SettingScreen(),
-     CommunityScreen(),
+    //Settings Screen
+    const SettingScreen(),
   ];
 
   @override
@@ -52,19 +53,23 @@ class _UserNavBarState extends State<UserNavBar> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),
-              label: "Home",
+              label: "Trang chủ",
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-              label: "Messages",
+              label: "Nhắn tin",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_3),
+              label: "Cộng đồng",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
-              label: "Schedule",
+              label: "Lịch khám",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
-              label: "Settings",
+              label: "Cài đặt",
             ),
           ],
         ),

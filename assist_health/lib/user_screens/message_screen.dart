@@ -1,14 +1,13 @@
-import 'package:assist_health/functions/methods.dart';
 import 'package:assist_health/user_screens/chatroom_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessageScreen extends StatefulWidget {
-  const MessageScreen({Key? key}) : super(key: key);
+  const MessageScreen({super.key});
 
   @override
-  _MessageScreenState createState() => _MessageScreenState();
+  State<MessageScreen> createState() => _MessageScreenState();
 }
 
 class _MessageScreenState extends State<MessageScreen>
@@ -29,10 +28,7 @@ class _MessageScreenState extends State<MessageScreen>
   }
 
   void setStatus(String status) async {
-    await _firestore
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .update({
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
       "status": status,
     });
   }
@@ -63,13 +59,13 @@ class _MessageScreenState extends State<MessageScreen>
     setState(() {
       isLoading = true;
     });
-    String searchText=_search.text.trim();
-    if(searchText.isEmpty){
+    String searchText = _search.text.trim();
+    if (searchText.isEmpty) {
       setState(() {
-      onLoadDoctors();
-      isLoading = false;
-    });
-    return;
+        onLoadDoctors();
+        isLoading = false;
+      });
+      return;
     }
     await firestore
         .collection('users')
@@ -86,8 +82,6 @@ class _MessageScreenState extends State<MessageScreen>
         }
         isLoading = false;
       });
-      print(userMap);
-      print(_auth.currentUser);
     });
   }
 
@@ -123,12 +117,9 @@ class _MessageScreenState extends State<MessageScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Messages"),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () => logOut(context))
-        ],
+        title: const Text("Hỏi đáp riêng cùng bác sĩ"),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF7165D6),
       ),
       body: isLoading
           ? Center(
@@ -152,11 +143,11 @@ class _MessageScreenState extends State<MessageScreen>
                     width: size.width / 1.15,
                     child: TextField(
                       controller: _search,
-                      onSubmitted: (value){
+                      onSubmitted: (value) {
                         onSearch();
                       },
                       decoration: InputDecoration(
-                        hintText: "Search",
+                        hintText: "Tìm kiếm...",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -168,8 +159,10 @@ class _MessageScreenState extends State<MessageScreen>
                   height: size.height / 50,
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF7165D6)),
                   onPressed: onSearch,
-                  child: const Text("Search"),
+                  child: const Text("Tìm kiếm"),
                 ),
                 SizedBox(
                   height: size.height / 30,
@@ -182,10 +175,7 @@ class _MessageScreenState extends State<MessageScreen>
                       return ListTile(
                         onTap: () {
                           String roomId = chatRoomId(
-                              _auth.currentUser!.displayName!,
-                              doctor['name']);
-                          print(roomId);
-
+                              _auth.currentUser!.displayName!, doctor['name']);
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => ChatRoom(
@@ -195,7 +185,8 @@ class _MessageScreenState extends State<MessageScreen>
                             ),
                           );
                         },
-                        leading: const Icon(Icons.account_box, color: Colors.black),
+                        leading:
+                            const Icon(Icons.account_box, color: Colors.black),
                         title: Text(
                           doctor['name'],
                           style: const TextStyle(

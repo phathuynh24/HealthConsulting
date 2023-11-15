@@ -151,8 +151,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const OtpVerificationScreen(),
+                              builder: (_) => const OtpVerificationScreen(),
                             ),
                           );
                         },

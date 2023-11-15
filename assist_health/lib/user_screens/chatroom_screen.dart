@@ -21,9 +21,7 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _message = TextEditingController();
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   File? imageFile;
@@ -60,7 +58,7 @@ class _ChatRoomState extends State<ChatRoom> {
 
     // ignore: body_might_complete_normally_catch_error
     var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
-      await _firestore
+      _firestore
           .collection('chatroom')
           .doc(widget.chatRoomId)
           .collection('chats')

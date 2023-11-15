@@ -1,10 +1,9 @@
-import 'dart:async';
-
+import 'package:assist_health/functions/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/user_screens/appointment_screen.dart';
+import 'package:assist_health/user_screens/detail_doctor_screen.dart';
+import 'package:assist_health/user_screens/list_doctor_screen.dart';
 import 'package:assist_health/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _MyHomeScreen extends State<HomeScreen> {
-  final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseStorage storage = FirebaseStorage.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -51,7 +49,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Hello",
+                      "Huỳnh Tiến Phát",
                       style: TextStyle(
                         fontSize: 35,
                         fontWeight: FontWeight.w500,
@@ -64,7 +62,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -74,51 +71,57 @@ class _MyHomeScreen extends State<HomeScreen> {
                       child: ListView(
                         children: [
                           Container(
-                            color: Theme.of(context).primaryColor,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 20,
-                              ),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              child: GridView.count(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 0,
-                                mainAxisSpacing: 20,
-                                children: [
-                                  itemDashboard(
-                                      'Tư vấn online',
-                                      CupertinoIcons.play_rectangle,
-                                      Colors.deepOrange),
-                                  itemDashboard(
-                                      'Analytics',
-                                      CupertinoIcons.graph_circle,
-                                      Colors.green),
-                                  itemDashboard('Audience',
-                                      CupertinoIcons.person_2, Colors.purple),
-                                  itemDashboard(
-                                      'Comments',
-                                      CupertinoIcons.chat_bubble_2,
-                                      Colors.brown),
-                                  itemDashboard(
-                                      'Revenue',
-                                      CupertinoIcons.money_dollar_circle,
-                                      Colors.indigo),
-                                  itemDashboard('Upload',
-                                      CupertinoIcons.add_circled, Colors.teal),
-                                  itemDashboard(
-                                      'About',
-                                      CupertinoIcons.question_circle,
-                                      Colors.blue),
-                                  itemDashboard('Contact', CupertinoIcons.phone,
-                                      Colors.pinkAccent),
-                                ],
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                            ),
+                            child: GridView.count(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.zero,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 40,
+                              mainAxisSpacing: 0,
+                              children: [
+                                itemDashboard(
+                                    'Tư vấn online',
+                                    CupertinoIcons.play_rectangle,
+                                    Colors.deepOrange, () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ListDoctorScreen()),
+                                  );
+                                }),
+                                itemDashboard(
+                                    'Hỏi riêng bác sĩ',
+                                    CupertinoIcons.graph_circle,
+                                    Colors.green,
+                                    () {}),
+                                itemDashboard(
+                                    'Hồ sơ sức khỏe',
+                                    CupertinoIcons.person_2,
+                                    Colors.purple,
+                                    () {}),
+                                itemDashboard(
+                                    'Cộng đồng',
+                                    CupertinoIcons.chat_bubble_2,
+                                    Colors.brown,
+                                    () {}),
+                                itemDashboard(
+                                    'Lịch khám',
+                                    CupertinoIcons.calendar,
+                                    Colors.indigo,
+                                    () {}),
+                                itemDashboard(
+                                    'Gói dịch vụ',
+                                    CupertinoIcons.add_circled,
+                                    Colors.teal,
+                                    () {}),
+                              ],
                             ),
                           ),
                         ],
@@ -127,7 +130,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
               const Padding(
                 padding: EdgeInsets.only(left: 15),
                 child: Text(
@@ -225,7 +227,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => AppointmentScreen(
+                                      builder: (_) => DetailDoctorScreen(
                                           snapshot.data![index])));
                             },
                             child: Container(
@@ -268,8 +270,10 @@ class _MyHomeScreen extends State<HomeScreen> {
     );
   }
 
-  itemDashboard(String title, IconData iconData, Color background) => InkWell(
-        onTap: () {},
+  itemDashboard(String title, IconData iconData, Color background,
+          Function() onTap) =>
+      InkWell(
+        onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -296,30 +300,4 @@ class _MyHomeScreen extends State<HomeScreen> {
           ),
         ),
       );
-
-  Future<String> getUrl(String fileName) async {
-    final ref = storage.ref().child('Doctors/$fileName');
-    String url = await ref.getDownloadURL();
-    return url;
-  }
-
-  Future<List<DoctorInfo>> getInfoDoctors() async {
-    final doctorDocs = await firestore
-        .collection('users')
-        .where('role', isEqualTo: 'doctor')
-        .get();
-    final doctorInfos =
-        await Future.wait(doctorDocs.docs.map((doctorDoc) async {
-      final infoRef = firestore
-          .collection('users')
-          .doc(doctorDoc.id)
-          .collection('info')
-          .get();
-      final doctorInfo = await infoRef
-          .then((value) => DoctorInfo.fromJson(value.docs.first.data()));
-      doctorInfo.image = await getUrl(doctorInfo.image);
-      return doctorInfo;
-    }));
-    return doctorInfos;
-  }
 }

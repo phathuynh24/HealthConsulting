@@ -1,24 +1,26 @@
+// ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:assist_health/functions/question.dart';
+import 'package:assist_health/models/other/question.dart';
 
 class QuestionDetailScreen extends StatefulWidget {
   final Question question;
 
-  QuestionDetailScreen({required this.question});
+  const QuestionDetailScreen({super.key, required this.question});
 
   @override
-  _QuestionDetailScreenState createState() => _QuestionDetailScreenState();
+  State<QuestionDetailScreen> createState() => _QuestionDetailScreenState();
 }
 
 class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   List<String> answers = [];
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _loadAnswers();
   }
+
   void _loadAnswers() {
     FirebaseFirestore.instance
         .collection('questions')
@@ -39,7 +41,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Question Detail'),
+        title: const Text('Question Detail'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -51,18 +53,18 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Title: ${widget.question.title}',
-                    style: TextStyle(
+                    'Chủ đề: ${widget.question.title}',
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text('Content: ${widget.question.content}'),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
+                  Text('Nội dung: ${widget.question.content}'),
+                  const SizedBox(height: 8),
                   Text(
-                    'Anonymous: ${widget.question.isAnonymous ? "Yes" : "No"}',
-                    style: TextStyle(
+                    'Tuổi: ${widget.question.age} - Giới tính: ${widget.question.gender}',
+                    style: const TextStyle(
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -72,8 +74,8 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Answers (${answers.length}):',
-                style: TextStyle(
+                'Câu trả lời (${answers.length}):',
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -81,11 +83,11 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: answers.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text('Answer ${index + 1}:'),
+                  title: Text('Câu ${index + 1}:'),
                   subtitle: Text(answers[index]),
                 );
               },
@@ -96,7 +98,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                 onPressed: () {
                   _showAnswerDialog(context);
                 },
-                child: Text('Add Answer'),
+                child: const Text('Thêm câu trả lời'),
               ),
             ),
           ],
@@ -104,49 +106,53 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       ),
     );
   }
-void _showAnswerDialog(BuildContext context) {
-  TextEditingController answerController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Add Answer'),
-        content: TextField(
-          controller: answerController,
-          decoration: InputDecoration(
-            labelText: 'Answer',
+  void _showAnswerDialog(BuildContext context) {
+    TextEditingController answerController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Thêm câu trả lời'),
+          content: TextField(
+            controller: answerController,
+            decoration: const InputDecoration(
+              labelText: 'Câu trả lời',
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String answer = answerController.text.trim();
-              if (answer.isNotEmpty) {
-                setState(() {
-                  answers.add(answer);
-                });
-                _saveAnswerToFirebase(answer); // Lưu câu trả lời vào Firestore
-              }
-              Navigator.pop(context);
-            },
-            child: Text('Submit'),
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String answer = answerController.text.trim();
+                if (answer.isNotEmpty) {
+                  setState(() {
+                    answers.add(answer);
+                  });
+                  _saveAnswerToFirebase(
+                      answer); // Lưu câu trả lời vào Firestore
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Thêm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _saveAnswerToFirebase(String answer) {
     FirebaseFirestore.instance
         .collection('questions')
-        .doc(widget.question.id) // Giả sử có trường "id" trong đối tượng Question để xác định câu hỏi cần lưu câu trả lời
+        .doc(widget.question
+            .id) // Giả sử có trường "id" trong đối tượng Question để xác định câu hỏi cần lưu câu trả lời
         .update({
       'answers': FieldValue.arrayUnion([answer])
     }).then((_) {

@@ -12,7 +12,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   int _buttonIndex = 0;
 
   final _scheduleWidgets = [
-    // Chua done
+    // Chưa xong
     const UpcomingSchedule(),
     Container(),
     Container(),
@@ -29,7 +29,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
               child: Text(
-                "Schedule",
+                "Lịch khám",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w500,
@@ -63,7 +63,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "Upcoming",
+                        "Lịch sắp tới",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

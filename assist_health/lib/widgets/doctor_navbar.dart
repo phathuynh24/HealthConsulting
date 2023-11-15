@@ -5,7 +5,7 @@ class DoctorNavBar extends StatefulWidget {
   const DoctorNavBar({super.key});
 
   @override
-  State<StatefulWidget> createState() => _DoctorNavBarState();
+  State<DoctorNavBar> createState() => _DoctorNavBarState();
 }
 
 class _DoctorNavBarState extends State<DoctorNavBar> {

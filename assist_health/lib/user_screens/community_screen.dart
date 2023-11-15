@@ -1,105 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:assist_health/functions/question.dart';
-import 'package:assist_health/user_screens/question_detail_screen.dart';
+import 'package:assist_health/models/other/question.dart';
 import 'package:assist_health/user_screens/public_questions_screen.dart';
-// class CommunityScreen extends StatefulWidget {
-//   @override
-//   _CommunityScreenState createState() => _CommunityScreenState();
-// }
 
-// class _CommunityScreenState extends State<CommunityScreen> {
-//   TextEditingController titleController = TextEditingController();
-//   TextEditingController contentController = TextEditingController();
-//   bool isAnonymous = false;
-//   int age = 18;
-//   String gender = 'Male';
-//   List<Question> questions = [];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Community'),
-//       ),
-//       body: Column(
-//         children: [
-//           CheckboxListTile(
-//             title: Text('Anonymous'),
-//             value: isAnonymous,
-//             onChanged: (value) {
-//               setState(() {
-//                 isAnonymous = value!;
-//               });
-//             },
-//           ),
-//           ListTile(
-//             title: Text('Gender'),
-//             subtitle: Row(
-//               children: [
-//                 Radio(
-//                   value: 'Male',
-//                   groupValue: gender,
-//                   onChanged: (value) {
-//                     setState(() {
-//                       gender = value.toString();
-//                     });
-//                   },
-//                 ),
-//                 Text('Male'),
-//                 Radio(
-//                   value: 'Female',
-//                   groupValue: gender,
-//                   onChanged: (value) {
-//                     setState(() {
-//                       gender = value.toString();
-//                     });
-//                   },
-//                 ),
-//                 Text('Female'),
-//               ],
-//             ),
-//           ),
-//           ListTile(
-//             title: Text('Age'),
-//             subtitle: Slider(
-//               value: age.toDouble(),
-//               min: 0,
-//               max: 100,
-//               divisions: 82,
-//               onChanged: (value) {
-//                 setState(() {
-//                   age = value.toInt();
-//                 });
-//               },
-//             ),
-//           ),
-//           TextField(
-//             controller: titleController,
-//             decoration: InputDecoration(
-//               labelText: 'Title',
-//             ),
-//           ),
-//           TextField(
-//             controller: contentController,
-//             decoration: InputDecoration(
-//               labelText: 'Content',
-//             ),
-//           ),
-//           ElevatedButton(
-//             onPressed: () {
-//               final id = DateTime.now().millisecondsSinceEpoch.toString();
-//               final question = Question(
-//                 id: id,
-//                 gender: gender,
-//                 age: age,
-//                 title: titleController.text,
-//                 content: contentController.text,
-//                 isAnonymous: isAnonymous,
-//               );
 class CommunityScreen extends StatefulWidget {
+  const CommunityScreen({super.key});
+
   @override
-  _CommunityScreenState createState() => _CommunityScreenState();
+  State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
@@ -107,41 +15,26 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
-  bool isAnonymous = true;
   int age = 18;
-  String gender = 'Male'; // Giá trị mặc định
+  String gender = 'Nam'; // Giá trị mặc định
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Community'),
+        title: const Text('Cộng đồng hỏi đáp'),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF7165D6),
       ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Text('Anonymous: '),
-                Checkbox(
-                  value: isAnonymous,
-                  onChanged: (value) {
-                    setState(() {
-                      isAnonymous = value!;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Text('Gender: '),
+                const Text('Giới tính: '),
                 Radio(
-                  value: 'Male',
+                  value: 'Nam',
                   groupValue: gender,
                   onChanged: (value) {
                     setState(() {
@@ -149,9 +42,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     });
                   },
                 ),
-                Text('Male'),
+                const Text('Nam'),
                 Radio(
-                  value: 'Female',
+                  value: 'Nữ',
                   groupValue: gender,
                   onChanged: (value) {
                     setState(() {
@@ -159,15 +52,15 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     });
                   },
                 ),
-                Text('Female'),
+                const Text('Nữ'),
               ],
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Text('Age: '),
+                const Text('Age: '),
                 Expanded(
                   child: Slider(
                     value: age.toDouble(),
@@ -186,20 +79,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
+              decoration: const InputDecoration(
+                labelText: 'Tiêu đề',
               ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: contentController,
-              decoration: InputDecoration(
-                labelText: 'Content',
+              decoration: const InputDecoration(
+                labelText: 'Nội dung',
               ),
             ),
           ),
@@ -212,17 +105,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 age: age,
                 title: titleController.text,
                 content: contentController.text,
-                isAnonymous: isAnonymous,
               );
-              FirebaseFirestore.instance
-                  .collection('questions')
-                  .doc(id)
-                  .set({
+
+              FirebaseFirestore.instance.collection('questions').doc(id).set({
                 'gender': question.gender,
                 'age': question.age,
                 'title': question.title,
                 'content': question.content,
-                'isAnonymous': question.isAnonymous,
               });
 
               FirebaseFirestore.instance
@@ -233,8 +122,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 'age': question.age,
                 'title': question.title,
                 'content': question.content,
-                'isAnonymous': question.isAnonymous,
               });
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const PublicQuestionsScreen()),
+              );
 
               setState(() {
                 questions.add(question);
@@ -243,16 +137,17 @@ class _CommunityScreenState extends State<CommunityScreen> {
               titleController.clear();
               contentController.clear();
             },
-            child: Text('Submit'),
+            child: const Text('Gửi'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PublicQuestionsScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const PublicQuestionsScreen()),
               );
             },
-            child: Text('Public Questions'),
+            child: const Text('Public Questions'),
           ),
         ],
       ),

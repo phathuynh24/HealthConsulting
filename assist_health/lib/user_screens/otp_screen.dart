@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable, avoid_print
-
 import 'package:assist_health/user_screens/phone_screen.dart';
 import 'package:assist_health/user_screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,30 +16,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final defaultPinTheme = PinTheme(
-      width: 56,
-      height: 56,
-      textStyle: const TextStyle(
-          fontSize: 20,
-          color: Color.fromRGBO(30, 60, 87, 1),
-          fontWeight: FontWeight.w600),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color.fromRGBO(234, 239, 243, 1)),
-        borderRadius: BorderRadius.circular(20),
-      ),
-    );
-
-    final focusedPinTheme = defaultPinTheme.copyDecorationWith(
-      border: Border.all(color: const Color.fromRGBO(114, 178, 238, 1)),
-      borderRadius: BorderRadius.circular(8),
-    );
-
-    final submittedPinTheme = defaultPinTheme.copyWith(
-      decoration: defaultPinTheme.decoration?.copyWith(
-        color: const Color.fromRGBO(234, 239, 243, 1),
-      ),
-    );
-
     var code = "";
 
     return Scaffold(
@@ -101,27 +75,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         backgroundColor: const Color(0xFF7165D6),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
-                    onPressed: () async {
-                      try {
-                        PhoneAuthCredential credential =
-                            PhoneAuthProvider.credential(
-                                verificationId: PhoneScreen.verify,
-                                smsCode: code);
-                        await auth.signInWithCredential(credential);
-                        await auth.currentUser!.delete();
+                    onPressed: () {
+                      PhoneAuthCredential credential =
+                          PhoneAuthProvider.credential(
+                              verificationId: PhoneScreen.verify,
+                              smsCode: code);
+                      auth.signInWithCredential(credential);
+                      auth.currentUser!.delete();
 
-                        String? phoneNumber = auth.currentUser!.phoneNumber;
-                        // ignore: use_build_context_synchronously
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
-                                settings:
-                                    RouteSettings(arguments: phoneNumber)),
-                            (route) => false);
-                      } catch (e) {
-                        print("Wrong otp");
-                      }
+                      String? phoneNumber = auth.currentUser!.phoneNumber;
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SignUpScreen(),
+                              settings: RouteSettings(arguments: phoneNumber)),
+                          (route) => false);
                     },
                     child: const Text("Verify Phone Number")),
               ),
@@ -132,7 +100,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const PhoneScreen()),
+                                builder: (_) => const PhoneScreen()),
                             (route) => false);
                       },
                       child: const Text(

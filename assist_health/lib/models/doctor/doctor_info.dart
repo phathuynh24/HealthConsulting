@@ -1,10 +1,9 @@
-// ignore_for_file: avoid_print
-
 import 'package:firebase_storage/firebase_storage.dart';
 
 final FirebaseStorage storage = FirebaseStorage.instance;
 
 class DoctorInfo {
+  String uid = '';
   String name;
   String desc;
   int avgTime;

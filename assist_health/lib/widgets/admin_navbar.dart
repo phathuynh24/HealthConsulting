@@ -5,7 +5,7 @@ class AdminNavBar extends StatefulWidget {
   const AdminNavBar({super.key});
 
   @override
-  State<StatefulWidget> createState() => _AdminNavBarState();
+  State<AdminNavBar> createState() => _AdminNavBarState();
 }
 
 class _AdminNavBarState extends State<AdminNavBar> {

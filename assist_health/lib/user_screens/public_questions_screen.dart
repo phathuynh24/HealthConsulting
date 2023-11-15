@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:assist_health/functions/question.dart';
+import 'package:assist_health/models/other/question.dart';
 import 'package:assist_health/user_screens/question_detail_screen.dart';
 
 class PublicQuestionsScreen extends StatelessWidget {
+  const PublicQuestionsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Public Questions'),
+        title: const Text('Public Questions'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('public_questions').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('public_questions')
+            .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }
@@ -29,7 +33,6 @@ class PublicQuestionsScreen extends StatelessWidget {
               age: document['age'],
               title: document['title'],
               content: document['content'],
-              isAnonymous: document['isAnonymous'],
             );
 
             questions.add(question);
@@ -39,14 +42,14 @@ class PublicQuestionsScreen extends StatelessWidget {
             itemCount: questions.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text('Question: ${questions[index].title}'),
-                subtitle: Text(
-                  'Anonymous: ${questions[index].isAnonymous ? "Yes" : "No"}'),
+                title: Text(
+                    'Tuổi: ${questions[index].age} - Giới tính: ${questions[index].gender}'),
+                subtitle: Text('Chủ đề: ${questions[index].title}'),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuestionDetailScreen(
+                      builder: (_) => QuestionDetailScreen(
                         question: questions[index],
                       ),
                     ),
