@@ -1,5 +1,5 @@
-import 'package:assist_health/user_screens/phone_screen.dart';
-import 'package:assist_health/user_screens/sign_up_screen.dart';
+import 'package:assist_health/ui/user_ui/phone.dart';
+import 'package:assist_health/ui/user_ui/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';

@@ -4,7 +4,7 @@ import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
-import 'package:assist_health/other_screens/login_screen.dart';
+import 'package:assist_health/ui/other_ui/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

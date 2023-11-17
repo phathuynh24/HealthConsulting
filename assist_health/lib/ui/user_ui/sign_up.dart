@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:assist_health/functions/methods.dart';
-import 'package:assist_health/other_screens/login_screen.dart';
+import 'package:assist_health/ui/other_ui/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

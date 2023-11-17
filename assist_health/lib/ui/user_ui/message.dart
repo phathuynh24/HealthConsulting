@@ -1,4 +1,4 @@
-import 'package:assist_health/user_screens/chatroom_screen.dart';
+import 'package:assist_health/ui/user_ui/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:assist_health/functions/methods.dart';
-import 'package:assist_health/user_screens/phone_screen.dart';
-import 'package:assist_health/widgets/user_navbar.dart';
-import 'package:assist_health/widgets/doctor_navbar.dart';
-import 'package:assist_health/widgets/admin_navbar.dart';
+import 'package:assist_health/ui/user_ui/phone.dart';
+import 'package:assist_health/ui/widgets/user_navbar.dart';
+import 'package:assist_health/ui/widgets/doctor_navbar.dart';
+import 'package:assist_health/ui/widgets/admin_navbar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _name,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    label: Text("Enter Username"),
+                    label: Text("Nhập email"),
                     prefixIcon: Icon(Icons.person),
                   ),
                 ),
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: passToggle ? true : false,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(),
-                    label: const Text("Enter Password"),
+                    label: const Text("Nhập mật khẩu"),
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: InkWell(
                       onTap: () {
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: const Center(
                       child: Text(
-                        "Log In",
+                        "Đăng nhập",
                         style: TextStyle(
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't have any account?",
+                    "Nếu bạn chưa có tài khoản?",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -177,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ));
                     },
                     child: const Text(
-                      "Sign up",
+                      "Đăng ký",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

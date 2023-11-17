@@ -1,8 +1,8 @@
-import 'package:assist_health/user_screens/register_call_step1.dart';
-import 'package:assist_health/user_screens/register_call_step2.dart';
-import 'package:assist_health/user_screens/register_call_step3.dart';
-import 'package:assist_health/user_screens/register_call_step4.dart';
-import 'package:assist_health/widgets/time_line.dart';
+import 'package:assist_health/ui/user_ui/register_call_step1.dart';
+import 'package:assist_health/ui/user_ui/register_call_step2.dart';
+import 'package:assist_health/ui/user_ui/register_call_step3.dart';
+import 'package:assist_health/ui/user_ui/register_call_step4.dart';
+import 'package:assist_health/ui/widgets/time_line.dart';
 import 'package:flutter/material.dart';
 
 class RegisterCallNavBar extends StatefulWidget {

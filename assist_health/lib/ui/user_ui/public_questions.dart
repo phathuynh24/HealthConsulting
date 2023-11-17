@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
-import 'package:assist_health/user_screens/question_detail_screen.dart';
+import 'package:assist_health/ui/user_ui/question_detail.dart';
 
 class PublicQuestionsScreen extends StatelessWidget {
   const PublicQuestionsScreen({super.key});

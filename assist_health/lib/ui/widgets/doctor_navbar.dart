@@ -1,34 +1,25 @@
-import 'package:assist_health/user_screens/community_screen.dart';
-import 'package:assist_health/user_screens/home_screen.dart';
-import 'package:assist_health/user_screens/message_screen.dart';
-import 'package:assist_health/user_screens/schedule_screen.dart';
-import 'package:assist_health/user_screens/settings_screen.dart';
-import 'package:assist_health/user_screens/health_profile.dart';
+import 'package:assist_health/ui/doctor_ui/set_schedule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class UserNavBar extends StatefulWidget {
-  const UserNavBar({super.key});
+class DoctorNavBar extends StatefulWidget {
+  const DoctorNavBar({super.key});
 
   @override
-  State<UserNavBar> createState() => _UserNavBarState();
+  State<DoctorNavBar> createState() => _DoctorNavBarState();
 }
 
-class _UserNavBarState extends State<UserNavBar> {
+class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
-    // Home Screen
-    const HomeScreen(),
-    // Messages Screen
-    const MessageScreen(),
-    // Public Chat Screen
-    const CommunityScreen(),
-    // Schedule Screen
-    const ScheduleScreen(),
-    //Profile
-    HealthProfileScreen(),
-    //Setting Screen
-    const SettingScreen(),
+    // Screen 1
+    const SetScheduleScreen(),
+    // Screen 2
+    Container(),
+    // Screen 3
+    Container(),
+    // Screen 4
+    Container(),
   ];
 
   @override
@@ -56,27 +47,19 @@ class _UserNavBarState extends State<UserNavBar> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),
-              label: "Trang chủ",
+              label: "Home",
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-              label: "Nhắn tin",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_3),
-              label: "Cộng đồng",
+              label: "Messages",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
-              label: "Lịch khám",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.health_and_safety),
-              label: "Hồ sơ",
+              label: "Schedule",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
-              label: "Cài đặt",
+              label: "Settings",
             ),
           ],
         ),

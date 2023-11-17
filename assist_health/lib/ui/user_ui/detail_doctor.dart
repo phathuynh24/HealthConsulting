@@ -2,8 +2,8 @@ import 'package:assist_health/functions/Methods.dart';
 import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
-import 'package:assist_health/user_screens/message_screen.dart';
-import 'package:assist_health/widgets/register_call_navbar.dart';
+import 'package:assist_health/ui/user_ui/message.dart';
+import 'package:assist_health/ui/widgets/register_call_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 

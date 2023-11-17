@@ -1,8 +1,8 @@
 import 'package:assist_health/functions/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/user_screens/detail_doctor_screen.dart';
-import 'package:assist_health/user_screens/list_doctor_screen.dart';
-import 'package:assist_health/widgets/doctor_popular_card.dart';
+import 'package:assist_health/ui/user_ui/detail_doctor.dart';
+import 'package:assist_health/ui/user_ui/list_doctor.dart';
+import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';

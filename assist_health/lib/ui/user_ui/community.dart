@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
-import 'package:assist_health/user_screens/public_questions_screen.dart';
+import 'package:assist_health/ui/user_ui/public_questions.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});

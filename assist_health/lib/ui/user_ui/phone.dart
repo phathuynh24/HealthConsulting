@@ -1,7 +1,7 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/user_screens/otp_screen.dart';
+import 'package:assist_health/ui/user_ui/otp.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});

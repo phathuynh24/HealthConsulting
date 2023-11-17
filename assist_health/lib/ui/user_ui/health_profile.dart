@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
-import 'package:photo_view/photo_view.dart';
 
 class HealthProfileScreen extends StatefulWidget {
   const HealthProfileScreen({super.key});
@@ -288,14 +287,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         filePath.endsWith('.jpeg') ||
         filePath.endsWith('.png')) {
       // Mở file hình ảnh
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PhotoView(
-            imageProvider: FileImage(file),
-          ),
-        ),
-      );
+      OpenFile.open(file.path);
     } else {
       // Xử lý các định dạng khác tùy thuộc vào nhu cầu của bạn
       // ...
