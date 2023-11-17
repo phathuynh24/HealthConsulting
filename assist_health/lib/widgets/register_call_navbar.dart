@@ -1,6 +1,7 @@
-import 'package:assist_health/user_screens/register_call_first.dart';
-import 'package:assist_health/user_screens/register_call_second%20copy.dart';
-import 'package:assist_health/user_screens/register_call_second.dart';
+import 'package:assist_health/user_screens/register_call_step1.dart';
+import 'package:assist_health/user_screens/register_call_step2.dart';
+import 'package:assist_health/user_screens/register_call_step3.dart';
+import 'package:assist_health/user_screens/register_call_step4.dart';
 import 'package:assist_health/widgets/time_line.dart';
 import 'package:flutter/material.dart';
 
@@ -22,11 +23,13 @@ class _RegisterCallNavBar extends State<RegisterCallNavBar> {
     super.initState();
     _screens = [
       // Step 1
-      RegisterCallFist(widget.uid),
+      RegisterCallStep1(widget.uid),
       // Step 2
-      RegisterCallSecond(widget.uid),
+      RegisterCallStep2(widget.uid),
       // Step 3
-      RegisterCallThird(widget.uid),
+      RegisterCallStep3(widget.uid),
+      // Step 4
+      RegisterCallStep4(widget.uid),
     ];
   }
 

@@ -9,11 +9,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:photo_view/photo_view.dart';
 
-
 class HealthProfileScreen extends StatefulWidget {
+  const HealthProfileScreen({super.key});
+
   @override
   _HealthProfileScreenState createState() => _HealthProfileScreenState();
 }
+
 class Vaccination {
   final String name;
   final String date;
@@ -25,6 +27,7 @@ class LabTestResult {
   final String filePath;
   LabTestResult({required this.name, required this.filePath});
 }
+
 class _HealthProfileScreenState extends State<HealthProfileScreen> {
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
@@ -38,265 +41,266 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
   File? selectedImage;
   List<File> selectedFiles = [];
   @override
-   void initState() {
+  void initState() {
     super.initState();
-    
+
     // Gọi phương thức để tải dữ liệu từ Firebase khi trang được khởi tạo
     loadDataFromFirestore();
   }
+
   @override
   void dispose() {
-  weightController.dispose();
-  heightController.dispose();
-  bloodPressureController.dispose();
-  temperatureController.dispose();
-  super.dispose();
+    weightController.dispose();
+    heightController.dispose();
+    bloodPressureController.dispose();
+    temperatureController.dispose();
+    super.dispose();
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Health Profile'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Upload Photo',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+        appBar: AppBar(
+          title: Text('Health Profile'),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Upload Photo',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  pickImage();
-                },
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  color: Colors.grey,
-                  child: selectedImage != null
-                      ? Image.file(selectedImage!, fit: BoxFit.cover)
-                      : Icon(Icons.camera_alt, color: Colors.white),
+                SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () {
+                    pickImage();
+                  },
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey,
+                    child: selectedImage != null
+                        ? Image.file(selectedImage!, fit: BoxFit.cover)
+                        : Icon(Icons.camera_alt, color: Colors.white),
+                  ),
                 ),
-              ),
 
-              SizedBox(height: 16),
+                SizedBox(height: 16),
 
-              Text(
-                'Weight (kg)',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                Text(
+                  'Weight (kg)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              TextField(
-                controller: weightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Enter weight',
+                SizedBox(height: 8),
+                TextField(
+                  controller: weightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Enter weight',
+                  ),
                 ),
-              ),
 
-              SizedBox(height: 8),
+                SizedBox(height: 8),
 
-              Text(
-                'Height (cm)',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                Text(
+                  'Height (cm)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              TextField(
-                controller: heightController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Enter height',
+                SizedBox(height: 8),
+                TextField(
+                  controller: heightController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Enter height',
+                  ),
                 ),
-              ),
 
-              SizedBox(height: 16),
+                SizedBox(height: 16),
 
-              ElevatedButton(
-                onPressed: () {
-                  calculateBMI();
-                },
-                child: Text('Calculate BMI'),
-              ),
-
-              SizedBox(height: 16),
-
-              Text(
-                'BMI: ${bmi.toStringAsFixed(1)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                ElevatedButton(
+                  onPressed: () {
+                    calculateBMI();
+                  },
+                  child: Text('Calculate BMI'),
                 ),
-              ),
 
-              Text(
-                'BMI Status: $bmiStatus',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
+                SizedBox(height: 16),
 
-              SizedBox(height: 16),
+                Text(
+                  'BMI: ${bmi.toStringAsFixed(1)}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
 
-              Text(
-                'Blood Pressure',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                Text(
+                  'BMI Status: $bmiStatus',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              // Add blood pressure input fields (using TextFields)
-              TextField(
-                controller: bloodPressureController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Enter blood pressure',
-                ),
-              ),
-              SizedBox(height: 16),
 
-              Text(
-                'Temperature',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              SizedBox(height: 8),
-              // Add temperature input field (using TextField)
-               TextField(
-                controller: temperatureController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Enter temperature',
-                ),
-              ),
-              SizedBox(height: 16),
+                SizedBox(height: 16),
 
-              Text(
-                'Vaccination History',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                Text(
+                  'Blood Pressure',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  addVaccination();
-                },
-                child: Text('Add Vaccination'),
-              ),
-              SizedBox(height: 8),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: vaccinations.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(vaccinations[index].name),
-                    subtitle: Text(vaccinations[index].date),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          vaccinations.removeAt(index);
-                        });
-                      },
-                    ),
-                  );
-                },
-              ),
-
-              SizedBox(height: 16),
-
-              Text(
-                'Lab Test Results',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                SizedBox(height: 8),
+                // Add blood pressure input fields (using TextFields)
+                TextField(
+                  controller: bloodPressureController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Enter blood pressure',
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  pickFiles();
-                },
-                child: Text('Pick Files'),
-              ),
-              SizedBox(height: 8),
-              ListView.builder(
-              shrinkWrap: true,
-              itemCount: selectedFiles.length,
-              itemBuilder: (context, index) {
-              return ListTile(
-              title: GestureDetector(
-              onTap: () {
-                openFile(selectedFiles[index]);
-              },
-              child: Text(selectedFiles[index].path),
-              ),
-              trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-              setState(() {
-                selectedFiles.removeAt(index);
-              });
-            },
-          ),
-          );
-        },
-      ),          
-              ElevatedButton(
-                onPressed: (){
-                  saveDataToFirestore();
-                },
-                 child: Text('Save'))
+                SizedBox(height: 16),
+
+                Text(
+                  'Temperature',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: 8),
+                // Add temperature input field (using TextField)
+                TextField(
+                  controller: temperatureController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Enter temperature',
+                  ),
+                ),
+                SizedBox(height: 16),
+
+                Text(
+                  'Vaccination History',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    addVaccination();
+                  },
+                  child: Text('Add Vaccination'),
+                ),
+                SizedBox(height: 8),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: vaccinations.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(vaccinations[index].name),
+                      subtitle: Text(vaccinations[index].date),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            vaccinations.removeAt(index);
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+
+                SizedBox(height: 16),
+
+                Text(
+                  'Lab Test Results',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    pickFiles();
+                  },
+                  child: Text('Pick Files'),
+                ),
+                SizedBox(height: 8),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: selectedFiles.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: GestureDetector(
+                        onTap: () {
+                          openFile(selectedFiles[index]);
+                        },
+                        child: Text(selectedFiles[index].path),
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            selectedFiles.removeAt(index);
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      saveDataToFirestore();
+                    },
+                    child: Text('Save'))
               ],
             ),
           ),
-        )
-    );
+        ));
   }
-  void openFile(File file) {
-  String filePath = file.path.toLowerCase();
 
-  // Kiểm tra định dạng của file và mở tương ứng
-  if (filePath.endsWith('.txt')) {
-    // Mở file văn bản
-    OpenFile.open(file.path);
-    // OpenFile.openText(file.path);
-  } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.png')) {
-    // Mở file hình ảnh
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PhotoView(
-          imageProvider: FileImage(file),
+  void openFile(File file) {
+    String filePath = file.path.toLowerCase();
+
+    // Kiểm tra định dạng của file và mở tương ứng
+    if (filePath.endsWith('.txt')) {
+      // Mở file văn bản
+      OpenFile.open(file.path);
+      // OpenFile.openText(file.path);
+    } else if (filePath.endsWith('.jpg') ||
+        filePath.endsWith('.jpeg') ||
+        filePath.endsWith('.png')) {
+      // Mở file hình ảnh
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoView(
+            imageProvider: FileImage(file),
+          ),
         ),
-      ),
-    );
-  } else {
-    // Xử lý các định dạng khác tùy thuộc vào nhu cầu của bạn
-    // ...
+      );
+    } else {
+      // Xử lý các định dạng khác tùy thuộc vào nhu cầu của bạn
+      // ...
+    }
   }
-}
 
   void pickImage() async {
     final picker = ImagePicker();
@@ -327,12 +331,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
       });
     }
   }
-   void loadDataFromFirestore() async {
+
+  void loadDataFromFirestore() async {
     try {
       final firestore = FirebaseFirestore.instance;
 
       // Truy vấn document mới nhất trong collection "health_profiles"
-      QuerySnapshot snapshot = await firestore.collection('health_profiles').get();
+      QuerySnapshot snapshot =
+          await firestore.collection('health_profiles').get();
       // Kiểm tra xem có document nào hay không
       if (snapshot.docs.isNotEmpty) {
         // Lấy document đầu tiên
@@ -356,7 +362,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             selectedImage = imageFile;
           });
         }
-        
+
         // Kiểm tra và tải danh sách các file từ Firestore
         if (document['fileURLs'] != null) {
           List<String> fileURLs = List<String>.from(document['fileURLs']);
@@ -374,46 +380,45 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             selectedFiles = files;
           });
         }
-         // Kiểm tra và tải danh sách lịch sử tiêm chủng từ Firestore
-  //  if (document['vaccinations'] != null) {
-      List<Map<String, dynamic>> vaccinationsData =
-          List<Map<String, dynamic>>.from(document['vaccinations']);
+        // Kiểm tra và tải danh sách lịch sử tiêm chủng từ Firestore
+        //  if (document['vaccinations'] != null) {
+        List<Map<String, dynamic>> vaccinationsData =
+            List<Map<String, dynamic>>.from(document['vaccinations']);
 
-      List<Vaccination> loadedVaccinations = vaccinationsData
-          .map((data) => Vaccination(
-                name: data['name'],
-                date: data['date'],
-              ))
-          .toList();
+        List<Vaccination> loadedVaccinations = vaccinationsData
+            .map((data) => Vaccination(
+                  name: data['name'],
+                  date: data['date'],
+                ))
+            .toList();
 
-      // Cập nhật danh sách lịch sử tiêm chủng
-      setState(() {
-        vaccinations = loadedVaccinations;
-      });
-     }
-   // }
-    // else {
-    //   showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         title: Text('No Data'),
-    //         content: Text('No data available.'),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: Text('OK'),
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    // }
-  } catch (error) {
+        // Cập nhật danh sách lịch sử tiêm chủng
+        setState(() {
+          vaccinations = loadedVaccinations;
+        });
+      }
+      // }
+      // else {
+      //   showDialog(
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return AlertDialog(
+      //         title: Text('No Data'),
+      //         content: Text('No data available.'),
+      //         actions: [
+      //           TextButton(
+      //             onPressed: () {
+      //               Navigator.of(context).pop();
+      //             },
+      //             child: Text('OK'),
+      //           ),
+      //         ],
+      //       );
+      //     },
+      //   );
+      // }
+    } catch (error) {
       showDialog(
-       
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -450,12 +455,8 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     await file.writeAsBytes(response.bodyBytes);
     return file;
   }
-  
 
-
-
-
-void saveDataToFirestore() async {
+  void saveDataToFirestore() async {
     try {
       final firestore = FirebaseFirestore.instance;
 
@@ -466,23 +467,29 @@ void saveDataToFirestore() async {
       String temperature = temperatureController.text;
 
       // Tạo một document mới trong collection "health_profiles"
-      DocumentReference documentRef = await firestore.collection('health_profiles').add({
+      DocumentReference documentRef =
+          await firestore.collection('health_profiles').add({
         'weight': weight,
         'height': height,
         'bloodPressure': bloodPressure,
         'temperature': temperature,
-        'vaccinations': vaccinations.map((vaccination) => {
-        'name': vaccination.name,
-        'date': vaccination.date,
-  }).toList(),
+        'vaccinations': vaccinations
+            .map((vaccination) => {
+                  'name': vaccination.name,
+                  'date': vaccination.date,
+                })
+            .toList(),
       });
-          // Lưu trữ vaccinations vào subcollection "vaccinations" của document mới được tạo
-     
+      // Lưu trữ vaccinations vào subcollection "vaccinations" của document mới được tạo
+
       // Lưu trữ hình ảnh vào Firebase Storage và lấy URL của hình ảnh đã lưu
       if (selectedImage != null) {
-        Reference imageReference = FirebaseStorage.instance.ref().child('images/${DateTime.now()}.png');
+        Reference imageReference = FirebaseStorage.instance
+            .ref()
+            .child('images/${DateTime.now()}.png');
         UploadTask uploadTask = imageReference.putFile(selectedImage!);
-        TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() => null);
+        TaskSnapshot storageTaskSnapshot =
+            await uploadTask.whenComplete(() => null);
         String imageURL = await storageTaskSnapshot.ref.getDownloadURL();
 
         // Cập nhật URL của hình ảnh đã lưu vào Firestore
@@ -492,9 +499,11 @@ void saveDataToFirestore() async {
       // Lưu trữ các tệp vào Firebase Storage và lấy URL của các tệp đã lưu
       List<String> fileURLs = [];
       for (var selectedFile in selectedFiles) {
-        Reference fileReference = FirebaseStorage.instance.ref().child('files/${DateTime.now()}_${selectedFile.path.split('/').last}');
+        Reference fileReference = FirebaseStorage.instance.ref().child(
+            'files/${DateTime.now()}_${selectedFile.path.split('/').last}');
         UploadTask uploadTask = fileReference.putFile(selectedFile);
-        TaskSnapshot storageTaskSnapshot = await uploadTask.whenComplete(() => null);
+        TaskSnapshot storageTaskSnapshot =
+            await uploadTask.whenComplete(() => null);
         String fileURL = await storageTaskSnapshot.ref.getDownloadURL();
         fileURLs.add(fileURL);
       }
@@ -542,21 +551,18 @@ void saveDataToFirestore() async {
     }
   }
 
+  void addVaccination() async {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    DateTime currentDate = DateTime.now();
 
-void addVaccination() async {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
-  DateTime currentDate = DateTime.now();
+    DateTime? selectedDate;
 
-  DateTime? selectedDate;
-
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Add Vaccination'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Add Vaccination'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
           TextField(
             controller: nameController,
             decoration: InputDecoration(
@@ -572,7 +578,7 @@ void addVaccination() async {
                 firstDate: DateTime(1900),
                 lastDate: DateTime(2100),
               );
-               // Update the text field when a date is selected
+              // Update the text field when a date is selected
               if (selectedDate != null) {
                 dateController.text =
                     selectedDate!.toLocal().toString().split(' ')[0];
@@ -586,47 +592,44 @@ void addVaccination() async {
                   suffixIcon: Icon(Icons.calendar_today),
                 ),
                 controller: dateController,
-                ),
               ),
             ),
-        ]
+          ),
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (selectedDate != null) {
+                setState(() {
+                  vaccinations.add(
+                    Vaccination(
+                      name: nameController.text,
+                      date: selectedDate!.toLocal().toString().split(' ')[0],
+                    ),
+                  );
+                  Navigator.pop(context);
+                });
+              }
+            },
+            child: Text('Add'),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () {
-            if (selectedDate != null) {
-              setState(() {
-                vaccinations.add(
-                  Vaccination(
-                    name: nameController.text,
-                    date: selectedDate!.toLocal().toString().split(' ')[0],
-                  ),
-                );
-                Navigator.pop(context);
-              });
-            }
-          },
-          child: Text('Add'),
-        ),
-      ],
-    ),
-  );
-}
-
-  void pickFiles() async {
-  final result = await FilePicker.platform.pickFiles(allowMultiple: true);
-  if (result != null) {
-    setState(() {
-      selectedFiles.addAll(result.paths.map((path) => File(path!)));
-        });
-      }
-    }
+    );
   }
 
-
+  void pickFiles() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    if (result != null) {
+      setState(() {
+        selectedFiles.addAll(result.paths.map((path) => File(path!)));
+      });
+    }
+  }
+}
