@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_ui/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,51 +24,26 @@ class _MessageScreenState extends State<MessageScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // setStatus("online");
-    _auth.authStateChanges().listen((User? user) {
-      if (user != null) {
-        // User is signed in, update status to "online"
-        setStatus("online");
-      } else {
-        // User is signed out, update status to "offline"
-        setStatus("offline");
-      }
-    });
+    setStatus("online");
     onLoadDoctors();
   }
 
-  // void setStatus(String status) async {
-  //   await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
-  //     "status": status,
-  //   });
-  // }
-    void setStatus(String status) async {
-    if (_auth.currentUser != null) {
-      await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .update({
-        "status": status,
-      });
-    }
+  void setStatus(String status) async {
+    await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+      "status": status,
+    });
   }
 
-  
   @override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-  if (state == AppLifecycleState.resumed) {
-    // App is in the foreground, user is online
-    if (_auth.currentUser != null) {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // online
       setStatus("online");
-    }
-  } else {
-    // App is in the background, user is considered offline
-    if (_auth.currentUser != null) {
+    } else {
+      // offline
       setStatus("offline");
     }
   }
-}
-
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
@@ -135,35 +111,17 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
       }
     });
   }
-  //online offline
-  Color getStatusDotColor(bool isOnline) {
-  return isOnline ? Colors.green : Colors.red;
-}
-
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-   
-    appBar: AppBar(
-  title: const Text("Hỏi đáp riêng cùng bác sĩ"),
-  centerTitle: true,
-  backgroundColor: const Color(0xFF7165D6),
-  leading: CircleAvatar(
-    backgroundImage: NetworkImage("URL_TO_USER_PROFILE_IMAGE"),
-  ),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.search),
-      onPressed: () {
-        // Implement search functionality
-      },
-    ),
-  ],
-),
-
+      appBar: AppBar(
+        title: const Text("Hỏi đáp riêng cùng bác sĩ"),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF7165D6),
+      ),
       body: isLoading
           ? Center(
               child: SizedBox(
@@ -189,13 +147,10 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
                       onSubmitted: (value) {
                         onSearch();
                       },
-                  
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
                         hintText: "Tìm kiếm...",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: const Color(0xFF7165D6)),
                         ),
                       ),
                     ),
@@ -204,19 +159,11 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
                 SizedBox(
                   height: size.height / 50,
                 ),
-       
-                  ElevatedButton(
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: const Color(0xFF7165D6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                      backgroundColor: const Color(0xFF7165D6)),
                   onPressed: onSearch,
-                  child: const Text(
-                    "Tìm kiếm",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text("Tìm kiếm"),
                 ),
                 SizedBox(
                   height: size.height / 30,
@@ -239,26 +186,8 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
                             ),
                           );
                         },
-                        leading: Stack(
-    children: [
-      CircleAvatar(
-        backgroundImage:
-            NetworkImage("URL_TO_DOCTOR_PROFILE_IMAGE"),
-      ),
-      Positioned(
-        bottom: 0,
-        right: 0,
-        child: Container(
-          height: 12,
-          width: 12,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: getStatusDotColor(doctor['status'] == 'online'),
-          ),
-        ),
-      ),
-    ],
-  ),
+                        leading:
+                            const Icon(Icons.account_box, color: Colors.black),
                         title: Text(
                           doctor['name'],
                           style: const TextStyle(

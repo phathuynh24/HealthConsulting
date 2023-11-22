@@ -1,7 +1,8 @@
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/ui/user_ui/detail_doctor.dart';
-import 'package:assist_health/ui/user_ui/list_doctor.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/detail_doctor.dart';
+import 'package:assist_health/ui/user_screens/list_doctor.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -37,6 +38,7 @@ class _MyHomeScreen extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(top: 40),
@@ -75,7 +77,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                               horizontal: 10,
                             ),
                             decoration: const BoxDecoration(
-                              color: Colors.white,
+                              color: Themes.backgroundClr,
                             ),
                             child: GridView.count(
                               shrinkWrap: true,
@@ -88,7 +90,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 itemDashboard(
                                     'Tư vấn online',
                                     CupertinoIcons.play_rectangle,
-                                    Colors.deepOrange, () {
+                                    Themes.selectedClr, () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -99,27 +101,27 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 itemDashboard(
                                     'Hỏi riêng bác sĩ',
                                     CupertinoIcons.graph_circle,
-                                    Colors.green,
+                                    Themes.selectedClr,
                                     () {}),
                                 itemDashboard(
                                     'Hồ sơ sức khỏe',
                                     CupertinoIcons.person_2,
-                                    Colors.purple,
+                                    Themes.selectedClr,
                                     () {}),
                                 itemDashboard(
                                     'Cộng đồng',
                                     CupertinoIcons.chat_bubble_2,
-                                    Colors.brown,
+                                    Themes.selectedClr,
                                     () {}),
                                 itemDashboard(
                                     'Lịch khám',
                                     CupertinoIcons.calendar,
-                                    Colors.indigo,
+                                    Themes.selectedClr,
                                     () {}),
                                 itemDashboard(
                                     'Gói dịch vụ',
                                     CupertinoIcons.add_circled,
-                                    Colors.teal,
+                                    Themes.selectedClr,
                                     () {}),
                               ],
                             ),
@@ -153,7 +155,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                           horizontal: 15, vertical: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF4F6FA),
+                        color: Themes.highlightClr,
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: const [
                           BoxShadow(
@@ -191,7 +193,7 @@ class _MyHomeScreen extends State<HomeScreen> {
               ),
               FutureBuilder<List<DoctorInfo>>(
                 future: getInfoDoctors(),
-                builder: (context, snapshot) {
+                builder: (_, snapshot) {
                   if (snapshot.hasError) {
                     return const SizedBox(
                         height: 290,

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
@@ -40,8 +41,10 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Question Detail'),
+        backgroundColor: Themes.hearderClr,
       ),
       body: SingleChildScrollView(
         child: Column(

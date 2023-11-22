@@ -1,7 +1,8 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
-import 'package:assist_health/ui/user_ui/question_detail.dart';
+import 'package:assist_health/ui/user_screens/question_detail.dart';
 
 class PublicQuestionsScreen extends StatelessWidget {
   const PublicQuestionsScreen({super.key});
@@ -9,8 +10,10 @@ class PublicQuestionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Public Questions'),
+        backgroundColor: Themes.hearderClr,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance

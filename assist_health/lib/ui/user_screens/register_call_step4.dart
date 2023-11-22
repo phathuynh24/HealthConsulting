@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -78,10 +79,11 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Đăng ký dịch vụ'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF7165D6),
+        backgroundColor: Themes.hearderClr,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -148,7 +150,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                 },
                                 child: CircleAvatar(
                                   backgroundColor: (_selectedField == index)
-                                      ? Colors.purple
+                                      ? Themes.selectedClr
                                       : Colors.black45,
                                   radius: 12,
                                   child: const Icon(
@@ -277,7 +279,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                               });
                             },
                             child: const CircleAvatar(
-                              backgroundColor: Colors.purple,
+                              backgroundColor: Themes.iconClr,
                               radius: 12,
                               child: Icon(
                                 Icons.close,

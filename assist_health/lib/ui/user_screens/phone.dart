@@ -1,7 +1,8 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/ui/user_ui/otp.dart';
+import 'package:assist_health/ui/user_screens/otp.dart';
 
 class PhoneScreen extends StatefulWidget {
   const PhoneScreen({super.key});
@@ -32,6 +33,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       body: Container(
         margin: const EdgeInsets.only(left: 25, right: 25),
         alignment: Alignment.center,
@@ -59,7 +61,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
               ),
               const SizedBox(height: 30),
               TextFormField(
-                cursorColor: Colors.purple,
+                cursorColor: Themes.highlightClr,
                 controller: phoneController,
                 style: const TextStyle(
                   fontSize: 18,
@@ -119,11 +121,11 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           margin: const EdgeInsets.all(10.0),
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFF7165D6),
+                            color: Themes.buttonClr,
                           ),
                           child: const Icon(
                             Icons.done,
-                            color: Colors.white,
+                            color: Themes.iconClr,
                             size: 20,
                           ),
                         )
@@ -136,7 +138,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                 height: 45,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7165D6),
+                        backgroundColor: Themes.buttonClr,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
                     onPressed: () async {

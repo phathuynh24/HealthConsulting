@@ -1,7 +1,8 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
-import 'package:assist_health/ui/user_ui/public_questions.dart';
+import 'package:assist_health/ui/user_screens/public_questions.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -21,10 +22,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Cộng đồng hỏi đáp'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF7165D6),
+        backgroundColor: Themes.hearderClr,
       ),
       body: Column(
         children: [

@@ -15,7 +15,7 @@ class MyInputField extends StatelessWidget {
   @override
   Widget build(Object context) {
     return Container(
-      margin: EdgeInsets.only(
+      margin: const EdgeInsets.only(
         top: 16,
       ),
       child: Column(
@@ -26,12 +26,15 @@ class MyInputField extends StatelessWidget {
           ),
           Container(
             height: 52,
-            margin: EdgeInsets.only(top: 8.0),
+            margin: const EdgeInsets.only(top: 8.0),
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey, width: 1.0),
                 borderRadius: BorderRadius.circular(12)),
             child: Row(
               children: [
+                const SizedBox(
+                  width: 10,
+                ),
                 Expanded(
                   child: TextFormField(
                     readOnly: widget == null ? false : true,
@@ -40,18 +43,10 @@ class MyInputField extends StatelessWidget {
                     controller: controller,
                     decoration: InputDecoration(
                       hintText: hint,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 0,
-                        ),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.grey,
-                          width: 0,
-                        ),
-                      ),
+                      focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none),
+                      enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide.none),
                     ),
                   ),
                 ),

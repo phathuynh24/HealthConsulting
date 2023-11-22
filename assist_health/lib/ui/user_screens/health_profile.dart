@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -59,8 +60,10 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Themes.backgroundClr,
         appBar: AppBar(
           title: Text('Health Profile'),
+          backgroundColor: Themes.hearderClr,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -86,7 +89,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     color: Colors.grey,
                     child: selectedImage != null
                         ? Image.file(selectedImage!, fit: BoxFit.cover)
-                        : Icon(Icons.camera_alt, color: Colors.white),
+                        : Icon(Icons.camera_alt, color: Themes.iconClr),
                   ),
                 ),
 
@@ -129,6 +132,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                 SizedBox(height: 16),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Themes.buttonClr,
+                  ),
                   onPressed: () {
                     calculateBMI();
                   },
@@ -200,6 +206,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                 ),
                 SizedBox(height: 8),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Themes.buttonClr,
+                  ),
                   onPressed: () {
                     addVaccination();
                   },
@@ -236,6 +245,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                 ),
                 SizedBox(height: 8),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Themes.buttonClr,
+                  ),
                   onPressed: () {
                     pickFiles();
                   },
@@ -265,6 +277,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   },
                 ),
                 ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Themes.buttonClr,
+                    ),
                     onPressed: () {
                       saveDataToFirestore();
                     },

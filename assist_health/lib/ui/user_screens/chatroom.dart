@@ -1,12 +1,14 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
+import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 
 class ChatRoom extends StatefulWidget {
   final Map<String, dynamic> userMap;
@@ -22,9 +24,7 @@ class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final ScrollController _scrollController = ScrollController();
-  
-  List<Asset> _images = [];
+
   File? imageFile;
 
   Future getImage() async {
@@ -107,29 +107,28 @@ class _ChatRoomState extends State<ChatRoom> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: StreamBuilder<DocumentSnapshot>(
           stream: _firestore
               .collection("users")
               .doc(widget.userMap['uid'])
               .snapshots(),
-         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var userData = snapshot.data!.data() as Map<String, dynamic>;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.userMap['name']),
-                Text(
-                  userData['status'],
-                  style: const TextStyle(fontSize: 14),
+          builder: (context, snapshot) {
+            if (snapshot.data != null) {
+              return Scaffold(
+                body: Column(
+                  children: [
+                    Text(widget.userMap['name']),
+                    Text(
+                      snapshot.data!['status'],
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          } else {
-            return Container();
-          }
+              );
+            } else {
+              return Container();
+            }
           },
         ),
       ),
@@ -163,100 +162,98 @@ class _ChatRoomState extends State<ChatRoom> {
                 },
               ),
             ),
-              Container(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25)
+            Container(
+              height: size.height / 10,
+              width: size.width,
+              alignment: Alignment.center,
+              child: SizedBox(
+                height: size.height / 12,
+                width: size.width / 1.1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: size.height / 17,
+                      width: size.width / 1.3,
+                      child: TextField(
+                        controller: _message,
+                        decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: () => getImage(),
+                              icon: const Icon(Icons.photo),
+                            ),
+                            hintText: "Send Message",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            )),
+                      ),
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.send), onPressed: onSendMessage),
+                  ],
+                ),
               ),
             ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: getImage,
-                  icon: const Icon(Icons.image),
-                  color: Colors.blue,
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _message,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message...',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: onSendMessage,
-                  icon: const Icon(Icons.send),
-                  color: Colors.blue,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
   Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
-  final isSentByMe = map['sendby'] == _auth.currentUser!.displayName;
-  
-  return map['type'] == "text"
-      ? Container(
-          width: size.width,
-          alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: isSentByMe ? Colors.blue : Color.fromARGB(255, 231, 223, 223), // Customize the colors here
-            ),
-            child: Text(
-              map['message'],
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isSentByMe ? Colors.white : Colors.black, // Customize the text color here
+    return map['type'] == "text"
+        ? Container(
+            width: size.width,
+            alignment: map['sendby'] == _auth.currentUser!.displayName
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.blue,
               ),
-            ),
-          ),
-        )
-      : Container(
-          height: size.height / 2.5,
-          width: size.width,
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-          alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: InkWell(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ShowImage(
-                  imageUrl: map['message'],
+              child: Text(
+                map['message'],
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
               ),
             ),
-            child: Container(
-              height: size.height / 2.5,
-              width: size.width / 2,
-              decoration: BoxDecoration(border: Border.all()),
-              alignment: map['message'] != "" ? null : Alignment.center,
-              child: map['message'] != ""
-                  ? Image.network(
-                      map['message'],
-                      fit: BoxFit.cover,
-                    )
-                  : const CircularProgressIndicator(),
+          )
+        : Container(
+            height: size.height / 2.5,
+            width: size.width,
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            alignment: map['sendby'] == _auth.currentUser!.displayName
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ShowImage(
+                    imageUrl: map['message'],
+                  ),
+                ),
+              ),
+              child: Container(
+                height: size.height / 2.5,
+                width: size.width / 2,
+                decoration: BoxDecoration(border: Border.all()),
+                alignment: map['message'] != "" ? null : Alignment.center,
+                child: map['message'] != ""
+                    ? Image.network(
+                        map['message'],
+                        fit: BoxFit.cover,
+                      )
+                    : const CircularProgressIndicator(),
+              ),
             ),
-          ),
-        );
-}
-
+          );
+  }
 }
 
 class ShowImage extends StatelessWidget {

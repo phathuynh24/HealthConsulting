@@ -1,8 +1,9 @@
-import 'package:assist_health/functions/Methods.dart';
+import 'package:assist_health/others/Methods.dart';
 import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
-import 'package:assist_health/ui/user_ui/message.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/widgets/register_call_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Themes.backgroundClr,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -78,7 +79,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF7165D6),
+                              color: Themes.buttonClr,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Center(
@@ -203,10 +204,9 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                     padding: const EdgeInsets.all(10),
                     margin: const EdgeInsets.only(right: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF9F9FFF),
+                      color: Themes.primaryColor,
                       borderRadius: BorderRadius.circular(10),
-                      border:
-                          Border.all(width: 1, color: const Color(0xFF7165D6)),
+                      border: Border.all(width: 1, color: Themes.hearderClr),
                     ),
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -217,7 +217,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                             textAlign: TextAlign.justify,
                             style: const TextStyle(
                               fontSize: 18,
-                              color: Colors.black87,
+                              color: Colors.black,
                             ),
                           ),
                         ]),
@@ -245,7 +245,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                             child: const Text(
                               "Xem tất cả",
                               style: TextStyle(
-                                color: Color(0xFF7165D6),
+                                color: Themes.buttonClr,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
                               ),
@@ -588,7 +588,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                           ),
                           child: const Icon(
                             Icons.location_on,
-                            color: Color(0xFF7165D6),
+                            color: Themes.iconClr,
                             size: 30,
                           ),
                         ),
@@ -650,7 +650,7 @@ class BottomSheetContent extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
-                color: const Color(0xFF7165D6),
+                color: Themes.buttonClr,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(
@@ -675,7 +675,7 @@ class BottomSheetContent extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
-                color: const Color(0xFF7165D6),
+                color: Themes.buttonClr,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Center(

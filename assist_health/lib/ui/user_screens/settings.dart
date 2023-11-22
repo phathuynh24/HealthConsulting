@@ -1,6 +1,7 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({super.key});
@@ -8,6 +9,7 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       body: Padding(
         padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
         child: Column(

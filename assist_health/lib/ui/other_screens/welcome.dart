@@ -1,11 +1,12 @@
 // ignore_for_file: avoid_print
 
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/widgets/admin_navbar.dart';
 import 'package:assist_health/ui/widgets/doctor_navbar.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
-import 'package:assist_health/ui/user_ui/phone.dart';
-import 'package:assist_health/ui/other_ui/login.dart';
+import 'package:assist_health/ui/user_screens/phone.dart';
+import 'package:assist_health/ui/other_screens/login.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      color: Themes.backgroundClr,
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -43,7 +45,7 @@ class WelcomeScreen extends StatelessWidget {
                     child: const Text(
                       "User",
                       style: TextStyle(
-                        color: Color(0xFF7165D6),
+                        color: Themes.selectedClr,
                         fontSize: 20,
                       ),
                     ),
@@ -65,7 +67,7 @@ class WelcomeScreen extends StatelessWidget {
                     child: const Text(
                       "Doctor",
                       style: TextStyle(
-                        color: Color(0xFF7165D6),
+                        color: Themes.selectedClr,
                         fontSize: 20,
                       ),
                     ),
@@ -87,7 +89,7 @@ class WelcomeScreen extends StatelessWidget {
                     child: const Text(
                       "Admin",
                       style: TextStyle(
-                        color: Color(0xFF7165D6),
+                        color: Themes.selectedClr,
                         fontSize: 20,
                       ),
                     ),
@@ -107,7 +109,7 @@ class WelcomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Material(
-                  color: const Color(0xFF7165D6),
+                  color: Themes.buttonClr,
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     onTap: () {
@@ -132,7 +134,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 Material(
-                  color: const Color(0xFF7165D6),
+                  color: Themes.buttonClr,
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
                     onTap: () {

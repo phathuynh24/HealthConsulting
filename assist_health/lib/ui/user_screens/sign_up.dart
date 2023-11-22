@@ -1,7 +1,8 @@
 // ignore_for_file: avoid_print
 
-import 'package:assist_health/functions/methods.dart';
-import 'package:assist_health/ui/other_ui/login.dart';
+import 'package:assist_health/others/methods.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/other_screens/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     phoneNumber = ModalRoute.of(context)!.settings.arguments as String;
     _phone.text = phoneNumber;
     return Material(
-      color: Colors.white,
+      color: Themes.backgroundClr,
       child: SingleChildScrollView(
         child: SafeArea(
           child: Column(
@@ -133,7 +134,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   width: 350,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7165D6),
+                    color: Themes.buttonClr,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: const [
                       BoxShadow(

@@ -1,5 +1,6 @@
-import 'package:assist_health/ui/user_ui/phone.dart';
-import 'package:assist_health/ui/user_ui/sign_up.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/phone.dart';
+import 'package:assist_health/ui/user_screens/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
@@ -20,15 +21,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Themes.hearderClr,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
           },
           icon: const Icon(
             Icons.arrow_back_ios_rounded,
-            color: Colors.black,
+            color: Themes.iconClr,
           ),
         ),
         elevation: 0,
@@ -72,7 +74,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 height: 45,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7165D6),
+                        backgroundColor: Themes.buttonClr,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
                     onPressed: () {
@@ -105,7 +107,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       },
                       child: const Text(
                         "Edit Phone Number ?",
-                        style: TextStyle(color: Color(0xFF7165D6)),
+                        style: TextStyle(color: Themes.buttonClr),
                       ))
                 ],
               )

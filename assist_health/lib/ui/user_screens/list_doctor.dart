@@ -1,6 +1,7 @@
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/ui/user_ui/detail_doctor.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/detail_doctor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -17,10 +18,11 @@ class _ListDoctorScreenState extends State<ListDoctorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Danh sách bác sĩ'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF7165D6),
+        backgroundColor: Themes.hearderClr,
       ),
       body: SingleChildScrollView(
         child: Column(

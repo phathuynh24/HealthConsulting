@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
@@ -11,10 +12,9 @@ class MyButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 100,
-        height: 60,
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20), color: Colors.purple),
+            borderRadius: BorderRadius.circular(20), color: Themes.buttonClr),
         child: Center(
           child: Text(
             label,
