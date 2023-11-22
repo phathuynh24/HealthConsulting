@@ -6,7 +6,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 
 class ChatRoom extends StatefulWidget {
   final Map<String, dynamic> userMap;
@@ -22,9 +21,7 @@ class _ChatRoomState extends State<ChatRoom> {
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final ScrollController _scrollController = ScrollController();
-  
-  List<Asset> _images = [];
+ 
   File? imageFile;
 
   Future getImage() async {
