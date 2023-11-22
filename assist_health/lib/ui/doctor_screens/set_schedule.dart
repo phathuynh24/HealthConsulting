@@ -175,9 +175,6 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const SizedBox(
-                              height: 50,
-                            ),
                             Text(
                               _doctorSchedule.timeLine![index].duration,
                               style: const TextStyle(
