@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -106,6 +107,7 @@ class _ChatRoomState extends State<ChatRoom> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: StreamBuilder<DocumentSnapshot>(
           stream: _firestore
@@ -211,7 +213,7 @@ class _ChatRoomState extends State<ChatRoom> {
               margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: Colors.blue,
+                color: Themes.hearderClr,
               ),
               child: Text(
                 map['message'],

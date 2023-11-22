@@ -1,10 +1,11 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
+import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:assist_health/functions/methods.dart';
-import 'package:assist_health/ui/user_ui/phone.dart';
+import 'package:assist_health/others/methods.dart';
+import 'package:assist_health/ui/user_screens/phone.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
 import 'package:assist_health/ui/widgets/doctor_navbar.dart';
 import 'package:assist_health/ui/widgets/admin_navbar.dart';
@@ -26,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: Themes.backgroundClr,
       child: SingleChildScrollView(
         child: SafeArea(
           child: Column(
@@ -133,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF7165D6),
+                      color: Themes.buttonClr,
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: const [
                         BoxShadow(
@@ -181,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF7165D6),
+                        color: Themes.primaryColor,
                       ),
                     ),
                   ),

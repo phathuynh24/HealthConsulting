@@ -1,4 +1,5 @@
-import 'package:assist_health/ui/doctor_ui/set_schedule.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +33,7 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
         child: BottomNavigationBar(
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF7165D6),
+          selectedItemColor: Themes.selectedClr,
           unselectedItemColor: Colors.black26,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.bold,

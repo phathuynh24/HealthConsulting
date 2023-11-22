@@ -1,4 +1,5 @@
-import 'package:assist_health/ui/user_ui/chatroom.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -116,10 +117,11 @@ class _MessageScreenState extends State<MessageScreen>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text("Hỏi đáp riêng cùng bác sĩ"),
         centerTitle: true,
-        backgroundColor: const Color(0xFF7165D6),
+        backgroundColor: Themes.hearderClr,
       ),
       body: isLoading
           ? Center(
@@ -160,7 +162,7 @@ class _MessageScreenState extends State<MessageScreen>
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF7165D6)),
+                      backgroundColor: Themes.buttonClr),
                   onPressed: onSearch,
                   child: const Text("Tìm kiếm"),
                 ),

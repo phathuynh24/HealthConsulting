@@ -1,5 +1,6 @@
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 
 class RegisterCallStep1 extends StatefulWidget {
@@ -17,10 +18,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         title: const Text('Đăng ký dịch vụ'),
         centerTitle: true,
-        backgroundColor: const Color(0xFF7165D6),
+        backgroundColor: Themes.hearderClr,
       ),
       body: SingleChildScrollView(
         child: FutureBuilder<List<DoctorService>>(
@@ -111,7 +113,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8.0),
         side: BorderSide(
-          color: isSelected ? Colors.purple : Colors.grey,
+          color: isSelected ? Themes.selectedClr : Colors.grey,
           width: 2.0,
         ),
       ),
@@ -137,7 +139,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                   ],
                 ),
               ),
-              Icon(icon, color: isSelected ? Colors.purple : null),
+              Icon(icon, color: isSelected ? Themes.selectedClr : null),
               const SizedBox(
                 width: 10,
               )

@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +32,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
         child: BottomNavigationBar(
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
-          selectedItemColor: const Color(0xFF7165D6),
+          selectedItemColor: Themes.selectedClr,
           unselectedItemColor: Colors.black26,
           selectedLabelStyle: const TextStyle(
             fontWeight: FontWeight.bold,

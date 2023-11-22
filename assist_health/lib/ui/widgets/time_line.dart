@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
@@ -25,13 +26,13 @@ class TimeLine extends StatelessWidget {
         // decorate the lines
         beforeLineStyle: const LineStyle(
           thickness: 10,
-          color: Colors.purple,
+          color: Themes.primaryColor,
         ),
         // decorate the icon
         indicatorStyle: IndicatorStyle(
           width: 30,
           height: 30,
-          color: Colors.purple,
+          color: Themes.primaryColor,
           iconStyle: IconStyle(
             iconData: Icons.done,
             color: Colors.white,

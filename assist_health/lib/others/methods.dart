@@ -2,12 +2,15 @@
 
 import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/models/doctor/doctor_schedule.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
-import 'package:assist_health/ui/other_ui/login.dart';
+import 'package:assist_health/models/doctor/doctor_timeline.dart';
+import 'package:assist_health/ui/other_screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 FirebaseAuth _auth = FirebaseAuth.instance;
 FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -180,4 +183,45 @@ Future<List<DoctorService>> getDoctorServices(String uid) async {
   }
 
   return doctorServices;
+}
+
+Future<DoctorSchedule> getDoctorSchedules(
+    String uid, DateTime selectedDate) async {
+  DoctorSchedule doctorSchedule = DoctorSchedule();
+  List<DoctorTimeLine> timeLineList = [];
+  String date = DateFormat('dd-MM-yyyy').format(selectedDate);
+
+  final docRef = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('schedule')
+      .doc(date)
+      .get();
+
+  final scheduleData = docRef.data();
+
+  Map<String, dynamic>? timeLineData = scheduleData?['time_line'];
+  doctorSchedule.date = scheduleData?['date'];
+
+  if (timeLineData != null) {
+    DoctorTimeLine timeLine = DoctorTimeLine();
+    timeLineData.forEach((key, value) {
+      timeLine.duration = key;
+
+      Map<String, dynamic>? t = timeLineData[key];
+      if (t != null) {
+        t.forEach((key, value) {
+          timeLine.shifts.add(key);
+
+          timeLine.shiftTimes.add(t[key]?.cast<String>() ?? []);
+        });
+      }
+    });
+
+    timeLineList.add(timeLine);
+  }
+
+  doctorSchedule.timeLine = timeLineList;
+
+  return doctorSchedule;
 }

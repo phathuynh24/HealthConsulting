@@ -1,7 +1,7 @@
 import 'package:assist_health/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/ui/other_ui/welcome.dart';
+import 'package:assist_health/ui/other_screens/welcome.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

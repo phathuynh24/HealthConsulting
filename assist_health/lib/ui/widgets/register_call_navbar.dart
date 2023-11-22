@@ -1,7 +1,8 @@
-import 'package:assist_health/ui/user_ui/register_call_step1.dart';
-import 'package:assist_health/ui/user_ui/register_call_step2.dart';
-import 'package:assist_health/ui/user_ui/register_call_step3.dart';
-import 'package:assist_health/ui/user_ui/register_call_step4.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/register_call_step1.dart';
+import 'package:assist_health/ui/user_screens/register_call_step2.dart';
+import 'package:assist_health/ui/user_screens/register_call_step3.dart';
+import 'package:assist_health/ui/user_screens/register_call_step4.dart';
 import 'package:assist_health/ui/widgets/time_line.dart';
 import 'package:flutter/material.dart';
 
@@ -77,7 +78,7 @@ class _RegisterCallNavBar extends State<RegisterCallNavBar> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7165D6)),
+                        backgroundColor: Themes.buttonClr),
                     onPressed: () {
                       _index = (--_index > 0) ? _index : 0;
                       setState(() {
@@ -88,7 +89,7 @@ class _RegisterCallNavBar extends State<RegisterCallNavBar> {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF7165D6)),
+                        backgroundColor: Themes.buttonClr),
                     onPressed: () {
                       _index = (++_index < _screens.length)
                           ? _index
