@@ -73,7 +73,8 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     return Scaffold(
         backgroundColor: Themes.backgroundClr,
         appBar: AppBar(
-          title: Text('Health Profile'),
+          title: const Text('Hồ sơ sức khỏe cá nhân'),
+          centerTitle: true,
           backgroundColor: Themes.hearderClr,
         ),
         body: SingleChildScrollView(
@@ -82,14 +83,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Upload Photo',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 GestureDetector(
                   onTap: () {
                     pickImage();
@@ -100,47 +101,154 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     color: Colors.grey,
                     child: selectedImage != null
                         ? Image.file(selectedImage!, fit: BoxFit.cover)
-                        : Icon(Icons.camera_alt, color: Themes.iconClr),
+                        : const Icon(Icons.camera_alt, color: Themes.iconClr),
                   ),
                 ),
 
-                SizedBox(height: 16),
-
-                Text(
-                  'Weight (kg)',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                const SizedBox(height: 16),
+                Column(
+                  children: [
+                    const Text(
+                      'Chỉ số gần đây',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.purple,
+                                    borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 2, vertical: 8),
+                                child: Transform.rotate(
+                                  angle: 90 *
+                                      3.1415926535 /
+                                      180, // Chuyển đổi góc từ độ sang radian
+                                  child: const Icon(
+                                    Icons.straighten,
+                                    color: Colors.white,
+                                    size: 25,
+                                  ),
+                                )),
+                            const SizedBox(width: 10),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '170 cm',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  'Chiều cao',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.purple,
+                                    borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 2, vertical: 8),
+                                child: const Icon(
+                                  Icons.scale,
+                                  color: Colors.white,
+                                  size: 25,
+                                )),
+                            const SizedBox(width: 10),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '80 kg',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  'Cân nặng',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 2, vertical: 8),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Text(
+                      'Weight (kg)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: weightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter weight',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Height (cm)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: heightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter height',
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: weightController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Enter weight',
-                  ),
-                ),
 
-                SizedBox(height: 8),
-
-                Text(
-                  'Height (cm)',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: heightController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: 'Enter height',
-                  ),
-                ),
-
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -149,14 +257,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   onPressed: () {
                     calculateBMI();
                   },
-                  child: Text('Calculate BMI'),
+                  child: const Text('Calculate BMI'),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 Text(
                   'BMI: ${bmi.toStringAsFixed(1)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
@@ -164,58 +272,58 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
 
                 Text(
                   'BMI Status: $bmiStatus',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                Text(
+                const Text(
                   'Blood Pressure',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 // Add blood pressure input fields (using TextFields)
                 TextField(
                   controller: bloodPressureController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter blood pressure',
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                Text(
+                const Text(
                   'Temperature',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 // Add temperature input field (using TextField)
                 TextField(
                   controller: temperatureController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter temperature',
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                Text(
+                const Text(
                   'Vaccination History',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Themes.buttonClr,
@@ -223,9 +331,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   onPressed: () {
                     addVaccination();
                   },
-                  child: Text('Add Vaccination'),
+                  child: const Text('Add Vaccination'),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: vaccinations.length,
@@ -234,7 +342,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                       title: Text(vaccinations[index].name),
                       subtitle: Text(vaccinations[index].date),
                       trailing: IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: const Icon(Icons.delete),
                         onPressed: () {
                           setState(() {
                             vaccinations.removeAt(index);
@@ -245,16 +353,16 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   },
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                Text(
+                const Text(
                   'Lab Test Results',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Themes.buttonClr,
@@ -262,9 +370,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   onPressed: () {
                     pickFiles();
                   },
-                  child: Text('Pick Files'),
+                  child: const Text('Pick Files'),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: selectedFiles.length,
@@ -277,7 +385,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                         child: Text(selectedFiles[index].path),
                       ),
                       trailing: IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: const Icon(Icons.delete),
                         onPressed: () {
                           setState(() {
                             selectedFiles.removeAt(index);
@@ -294,7 +402,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     onPressed: () {
                       saveDataToFirestore();
                     },
-                    child: Text('Save'))
+                    child: const Text('Save'))
               ],
             ),
           ),
@@ -433,14 +541,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('An error occurred while loading data.'),
+            title: const Text('Error'),
+            content: const Text('An error occurred while loading data.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -524,14 +632,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Success'),
-            content: Text('Data saved successfully.'),
+            title: const Text('Success'),
+            content: const Text('Data saved successfully.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -543,14 +651,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('An error occurred. Please try again later.'),
+            title: const Text('Error'),
+            content: const Text('An error occurred. Please try again later.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );
@@ -569,15 +677,15 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add Vaccination'),
+        title: const Text('Add Vaccination'),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           TextField(
             controller: nameController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Vaccine Name',
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           GestureDetector(
             onTap: () async {
               selectedDate = await showDatePicker(
@@ -595,7 +703,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             },
             child: AbsorbPointer(
               child: TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Date',
                   suffixIcon: Icon(Icons.calendar_today),
                 ),

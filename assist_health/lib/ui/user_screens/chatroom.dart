@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -108,6 +109,7 @@ class _ChatRoomState extends State<ChatRoom> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Themes.hearderClr,
         title: StreamBuilder<DocumentSnapshot>(
           stream: _firestore
               .collection("users")

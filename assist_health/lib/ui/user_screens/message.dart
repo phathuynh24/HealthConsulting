@@ -1,3 +1,6 @@
+import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -41,33 +44,28 @@ class _MessageScreenState extends State<MessageScreen>
   //     "status": status,
   //   });
   // }
-    void setStatus(String status) async {
+  void setStatus(String status) async {
     if (_auth.currentUser != null) {
-      await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .update({
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
         "status": status,
       });
     }
   }
 
-  
   @override
-void didChangeAppLifecycleState(AppLifecycleState state) {
-  if (state == AppLifecycleState.resumed) {
-    // App is in the foreground, user is online
-    if (_auth.currentUser != null) {
-      setStatus("online");
-    }
-  } else {
-    // App is in the background, user is considered offline
-    if (_auth.currentUser != null) {
-      setStatus("offline");
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // App is in the foreground, user is online
+      if (_auth.currentUser != null) {
+        setStatus("online");
+      }
+    } else {
+      // App is in the background, user is considered offline
+      if (_auth.currentUser != null) {
+        setStatus("offline");
+      }
     }
   }
-}
-
 
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
@@ -135,145 +133,185 @@ void didChangeAppLifecycleState(AppLifecycleState state) {
       }
     });
   }
+
   //online offline
   Color getStatusDotColor(bool isOnline) {
-  return isOnline ? Colors.green : Colors.red;
-}
-
+    return isOnline ? Colors.green : Colors.red;
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-   
-    appBar: AppBar(
-  title: const Text("Hỏi đáp riêng cùng bác sĩ"),
-  centerTitle: true,
-  backgroundColor: const Color(0xFF7165D6),
-  leading: CircleAvatar(
-    backgroundImage: NetworkImage("URL_TO_USER_PROFILE_IMAGE"),
-  ),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.search),
-      onPressed: () {
-        // Implement search functionality
-      },
-    ),
-  ],
-),
-
+      appBar: AppBar(
+        title: const Text('Hỏi đáp riêng cùng bác sĩ'),
+        centerTitle: true,
+        backgroundColor: Themes.hearderClr,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Implement search functionality
+            },
+          ),
+        ],
+      ),
       body: isLoading
-          ? Center(
-              child: SizedBox(
-                height: size.height / 20,
-                width: size.height / 20,
-                child: const CircularProgressIndicator(),
+          ? SingleChildScrollView(
+              child: Center(
+                child: SizedBox(
+                  height: size.height / 20,
+                  width: size.height / 20,
+                  child: const CircularProgressIndicator(),
+                ),
               ),
             )
-          : Column(
-              children: [
-                SizedBox(
-                  height: size.height / 20,
-                ),
-                Container(
-                  height: size.height / 14,
-                  width: size.width,
-                  alignment: Alignment.center,
-                  child: SizedBox(
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: size.height / 20,
+                  ),
+                  Container(
                     height: size.height / 14,
-                    width: size.width / 1.15,
-                    child: TextField(
-                      controller: _search,
-                      onSubmitted: (value) {
-                        onSearch();
-                      },
-                  
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.search),
-                        hintText: "Tìm kiếm...",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: const Color(0xFF7165D6)),
+                    width: size.width,
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      height: size.height / 14,
+                      width: size.width / 1.15,
+                      child: TextField(
+                        controller: _search,
+                        onSubmitted: (value) {
+                          onSearch();
+                        },
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.search),
+                          hintText: "Tìm kiếm...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: size.height / 50,
-                ),
-       
+                  SizedBox(
+                    height: size.height / 50,
+                  ),
                   ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: const Color(0xFF7165D6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Themes.buttonClr,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: onSearch,
+                    child: const Text(
+                      "Tìm kiếm",
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  onPressed: onSearch,
-                  child: const Text(
-                    "Tìm kiếm",
-                    style: TextStyle(color: Colors.white),
+                  SizedBox(
+                    height: size.height / 30,
                   ),
-                ),
-                SizedBox(
-                  height: size.height / 30,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: doctorList.length,
-                    itemBuilder: (context, index) {
-                      Map<String, dynamic> doctor = doctorList[index];
-                      return ListTile(
-                        onTap: () {
-                          String roomId = chatRoomId(
-                              _auth.currentUser!.displayName!, doctor['name']);
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => ChatRoom(
-                                chatRoomId: roomId,
-                                userMap: doctor,
+                  FutureBuilder<List<DoctorInfo>>(
+                    future: getInfoDoctors(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return const SizedBox(
+                            height: 290,
+                            width: double.infinity,
+                            child: Center(
+                              child: Text('Something went wrong'),
+                            ));
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                            height: 290,
+                            width: double.infinity,
+                            child: Center(
+                              child: SizedBox(
+                                height: 40,
+                                width: 40,
+                                child: CircularProgressIndicator(),
                               ),
-                            ),
-                          );
-                        },
-                        leading: Stack(
-    children: [
-      CircleAvatar(
-        backgroundImage:
-            NetworkImage("URL_TO_DOCTOR_PROFILE_IMAGE"),
-      ),
-      Positioned(
-        bottom: 0,
-        right: 0,
-        child: Container(
-          height: 12,
-          width: 12,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: getStatusDotColor(doctor['status'] == 'online'),
-          ),
-        ),
-      ),
-    ],
-  ),
-                        title: Text(
-                          doctor['name'],
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                          ),
+                            ));
+                      }
+
+                      return Container(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: doctorList.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> doctor = doctorList[index];
+                            return Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 5,
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  String roomId = chatRoomId(
+                                      _auth.currentUser!.displayName!,
+                                      doctor['name']);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => ChatRoom(
+                                        chatRoomId: roomId,
+                                        userMap: doctor,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                leading: Stack(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(
+                                          snapshot.data![index].image),
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        height: 12,
+                                        width: 12,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: getStatusDotColor(
+                                              doctor['status'] == 'online'),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                title: Text(
+                                  doctor['name'],
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    height: 1.5,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  doctor['email'],
+                                  style: const TextStyle(
+                                    color: Colors.black54,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                trailing:
+                                    const Icon(Icons.chat, color: Colors.black),
+                              ),
+                            );
+                          },
                         ),
-                        subtitle: Text(doctor['email']),
-                        trailing: const Icon(Icons.chat, color: Colors.black),
                       );
                     },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }
