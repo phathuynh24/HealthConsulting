@@ -2,6 +2,7 @@ import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/community.dart';
 import 'package:assist_health/ui/user_screens/home.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
+import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/user_screens/schedule.dart';
 import 'package:assist_health/ui/user_screens/settings.dart';
 import 'package:assist_health/ui/user_screens/health_profile.dart';
@@ -23,7 +24,7 @@ class _UserNavBarState extends State<UserNavBar> {
     // Messages Screen
     const MessageScreen(),
     // Public Chat Screen
-    const CommunityScreen(),
+    const PublicQuestionsScreen(),
     // Schedule Screen
     const ScheduleScreen(),
     //Profile

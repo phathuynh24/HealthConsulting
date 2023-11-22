@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:assist_health/others/theme.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -40,10 +41,20 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
 
   File? selectedImage;
   List<File> selectedFiles = [];
+
+  late User? _currentUser;
+  late String _userHealthProfileCollection;
+  late DocumentReference _userDocumentRef;
+
   @override
   void initState() {
     super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
 
+    _userHealthProfileCollection =
+        'health_profiles/${_currentUser?.uid ?? 'unknown_user'}';
+    _userDocumentRef =
+        FirebaseFirestore.instance.doc(_userHealthProfileCollection);
     // Gọi phương thức để tải dữ liệu từ Firebase khi trang được khởi tạo
     loadDataFromFirestore();
   }
@@ -341,16 +352,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
 
   void loadDataFromFirestore() async {
     try {
-      final firestore = FirebaseFirestore.instance;
+      DocumentSnapshot document = await _userDocumentRef.get();
 
-      // Truy vấn document mới nhất trong collection "health_profiles"
-      QuerySnapshot snapshot =
-          await firestore.collection('health_profiles').get();
-      // Kiểm tra xem có document nào hay không
-      if (snapshot.docs.isNotEmpty) {
-        // Lấy document đầu tiên
-        DocumentSnapshot document = snapshot.docs.first;
-
+      if (document.exists) {
         // Cập nhật các giá trị từ Firestore vào các text controllers và biến thành viên
         setState(() {
           weightController.text = document['weight'].toString();
@@ -465,8 +469,6 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
 
   void saveDataToFirestore() async {
     try {
-      final firestore = FirebaseFirestore.instance;
-
       // Lưu trữ thông tin từ các text controllers vào các biến
       double weight = double.tryParse(weightController.text) ?? 0.0;
       double height = double.tryParse(heightController.text) ?? 0.0;
@@ -474,8 +476,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
       String temperature = temperatureController.text;
 
       // Tạo một document mới trong collection "health_profiles"
-      DocumentReference documentRef =
-          await firestore.collection('health_profiles').add({
+      await _userDocumentRef.set({
         'weight': weight,
         'height': height,
         'bloodPressure': bloodPressure,
@@ -486,7 +487,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                   'date': vaccination.date,
                 })
             .toList(),
-      });
+      }, SetOptions(merge: true));
       // Lưu trữ vaccinations vào subcollection "vaccinations" của document mới được tạo
 
       // Lưu trữ hình ảnh vào Firebase Storage và lấy URL của hình ảnh đã lưu
@@ -500,7 +501,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         String imageURL = await storageTaskSnapshot.ref.getDownloadURL();
 
         // Cập nhật URL của hình ảnh đã lưu vào Firestore
-        await documentRef.update({'imageURL': imageURL});
+        await _userDocumentRef.update({'imageURL': imageURL});
       }
 
       // Lưu trữ các tệp vào Firebase Storage và lấy URL của các tệp đã lưu
@@ -516,7 +517,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
       }
 
       // Cập nhật URL của các tệp đã lưu vào Firestore
-      await documentRef.update({'fileURLs': fileURLs});
+      await _userDocumentRef.update({'fileURLs': fileURLs});
 
       // Hiển thị thông báo thành công
       showDialog(
@@ -608,7 +609,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -624,7 +625,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                 });
               }
             },
-            child: Text('Add'),
+            child: const Text('Add'),
           ),
         ],
       ),

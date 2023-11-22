@@ -23,7 +23,7 @@ class _ChatRoomState extends State<ChatRoom> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ScrollController _scrollController = ScrollController();
-  
+
   List<Asset> _images = [];
   File? imageFile;
 
@@ -105,7 +105,6 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -114,22 +113,22 @@ class _ChatRoomState extends State<ChatRoom> {
               .collection("users")
               .doc(widget.userMap['uid'])
               .snapshots(),
-         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            var userData = snapshot.data!.data() as Map<String, dynamic>;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.userMap['name']),
-                Text(
-                  userData['status'],
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ],
-            );
-          } else {
-            return Container();
-          }
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              var userData = snapshot.data!.data() as Map<String, dynamic>;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.userMap['name']),
+                  Text(
+                    userData['status'],
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              );
+            } else {
+              return Container();
+            }
           },
         ),
       ),
@@ -163,100 +162,105 @@ class _ChatRoomState extends State<ChatRoom> {
                 },
               ),
             ),
-              Container(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(25),
-                topRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-                bottomRight: Radius.circular(25)
+            Container(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(25),
+                    topRight: Radius.circular(25),
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25)),
               ),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: getImage,
-                  icon: const Icon(Icons.image),
-                  color: Colors.blue,
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _message,
-                    decoration: const InputDecoration(
-                      hintText: 'Type a message...',
-                      border: InputBorder.none,
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: getImage,
+                    icon: const Icon(Icons.image),
+                    color: Colors.blue,
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _message,
+                      decoration: const InputDecoration(
+                        hintText: 'Type a message...',
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  onPressed: onSendMessage,
-                  icon: const Icon(Icons.send),
-                  color: Colors.blue,
-                ),
-              ],
+                  IconButton(
+                    onPressed: onSendMessage,
+                    icon: const Icon(Icons.send),
+                    color: Colors.blue,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
     );
   }
 
   Widget messages(Size size, Map<String, dynamic> map, BuildContext context) {
-  final isSentByMe = map['sendby'] == _auth.currentUser!.displayName;
-  
-  return map['type'] == "text"
-      ? Container(
-          width: size.width,
-          alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: isSentByMe ? Colors.blue : Color.fromARGB(255, 231, 223, 223), // Customize the colors here
-            ),
-            child: Text(
-              map['message'],
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isSentByMe ? Colors.white : Colors.black, // Customize the text color here
+    final isSentByMe = map['sendby'] == _auth.currentUser!.displayName;
+
+    return map['type'] == "text"
+        ? Container(
+            width: size.width,
+            alignment:
+                isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: isSentByMe
+                    ? Colors.blue
+                    : Color.fromARGB(
+                        255, 231, 223, 223), // Customize the colors here
               ),
-            ),
-          ),
-        )
-      : Container(
-          height: size.height / 2.5,
-          width: size.width,
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-          alignment: isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-          child: InkWell(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ShowImage(
-                  imageUrl: map['message'],
+              child: Text(
+                map['message'],
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isSentByMe
+                      ? Colors.white
+                      : Colors.black, // Customize the text color here
                 ),
               ),
             ),
-            child: Container(
-              height: size.height / 2.5,
-              width: size.width / 2,
-              decoration: BoxDecoration(border: Border.all()),
-              alignment: map['message'] != "" ? null : Alignment.center,
-              child: map['message'] != ""
-                  ? Image.network(
-                      map['message'],
-                      fit: BoxFit.cover,
-                    )
-                  : const CircularProgressIndicator(),
+          )
+        : Container(
+            height: size.height / 2.5,
+            width: size.width,
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            alignment:
+                isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ShowImage(
+                    imageUrl: map['message'],
+                  ),
+                ),
+              ),
+              child: Container(
+                height: size.height / 2.5,
+                width: size.width / 2,
+                decoration: BoxDecoration(border: Border.all()),
+                alignment: map['message'] != "" ? null : Alignment.center,
+                child: map['message'] != ""
+                    ? Image.network(
+                        map['message'],
+                        fit: BoxFit.cover,
+                      )
+                    : const CircularProgressIndicator(),
+              ),
             ),
-          ),
-        );
-}
-
+          );
+  }
 }
 
 class ShowImage extends StatelessWidget {

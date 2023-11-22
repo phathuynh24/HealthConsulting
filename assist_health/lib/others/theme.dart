@@ -9,7 +9,7 @@ const Color whiteClr = Colors.white;
 
 class Themes {
   static const hearderClr = darkPurpleClr;
-  static const buttonClr = purpleClr;
+  static const buttonClr = mediumPurpleClr;
   static const iconClr = mediumPurpleClr;
   static const selectedClr = mediumPurpleClr;
   static const primaryColor = lightPurpleClr;
