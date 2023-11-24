@@ -20,6 +20,8 @@ class MyButton extends StatelessWidget {
             label,
             style: const TextStyle(
               color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize:16,
             ),
           ),
         ),

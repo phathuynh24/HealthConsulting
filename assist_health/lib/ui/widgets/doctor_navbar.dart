@@ -14,11 +14,11 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    const SetScheduleScreen(),
+    Container(),
     // Screen 2
     Container(),
     // Screen 3
-    Container(),
+    const SetScheduleScreen(),
     // Screen 4
     Container(),
   ];

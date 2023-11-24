@@ -122,12 +122,22 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                DateFormat('dd/MM/yyyy').format(DateTime.now()),
+             Text(
+              DateFormat('dd/MM/yyyy').format(DateTime.now()),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Themes.buttonClr, // Set the color based on your theme
               ),
-              const Text(
-                "Hôm nay",
+            ),
+            const SizedBox(height: 5),
+            const Text(
+              "Hôm nay",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey, // Set the color based on your theme
               ),
+            ),
             ],
           ),
           MyButton(
@@ -170,7 +180,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
-                          color: Themes.primaryColor,
+                          color: Themes.buttonClr,
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -178,7 +188,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                             Text(
                               _doctorSchedule.timeLine![index].duration,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -197,15 +207,16 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                       _doctorSchedule
                                           .timeLine![index].shifts[subIndex],
                                       style: const TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color.fromARGB(255, 255, 255, 255),
                                       ),
                                     ),
                                     const SizedBox(
                                       height: 10,
                                     ),
                                     SizedBox(
-                                      height: 50,
+                                      height: 40,
                                       child: ListView.builder(
                                         scrollDirection: Axis.horizontal,
                                         shrinkWrap: true,
@@ -217,7 +228,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                           return Column(
                                             children: [
                                               Container(
-                                                width: 40,
+                                                width: 50,
                                                 margin:
                                                     const EdgeInsets.symmetric(
                                                   horizontal: 5,
@@ -227,7 +238,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                                   vertical: 5,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.blue,
+                                            color: Color.fromARGB(255, 255, 255, 255),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -238,8 +249,8 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                                             .shiftTimes[
                                                         subIndex][i],
                                                     style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                color: Color.fromARGB(255, 0, 0, 0),
                                                     ),
                                                   ),
                                                 ),
