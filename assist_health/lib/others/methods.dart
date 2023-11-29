@@ -6,6 +6,11 @@ import 'package:assist_health/models/doctor/doctor_schedule.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
 import 'package:assist_health/models/doctor/doctor_timeline.dart';
+import 'package:assist_health/models/user/user_bmi.dart';
+import 'package:assist_health/models/user/user_profile.dart';
+import 'package:assist_health/models/user/user_height.dart';
+import 'package:assist_health/models/user/user_temperature.dart';
+import 'package:assist_health/models/user/user_weight.dart';
 import 'package:assist_health/ui/other_screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -98,94 +103,73 @@ Future<List<DoctorInfo>> getInfoDoctors() async {
   return doctorInfos;
 }
 
-Future<List<DoctorExperience>> getDoctorExperiences(String uid) async {
-  final selectedDoctorDocs =
-      await _firestore.collection('users').where('uid', isEqualTo: uid).get();
+Future<List<DoctorExperience>> getExperiencesDoctor(String uid) async {
+  List<DoctorExperience> doctorExperiences = [];
 
-  final doctorExperiences = <DoctorExperience>[];
+  final docRef = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('experience')
+      .get();
 
-  for (final doc in selectedDoctorDocs.docs) {
-    final docRef = await _firestore
-        .collection('users')
-        .doc(doc.id)
-        .collection('experience')
-        .get();
+  final listOfExperiences = docRef.docs.map((experienceDoc) {
+    if (experienceDoc.exists) {
+      final data = experienceDoc.data();
+      final doctorExperience = DoctorExperience.fromJson(data);
+      return doctorExperience;
+    } else {
+      return null;
+    }
+  }).whereType<DoctorExperience>();
 
-    final listOfExperiences = docRef.docs.map((experienceDoc) {
-      if (experienceDoc.exists) {
-        final experienceData = experienceDoc.data();
-        final doctorExperience = DoctorExperience.fromJson(experienceData);
-        return doctorExperience;
-      } else {
-        return null;
-      }
-    }).whereType<DoctorExperience>();
-
-    doctorExperiences.addAll(listOfExperiences);
-  }
+  doctorExperiences.addAll(listOfExperiences);
 
   return doctorExperiences;
 }
 
-Future<List<DoctorStudy>> getDoctorStudys(String uid) async {
-  final selectedDoctorDocs =
-      await _firestore.collection('users').where('uid', isEqualTo: uid).get();
+Future<List<DoctorStudy>> getStudysDoctor(String uid) async {
+  List<DoctorStudy> doctorStudys = [];
 
-  final doctorStudys = <DoctorStudy>[];
+  final docRef =
+      await _firestore.collection('users').doc(uid).collection('study').get();
 
-  for (final doc in selectedDoctorDocs.docs) {
-    final docRef = await _firestore
-        .collection('users')
-        .doc(doc.id)
-        .collection('study')
-        .get();
+  final listOfStudys = docRef.docs.map((studyDoc) {
+    if (studyDoc.exists) {
+      final data = studyDoc.data();
+      final doctorExperience = DoctorStudy.fromJson(data);
+      return doctorExperience;
+    } else {
+      return null;
+    }
+  }).whereType<DoctorStudy>();
 
-    final listOfStudys = docRef.docs.map((studyDoc) {
-      if (studyDoc.exists) {
-        final studyDocData = studyDoc.data();
-        final doctorExperience = DoctorStudy.fromJson(studyDocData);
-        return doctorExperience;
-      } else {
-        return null;
-      }
-    }).whereType<DoctorStudy>();
-
-    doctorStudys.addAll(listOfStudys);
-  }
+  doctorStudys.addAll(listOfStudys);
 
   return doctorStudys;
 }
 
-Future<List<DoctorService>> getDoctorServices(String uid) async {
-  final selectedDoctorDocs =
-      await _firestore.collection('users').where('uid', isEqualTo: uid).get();
+Future<List<DoctorService>> getServicesDoctor(String uid) async {
+  List<DoctorService> doctorServices = [];
 
-  final doctorServices = <DoctorService>[];
+  final docRef =
+      await _firestore.collection('users').doc(uid).collection('service').get();
 
-  for (final doc in selectedDoctorDocs.docs) {
-    final docRef = await _firestore
-        .collection('users')
-        .doc(doc.id)
-        .collection('service')
-        .get();
+  final listOfStudys = docRef.docs.map((serviceDoc) {
+    if (serviceDoc.exists) {
+      final data = serviceDoc.data();
+      final doctorService = DoctorService.fromJson(data);
+      return doctorService;
+    } else {
+      return null;
+    }
+  }).whereType<DoctorService>();
 
-    final listOfStudys = docRef.docs.map((serviceDoc) {
-      if (serviceDoc.exists) {
-        final serviceDocData = serviceDoc.data();
-        final doctorService = DoctorService.fromJson(serviceDocData);
-        return doctorService;
-      } else {
-        return null;
-      }
-    }).whereType<DoctorService>();
-
-    doctorServices.addAll(listOfStudys);
-  }
+  doctorServices.addAll(listOfStudys);
 
   return doctorServices;
 }
 
-Future<DoctorSchedule> getDoctorSchedules(
+Future<DoctorSchedule> getSchedulesDoctor(
     String uid, DateTime selectedDate) async {
   DoctorSchedule doctorSchedule = DoctorSchedule();
   List<DoctorTimeLine> timeLineList = [];
@@ -224,4 +208,148 @@ Future<DoctorSchedule> getDoctorSchedules(
   doctorSchedule.timeLine = timeLineList;
 
   return doctorSchedule;
+}
+
+Future<List<UserProfile>> getProfileUsers(String uid) async {
+  List<UserProfile> doctorProfiles = [];
+
+  final docRef = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .get();
+
+  final listOfProfiles = docRef.docs.map((healthProfileDoc) {
+    if (healthProfileDoc.exists) {
+      final data = healthProfileDoc.data();
+      final doctorProfile = UserProfile.fromJson(data);
+      return doctorProfile;
+    } else {
+      return null;
+    }
+  }).whereType<UserProfile>();
+
+  doctorProfiles.addAll(listOfProfiles);
+
+  return doctorProfiles;
+}
+
+Future<List<UserHeight>> getHeightDataUser(String uid, String idDoc) async {
+  List<UserHeight> heightDataList = [];
+
+  final docHeight = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .doc(idDoc)
+      .collection('health_metrics')
+      .doc('height')
+      .get();
+
+  if (docHeight.exists) {
+    List<dynamic> data = docHeight.data()!['data'];
+    for (var value in data) {
+      UserHeight height = UserHeight.fromJson(value);
+      heightDataList.add(height);
+    }
+  }
+
+  return heightDataList;
+}
+
+Future<List<UserWeight>> getWeightDataUser(String uid, String idDoc) async {
+  List<UserWeight> weightDataList = [];
+
+  final docWeight = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .doc(idDoc)
+      .collection('health_metrics')
+      .doc('weight')
+      .get();
+
+  if (docWeight.exists) {
+    List<dynamic> data = docWeight.data()!['data'];
+    for (var value in data) {
+      UserWeight weight = UserWeight.fromJson(value);
+      weightDataList.add(weight);
+    }
+  }
+
+  return weightDataList;
+}
+
+Future<List<UserTemperature>> getTemperatureDataUser(
+    String uid, String idDoc) async {
+  List<UserTemperature> temperatureDataList = [];
+
+  final docTemperature = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .doc(idDoc)
+      .collection('health_metrics')
+      .doc('temperature')
+      .get();
+
+  if (docTemperature.exists) {
+    List<dynamic> data = docTemperature.data()!['data'];
+    for (var value in data) {
+      UserTemperature temperature = UserTemperature.fromJson(value);
+      temperatureDataList.add(temperature);
+    }
+  }
+
+  return temperatureDataList;
+}
+
+Future<List<UserBMI>> getBMIDataUser(String uid, String idDoc) async {
+  List<UserBMI> bmiDataList = [];
+
+  final docBMI = await _firestore
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .doc(idDoc)
+      .collection('health_metrics')
+      .doc('bmi')
+      .get();
+
+  if (docBMI.exists) {
+    List<dynamic> data = docBMI.data()!['data'];
+    for (var value in data) {
+      UserBMI bmi = UserBMI.fromJson(value);
+      bmiDataList.add(bmi);
+    }
+  }
+
+  return bmiDataList;
+}
+
+String calculateBirthdayToSelectedDate(String doB, String selectedDate) {
+  List<String> datePartsOfDoB = doB.split('/');
+  List<String> datePartsOfSelectedDate = selectedDate.split('/');
+
+  int dayOfDoB = int.parse(datePartsOfDoB[0]);
+  int monthOfDoB = int.parse(datePartsOfDoB[1]);
+  int yearOfDoB = int.parse(datePartsOfDoB[2]);
+
+  int dayOfSelectedDate = int.parse(datePartsOfSelectedDate[0]);
+  int monthOfSelectedDate = int.parse(datePartsOfSelectedDate[1]);
+  int yearOfSelectedDate = int.parse(datePartsOfSelectedDate[2]);
+
+  DateTime birthDateTime = DateTime(yearOfDoB, monthOfDoB, dayOfDoB);
+  DateTime selectedDateTime =
+      DateTime(yearOfSelectedDate, monthOfSelectedDate, dayOfSelectedDate);
+
+  Duration ageDuration = selectedDateTime.difference(birthDateTime);
+
+  int years = ageDuration.inDays ~/ 365;
+  int months = (ageDuration.inDays % 365) ~/ 30;
+  int days = (ageDuration.inDays % 365) % 30;
+
+  String birthdayToNowaday = '$years năm $months tháng $days ngày';
+
+  return birthdayToNowaday;
 }

@@ -6,8 +6,8 @@ class DoctorExperience {
 
   factory DoctorExperience.fromJson(Map<String, dynamic> json) {
     return DoctorExperience(
-      json['workplace'] as String,
-      json['desc'] as String,
+      json['workplace'],
+      json['desc'],
     );
   }
 }

@@ -45,7 +45,15 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       appBar: AppBar(
         title: const Text('Câu hỏi'),
         centerTitle: true,
-        backgroundColor: Themes.hearderClr,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.leftClr, Themes.rightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

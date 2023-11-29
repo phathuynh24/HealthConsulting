@@ -1,4 +1,4 @@
-import 'package:assist_health/functions/methods.dart';
+import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/chatroom.dart';
@@ -147,7 +147,15 @@ class _MessageScreenState extends State<MessageScreen>
       appBar: AppBar(
         title: const Text('Hỏi đáp riêng cùng bác sĩ'),
         centerTitle: true,
-        backgroundColor: Themes.hearderClr,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.leftClr, Themes.rightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

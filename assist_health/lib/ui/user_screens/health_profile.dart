@@ -1,751 +1,312 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
+
 import 'package:assist_health/others/theme.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:assist_health/others/methods.dart';
+import 'package:assist_health/models/user/user_profile.dart';
+import 'package:assist_health/ui/user_screens/health_profile_add.dart';
+import 'package:assist_health/ui/widgets/health_metrics_topnavbar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 
 class HealthProfileScreen extends StatefulWidget {
   const HealthProfileScreen({super.key});
 
   @override
-  _HealthProfileScreenState createState() => _HealthProfileScreenState();
-}
-
-class Vaccination {
-  final String name;
-  final String date;
-  Vaccination({required this.name, required this.date});
-}
-
-class LabTestResult {
-  final String name;
-  final String filePath;
-  LabTestResult({required this.name, required this.filePath});
+  State<HealthProfileScreen> createState() => _HealthProfileScreenState();
 }
 
 class _HealthProfileScreenState extends State<HealthProfileScreen> {
-  TextEditingController weightController = TextEditingController();
-  TextEditingController heightController = TextEditingController();
-  TextEditingController bloodPressureController = TextEditingController();
-  TextEditingController temperatureController = TextEditingController();
-  double bmi = 0.0;
-  String bmiStatus = '';
-  List<Vaccination> vaccinations = [];
-  List<LabTestResult> labTestResults = [];
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  File? selectedImage;
-  List<File> selectedFiles = [];
+  late String _uid;
 
-  late User? _currentUser;
-  late String _userHealthProfileCollection;
-  late DocumentReference _userDocumentRef;
+  late UserProfile _currentProfile;
+  List<UserProfile> _userProfiles = [];
+
+  int _selectedItemIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _currentUser = FirebaseAuth.instance.currentUser;
-
-    _userHealthProfileCollection =
-        'health_profiles/${_currentUser?.uid ?? 'unknown_user'}';
-    _userDocumentRef =
-        FirebaseFirestore.instance.doc(_userHealthProfileCollection);
-    // Gọi phương thức để tải dữ liệu từ Firebase khi trang được khởi tạo
-    loadDataFromFirestore();
+    _uid = _auth.currentUser!.uid;
+    _currentProfile = UserProfile('', '', '', '', '', '');
+    _loadDataFromFirestore(false);
   }
 
   @override
   void dispose() {
-    weightController.dispose();
-    heightController.dispose();
-    bloodPressureController.dispose();
-    temperatureController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Themes.backgroundClr,
-        appBar: AppBar(
-          title: const Text('Hồ sơ sức khỏe cá nhân'),
-          centerTitle: true,
-          backgroundColor: Themes.hearderClr,
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Upload Photo',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+      backgroundColor: Themes.backgroundClr,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Appbar và List account
+            Container(
+              padding: const EdgeInsets.only(
+                top: 40,
+                bottom: 20,
+              ),
+              margin: EdgeInsets.zero,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Themes.leftClr, Themes.rightClr],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: () {
-                    pickImage();
-                  },
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    color: Colors.grey,
-                    child: selectedImage != null
-                        ? Image.file(selectedImage!, fit: BoxFit.cover)
-                        : const Icon(Icons.camera_alt, color: Themes.iconClr),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-                Column(
-                  children: [
-                    const Text(
-                      'Chỉ số gần đây',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+              ),
+              child: Column(
+                children: [
+                  // Appbar
+                  Container(
+                    padding: const EdgeInsets.only(
+                      left: 25,
+                      right: 20,
+                      bottom: 10,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
-                                    color: Colors.purple,
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 2, vertical: 8),
-                                child: Transform.rotate(
-                                  angle: 90 *
-                                      3.1415926535 /
-                                      180, // Chuyển đổi góc từ độ sang radian
-                                  child: const Icon(
-                                    Icons.straighten,
-                                    color: Colors.white,
-                                    size: 25,
-                                  ),
-                                )),
-                            const SizedBox(width: 10),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '170 cm',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 6),
-                                Text(
-                                  'Chiều cao',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
-                                    color: Colors.purple,
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 2, vertical: 8),
-                                child: const Icon(
-                                  Icons.scale,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'HỒ SƠ SỨC KHỎE',
+                              style: TextStyle(
+                                  fontSize: 22,
                                   color: Colors.white,
-                                  size: 25,
-                                )),
-                            const SizedBox(width: 10),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '80 kg',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 6),
-                                Text(
-                                  'Cân nặng',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
+                                  fontWeight: FontWeight.bold),
                             ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.add,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () async {
+                              bool isAdded = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AddProfileScreen()),
+                              );
+
+                              if (isAdded) {
+                                setState(() {
+                                  _loadDataFromFirestore(true);
+                                });
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text('Lưu hồ sơ thành công!'),
+                                  backgroundColor: Colors.green,
+                                ));
+                              }
+                            },
+                          ),
+                        ]),
+                  ),
+                  // List account
+                  SizedBox(
+                    height: 155,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _userProfiles.length,
+                      itemBuilder: (_, index) {
+                        bool isSelected = (index == _selectedItemIndex);
+                        return Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedItemIndex = index;
+                                  _currentProfile = _userProfiles[index];
+                                });
+                              },
+                              child: Container(
+                                width: 90,
+                                height: 130,
+                                margin: EdgeInsets.only(
+                                  left: (index == 0) ? 20 : 10,
+                                  right: (index == _userProfiles.length - 1)
+                                      ? 20
+                                      : 0,
+                                  top: 10,
+                                  bottom: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Colors.yellowAccent.withOpacity(0.8)
+                                        : Colors.transparent,
+                                    width: 4,
+                                  ),
+                                  color: Themes.highlightClr,
+                                  boxShadow: isSelected
+                                      ? [
+                                          BoxShadow(
+                                            color: Colors.yellowAccent.withOpacity(
+                                                0.5), // Màu vàng với độ trong suốt
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    _userProfiles[index].image,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Container(
+                                height: 3,
+                                width: 50,
+                                margin: EdgeInsets.only(
+                                  left: (index == 0) ? 20 : 10,
+                                  right: (index == _userProfiles.length - 1)
+                                      ? 20
+                                      : 0,
+                                  top: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2),
+                                  color: Colors.white,
+                                ),
+                              ),
                           ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Thông tin cá nhân và nút chỉ số sức khỏe
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _currentProfile.name,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Themes.textClr,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
                         ),
                         Container(
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: Colors.purple,
-                              borderRadius: BorderRadius.circular(10)),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 2, vertical: 8),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 25,
+                              horizontal: 12, vertical: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.amber,
+                          ),
+                          child: Text(
+                            (_currentProfile.idDoc == 'main_profile')
+                                ? _currentProfile.relationship
+                                : '${_currentProfile.relationship} của tôi',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Themes.textClr,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const Text(
-                      'Weight (kg)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+                  ),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Ink(
+                            height: 45,
+                            width: 45,
+                            padding: EdgeInsets.zero,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red.withOpacity(0.2),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.favorite,
+                                size: 28,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          HealthMetricsTopNavBar(
+                                            userProfile: _currentProfile,
+                                          )),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Chỉ số sức khỏe',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.red.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: weightController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter weight',
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Height (cm)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: heightController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter height',
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Themes.buttonClr,
                   ),
-                  onPressed: () {
-                    calculateBMI();
-                  },
-                  child: const Text('Calculate BMI'),
-                ),
-
-                const SizedBox(height: 16),
-
-                Text(
-                  'BMI: ${bmi.toStringAsFixed(1)}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-
-                Text(
-                  'BMI Status: $bmiStatus',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Blood Pressure',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Add blood pressure input fields (using TextFields)
-                TextField(
-                  controller: bloodPressureController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter blood pressure',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Temperature',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                // Add temperature input field (using TextField)
-                TextField(
-                  controller: temperatureController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter temperature',
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Vaccination History',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Themes.buttonClr,
-                  ),
-                  onPressed: () {
-                    addVaccination();
-                  },
-                  child: const Text('Add Vaccination'),
-                ),
-                const SizedBox(height: 8),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: vaccinations.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(vaccinations[index].name),
-                      subtitle: Text(vaccinations[index].date),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            vaccinations.removeAt(index);
-                          });
-                        },
-                      ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Lab Test Results',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Themes.buttonClr,
-                  ),
-                  onPressed: () {
-                    pickFiles();
-                  },
-                  child: const Text('Pick Files'),
-                ),
-                const SizedBox(height: 8),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: selectedFiles.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: GestureDetector(
-                        onTap: () {
-                          openFile(selectedFiles[index]);
-                        },
-                        child: Text(selectedFiles[index].path),
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            selectedFiles.removeAt(index);
-                          });
-                        },
-                      ),
-                    );
-                  },
-                ),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Themes.buttonClr,
-                    ),
-                    onPressed: () {
-                      saveDataToFirestore();
-                    },
-                    child: const Text('Save'))
-              ],
-            ),
-          ),
-        ));
-  }
-
-  void openFile(File file) {
-    String filePath = file.path.toLowerCase();
-
-    // Kiểm tra định dạng của file và mở tương ứng
-    if (filePath.endsWith('.txt')) {
-      // Mở file văn bản
-      OpenFile.open(file.path);
-      // OpenFile.openText(file.path);
-    } else if (filePath.endsWith('.jpg') ||
-        filePath.endsWith('.jpeg') ||
-        filePath.endsWith('.png')) {
-      // Mở file hình ảnh
-      OpenFile.open(file.path);
-    } else {
-      // Xử lý các định dạng khác tùy thuộc vào nhu cầu của bạn
-      // ...
-    }
-  }
-
-  void pickImage() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() {
-        selectedImage = File(pickedImage.path);
-      });
-    }
-  }
-
-  void calculateBMI() {
-    double weight = double.tryParse(weightController.text) ?? 0.0;
-    double height = double.tryParse(heightController.text) ?? 0.0;
-    if (weight > 0 && height > 0) {
-      double bmiValue = weight / ((height / 100) * (height / 100));
-      setState(() {
-        bmi = bmiValue;
-        if (bmi < 18.5) {
-          bmiStatus = 'Underweight';
-        } else if (bmi < 25.0) {
-          bmiStatus = 'Normal weight';
-        } else if (bmi < 30.0) {
-          bmiStatus = 'Overweight';
-        } else {
-          bmiStatus = 'Obese';
-        }
-      });
-    }
-  }
-
-  void loadDataFromFirestore() async {
-    try {
-      DocumentSnapshot document = await _userDocumentRef.get();
-
-      if (document.exists) {
-        // Cập nhật các giá trị từ Firestore vào các text controllers và biến thành viên
-        setState(() {
-          weightController.text = document['weight'].toString();
-          heightController.text = document['height'].toString();
-          bloodPressureController.text = document['bloodPressure'];
-          temperatureController.text = document['temperature'];
-        });
-
-        // Kiểm tra và tải ảnh từ Firestore
-        if (document['imageURL'] != null) {
-          String imageURL = document['imageURL'];
-          // Tạo một đối tượng File từ URL
-          File imageFile = await getImageFileFromURL(imageURL);
-          // Cập nhật ảnh đã tải về vào biến thành viên
-          setState(() {
-            selectedImage = imageFile;
-          });
-        }
-
-        // Kiểm tra và tải danh sách các file từ Firestore
-        if (document['fileURLs'] != null) {
-          List<String> fileURLs = List<String>.from(document['fileURLs']);
-          List<File> files = [];
-
-          for (String fileURL in fileURLs) {
-            // Tạo một đối tượng File từ URL
-            File file = await getFileFromURL(fileURL);
-            // Thêm file đã tải về vào danh sách
-            files.add(file);
-          }
-
-          // Cập nhật danh sách các file đã tải về vào biến thành viên
-          setState(() {
-            selectedFiles = files;
-          });
-        }
-        // Kiểm tra và tải danh sách lịch sử tiêm chủng từ Firestore
-        //  if (document['vaccinations'] != null) {
-        List<Map<String, dynamic>> vaccinationsData =
-            List<Map<String, dynamic>>.from(document['vaccinations']);
-
-        List<Vaccination> loadedVaccinations = vaccinationsData
-            .map((data) => Vaccination(
-                  name: data['name'],
-                  date: data['date'],
-                ))
-            .toList();
-
-        // Cập nhật danh sách lịch sử tiêm chủng
-        setState(() {
-          vaccinations = loadedVaccinations;
-        });
-      }
-      // }
-      // else {
-      //   showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return AlertDialog(
-      //         title: Text('No Data'),
-      //         content: Text('No data available.'),
-      //         actions: [
-      //           TextButton(
-      //             onPressed: () {
-      //               Navigator.of(context).pop();
-      //             },
-      //             child: Text('OK'),
-      //           ),
-      //         ],
-      //       );
-      //     },
-      //   );
-      // }
-    } catch (error) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('An error occurred while loading data.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  Future<File> getImageFileFromURL(String url) async {
-    // Sử dụng package http để tải ảnh từ URL
-    var response = await http.get(Uri.parse(url));
-    var tempDir = await getTemporaryDirectory();
-    File file = File('${tempDir.path}/temp_image.png');
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
-  }
-
-  Future<File> getFileFromURL(String url) async {
-    // Sử dụng package http để tải file từ URL
-    var response = await http.get(Uri.parse(url));
-    var tempDir = await getTemporaryDirectory();
-    File file = File('${tempDir.path}/${DateTime.now()}.png');
-    await file.writeAsBytes(response.bodyBytes);
-    return file;
-  }
-
-  void saveDataToFirestore() async {
-    try {
-      // Lưu trữ thông tin từ các text controllers vào các biến
-      double weight = double.tryParse(weightController.text) ?? 0.0;
-      double height = double.tryParse(heightController.text) ?? 0.0;
-      String bloodPressure = bloodPressureController.text;
-      String temperature = temperatureController.text;
-
-      // Tạo một document mới trong collection "health_profiles"
-      await _userDocumentRef.set({
-        'weight': weight,
-        'height': height,
-        'bloodPressure': bloodPressure,
-        'temperature': temperature,
-        'vaccinations': vaccinations
-            .map((vaccination) => {
-                  'name': vaccination.name,
-                  'date': vaccination.date,
-                })
-            .toList(),
-      }, SetOptions(merge: true));
-      // Lưu trữ vaccinations vào subcollection "vaccinations" của document mới được tạo
-
-      // Lưu trữ hình ảnh vào Firebase Storage và lấy URL của hình ảnh đã lưu
-      if (selectedImage != null) {
-        Reference imageReference = FirebaseStorage.instance
-            .ref()
-            .child('images/${DateTime.now()}.png');
-        UploadTask uploadTask = imageReference.putFile(selectedImage!);
-        TaskSnapshot storageTaskSnapshot =
-            await uploadTask.whenComplete(() => null);
-        String imageURL = await storageTaskSnapshot.ref.getDownloadURL();
-
-        // Cập nhật URL của hình ảnh đã lưu vào Firestore
-        await _userDocumentRef.update({'imageURL': imageURL});
-      }
-
-      // Lưu trữ các tệp vào Firebase Storage và lấy URL của các tệp đã lưu
-      List<String> fileURLs = [];
-      for (var selectedFile in selectedFiles) {
-        Reference fileReference = FirebaseStorage.instance.ref().child(
-            'files/${DateTime.now()}_${selectedFile.path.split('/').last}');
-        UploadTask uploadTask = fileReference.putFile(selectedFile);
-        TaskSnapshot storageTaskSnapshot =
-            await uploadTask.whenComplete(() => null);
-        String fileURL = await storageTaskSnapshot.ref.getDownloadURL();
-        fileURLs.add(fileURL);
-      }
-
-      // Cập nhật URL của các tệp đã lưu vào Firestore
-      await _userDocumentRef.update({'fileURLs': fileURLs});
-
-      // Hiển thị thông báo thành công
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Data saved successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    } catch (error) {
-      // Hiển thị thông báo lỗi
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('An error occurred. Please try again later.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  void addVaccination() async {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController dateController = TextEditingController();
-    DateTime currentDate = DateTime.now();
-
-    DateTime? selectedDate;
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Vaccination'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(
-            controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Vaccine Name',
-            ),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () async {
-              selectedDate = await showDatePicker(
-                context: context,
-                initialDate: currentDate,
-                firstDate: DateTime(1900),
-                lastDate: DateTime(2100),
-              );
-              // Update the text field when a date is selected
-              if (selectedDate != null) {
-                dateController.text =
-                    selectedDate!.toLocal().toString().split(' ')[0];
-              }
-              // Handle the selected date
-            },
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Date',
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                controller: dateController,
+                ],
               ),
             ),
-          ),
-        ]),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (selectedDate != null) {
-                setState(() {
-                  vaccinations.add(
-                    Vaccination(
-                      name: nameController.text,
-                      date: selectedDate!.toLocal().toString().split(' ')[0],
-                    ),
-                  );
-                  Navigator.pop(context);
-                });
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  void pickFiles() async {
-    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
-    if (result != null) {
+  _loadDataFromFirestore(bool isReturnData) async {
+    try {
+      List<UserProfile> userProfiles = await getProfileUsers(_uid);
+      userProfiles = userProfiles.reversed.toList();
+
       setState(() {
-        selectedFiles.addAll(result.paths.map((path) => File(path!)));
+        _userProfiles = userProfiles;
+        _currentProfile = (isReturnData) ? _userProfiles[1] : _userProfiles[0];
       });
+    } catch (error) {
+      // Xử lý lỗi tại đây (nếu cần)
     }
   }
 }

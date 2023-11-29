@@ -19,15 +19,15 @@ class DoctorInfo {
 
   factory DoctorInfo.fromJson(Map<String, dynamic> json) {
     return DoctorInfo(
-      json['name'] as String,
-      json['desc'] as String,
-      json['avgTime'] as int,
-      json['count'] as int,
-      json['expert'] as String,
-      json['image'] as String,
-      json['rating'] as int,
-      json['workplace'] as String,
-      json['address'] as String,
+      json['name'],
+      json['desc'],
+      json['avgTime'],
+      json['count'],
+      json['expert'],
+      json['image'],
+      json['rating'],
+      json['workplace'],
+      json['address'],
     );
   }
 }

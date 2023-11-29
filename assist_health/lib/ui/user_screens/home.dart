@@ -1,6 +1,6 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/detail_doctor.dart';
 import 'package:assist_health/ui/user_screens/list_doctor.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';

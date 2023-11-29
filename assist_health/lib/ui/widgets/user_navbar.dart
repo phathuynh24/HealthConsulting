@@ -1,5 +1,4 @@
 import 'package:assist_health/others/theme.dart';
-import 'package:assist_health/ui/user_screens/community.dart';
 import 'package:assist_health/ui/user_screens/home.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';

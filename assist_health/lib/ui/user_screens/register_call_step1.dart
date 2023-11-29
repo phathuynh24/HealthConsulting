@@ -26,7 +26,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
       ),
       body: SingleChildScrollView(
         child: FutureBuilder<List<DoctorService>>(
-          future: getDoctorServices(widget.uid),
+          future: getServicesDoctor(widget.uid),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return const SizedBox(

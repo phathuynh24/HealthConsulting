@@ -7,6 +7,10 @@ const Color lightPurpleClr = Color(0xFF838BED);
 const Color pinkClr = Color(0xFFF0D6FA);
 const Color whiteClr = Colors.white;
 
+const Color gradientCenterLeft = Color(0xFF9B92FF);
+const Color gradientCenterRight = Color(0xFFFF92DA);
+const Color lightMediumPurpleClr = Color(0xFF5E2BB7);
+
 class Themes {
   static const hearderClr = darkPurpleClr;
   static const buttonClr = mediumPurpleClr;
@@ -15,6 +19,9 @@ class Themes {
   static const primaryColor = lightPurpleClr;
   static const highlightClr = pinkClr;
   static const backgroundClr = whiteClr;
+  static const leftClr = gradientCenterLeft;
+  static const rightClr = gradientCenterRight;
+  static const textClr = lightMediumPurpleClr;
 
   // static final light = ThemeData(
   //   primaryColor: darkPurpleClr,

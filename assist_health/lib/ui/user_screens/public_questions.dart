@@ -15,7 +15,15 @@ class PublicQuestionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cộng đồng hỏi đáp'),
         centerTitle: true,
-        backgroundColor: Themes.hearderClr,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.leftClr, Themes.rightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance

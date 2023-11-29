@@ -1,6 +1,6 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
-import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/detail_doctor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';

@@ -72,7 +72,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
 
   _initialize() async {
     String? uid = _auth.currentUser!.uid;
-    _doctorSchedule = await getDoctorSchedules(uid, _selectedDate);
+    _doctorSchedule = await getSchedulesDoctor(uid, _selectedDate);
     // for (var element in _doctorSchedule.timeLine!) {
     //   for (var shiftTimes in element.shiftTimes) {
     //     shiftTimes = shiftTimes.reversed.toList();

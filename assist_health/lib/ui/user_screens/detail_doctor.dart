@@ -1,8 +1,8 @@
-import 'package:assist_health/others/Methods.dart';
+import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
-import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/widgets/register_call_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -361,7 +361,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                           height: 10,
                         ),
                         FutureBuilder<List<DoctorExperience>>(
-                            future: getDoctorExperiences(widget.doctorInfo.uid),
+                            future: getExperiencesDoctor(widget.doctorInfo.uid),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const SizedBox(
@@ -484,7 +484,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                           height: 10,
                         ),
                         FutureBuilder<List<DoctorStudy>>(
-                            future: getDoctorStudys(widget.doctorInfo.uid),
+                            future: getStudysDoctor(widget.doctorInfo.uid),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) {
                                 return const SizedBox(

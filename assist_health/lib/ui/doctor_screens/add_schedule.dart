@@ -142,7 +142,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
 
   Future<void> _initialize() async {
     String? uid = _auth.currentUser!.uid;
-    List<DoctorService> services = await getDoctorServices(uid);
+    List<DoctorService> services = await getServicesDoctor(uid);
     setState(() {
       _uid = uid;
     });
