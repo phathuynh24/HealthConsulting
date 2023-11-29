@@ -1,19 +1,17 @@
-// ignore_for_file: avoid_print
-
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/widgets/input_field.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class AddSchedulePage extends StatefulWidget {
-  const AddSchedulePage({super.key});
+  const AddSchedulePage({Key? key}) : super(key: key);
 
   @override
-  State<AddSchedulePage> createState() => _AddSchedulePageState();
+  _AddSchedulePageState createState() => _AddSchedulePageState();
 }
 
 class _AddSchedulePageState extends State<AddSchedulePage> {
@@ -33,23 +31,17 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
   String? _uid;
   DateTime _selectedDate = DateTime.now();
   String _endTime = "9:30 PM";
-  String _startTime = DateFormat("hh:mm a").format(DateTime.now()).toString();
+  String _startTime =
+      DateFormat("hh:mm a").format(DateTime.now()).toString();
 
   final List<int> _options = [];
   List<bool> _isSelectedOptions = [];
+
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const SizedBox(
-        height: 290,
-        width: double.infinity,
-        child: Center(
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(),
-          ),
-        ),
+      return const Center(
+        child: CircularProgressIndicator(),
       );
     }
 
@@ -60,11 +52,8 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
         centerTitle: true,
         backgroundColor: Themes.hearderClr,
       ),
-      body: Container(
-        padding: const EdgeInsets.only(
-          left: 20,
-          right: 20,
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -81,6 +70,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
                   },
                 ),
               ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -98,9 +88,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 12,
-                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: MyInputField(
                       title: "Thời gian kết thúc",
@@ -118,7 +106,9 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
               _checkboxGroup(),
+              const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Themes.buttonClr,
@@ -138,7 +128,10 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
         ),
       ),
     );
-  }
+
+
+}
+
 
   Future<void> _initialize() async {
     String? uid = _auth.currentUser!.uid;

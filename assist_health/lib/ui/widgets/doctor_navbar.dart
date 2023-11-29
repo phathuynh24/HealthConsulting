@@ -1,7 +1,9 @@
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/admin_screens/add_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 
 class DoctorNavBar extends StatefulWidget {
   const DoctorNavBar({super.key});
@@ -14,11 +16,11 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    const SetScheduleScreen(),
+    Container(),
     // Screen 2
     Container(),
     // Screen 3
-    Container(),
+    const SetScheduleScreen(),
     // Screen 4
     Container(),
   ];

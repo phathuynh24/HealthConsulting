@@ -1,6 +1,7 @@
 import 'package:assist_health/others/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:assist_health/ui/admin_screens/add_doctor.dart';
 
 class AdminNavBar extends StatefulWidget {
   const AdminNavBar({super.key});
@@ -13,7 +14,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    Container(),
+    const AddDoctorPage(),
     // Screen 2
     Container(),
     // Screen 3
