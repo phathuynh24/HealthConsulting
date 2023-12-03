@@ -122,22 +122,22 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             Text(
-              DateFormat('dd/MM/yyyy').format(DateTime.now()),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Themes.buttonClr, // Set the color based on your theme
+              Text(
+                DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Themes.buttonClr, // Set the color based on your theme
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "Hôm nay",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey, // Set the color based on your theme
+              const SizedBox(height: 5),
+              const Text(
+                "Hôm nay",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey, // Set the color based on your theme
+                ),
               ),
-            ),
             ],
           ),
           MyButton(
@@ -209,14 +209,15 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: Color.fromARGB(255, 255, 255, 255),
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255),
                                       ),
                                     ),
                                     const SizedBox(
                                       height: 10,
                                     ),
                                     SizedBox(
-                                      height: 40,
+                                      height: 45,
                                       child: ListView.builder(
                                         scrollDirection: Axis.horizontal,
                                         shrinkWrap: true,
@@ -238,7 +239,8 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                                   vertical: 5,
                                                 ),
                                                 decoration: BoxDecoration(
-                                            color: Color.fromARGB(255, 255, 255, 255),
+                                                  color: Color.fromARGB(
+                                                      255, 255, 255, 255),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                 ),
@@ -250,7 +252,8 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                                         subIndex][i],
                                                     style: const TextStyle(
                                                       fontSize: 16,
-                                                color: Color.fromARGB(255, 0, 0, 0),
+                                                      color: Color.fromARGB(
+                                                          255, 0, 0, 0),
                                                     ),
                                                   ),
                                                 ),

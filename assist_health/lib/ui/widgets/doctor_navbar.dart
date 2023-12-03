@@ -1,9 +1,9 @@
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/admin_screens/add_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
+import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 
 class DoctorNavBar extends StatefulWidget {
   const DoctorNavBar({super.key});
@@ -18,7 +18,7 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
     // Screen 1
     Container(),
     // Screen 2
-    Container(),
+    const MessageScreen(),
     // Screen 3
     const SetScheduleScreen(),
     // Screen 4

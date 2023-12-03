@@ -3,8 +3,7 @@ import 'package:assist_health/ui/user_screens/home.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/user_screens/schedule.dart';
-import 'package:assist_health/ui/user_screens/settings.dart';
-import 'package:assist_health/ui/user_screens/health_profile.dart';
+import 'package:assist_health/ui/user_screens/account.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,16 +19,14 @@ class _UserNavBarState extends State<UserNavBar> {
   final _screens = [
     // Home Screen
     const HomeScreen(),
-    // Messages Screen
-    const MessageScreen(),
-    // Public Chat Screen
-    const PublicQuestionsScreen(),
     // Schedule Screen
     const ScheduleScreen(),
-    //Profile
-    const HealthProfileScreen(),
-    //Setting Screen
-    const SettingScreen(),
+    // Public Chat Screen
+    const PublicQuestionsScreen(),
+    // Messages Screen
+    const MessageScreen(),
+    //Account Screen
+    const AccountScreen(),
   ];
 
   @override
@@ -60,24 +57,20 @@ class _UserNavBarState extends State<UserNavBar> {
               label: "Trang chủ",
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-              label: "Nhắn tin",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_3),
-              label: "Cộng đồng",
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
               label: "Lịch khám",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.health_and_safety),
-              label: "Hồ sơ",
+              icon: Icon(CupertinoIcons.person_3_fill),
+              label: "Cộng đồng",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Cài đặt",
+              icon: Icon(CupertinoIcons.chat_bubble_text_fill),
+              label: "Tin nhắn",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: "Tài khoản",
             ),
           ],
         ),

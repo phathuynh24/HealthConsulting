@@ -2,7 +2,7 @@ import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/ui/user_screens/detail_doctor.dart';
-import 'package:assist_health/ui/user_screens/list_doctor.dart';
+import 'package:assist_health/ui/user_screens/doctor_list.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -21,11 +21,12 @@ class _MyHomeScreen extends State<HomeScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   List symptoms = [
-    "Temperature",
-    "Snuffle",
-    "Fever",
-    "Cough",
-    "Cold",
+    "Tay mũi họng",
+    "Bệnh nhiệt đới",
+    "Nội thần kinh",
+    "Mắt",
+    "Nha khoa",
+    "Chấn khương chỉnh hình",
   ];
 
   List imgs = [
@@ -54,7 +55,12 @@ class _MyHomeScreen extends State<HomeScreen> {
                       children: [
                         CircleAvatar(
                           radius: 25,
-                          backgroundImage: AssetImage("assets/doctor1.jpg"),
+                          backgroundColor: Themes.primaryColor,
+                          child: Icon(
+                            Icons.person,
+                            size: 40,
+                            color: Colors.white,
+                          ),
                         ),
                         SizedBox(
                           width: 20,
@@ -122,7 +128,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (_) =>
-                                            const ListDoctorScreen()),
+                                            const DoctorListScreen()),
                                   );
                                 }),
                                 itemDashboard(

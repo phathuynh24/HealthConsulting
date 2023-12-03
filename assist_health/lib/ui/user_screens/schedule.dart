@@ -89,7 +89,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "Completed",
+                        "Đã khám",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -115,7 +115,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        "Completed",
+                        "Đã hủy",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

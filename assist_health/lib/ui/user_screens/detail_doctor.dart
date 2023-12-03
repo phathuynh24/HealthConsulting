@@ -143,7 +143,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                               const Text(
                                 "Đánh giá",
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black54,
                                 ),
@@ -185,7 +185,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                               const Text(
                                 "Tư vấn trung bình",
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black54,
                                 ),
@@ -201,7 +201,7 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                               });
                             },
                             child: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               child: isFavorite
                                   ? const Icon(Icons.favorite,
                                       color: Colors.red, size: 35)
@@ -346,16 +346,30 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    margin: const EdgeInsets.only(right: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 15),
                     color: Colors.white,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Kinh nghiệm",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            gradient: const LinearGradient(
+                              colors: [Themes.leftClr, Themes.rightClr],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                          child: const Text(
+                            "Kinh nghiệm",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
                         ),
                         const SizedBox(
                           height: 10,
@@ -466,18 +480,30 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    margin: const EdgeInsets.only(right: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 15),
                     color: Colors.white,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Học vấn",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            gradient: const LinearGradient(
+                              colors: [Themes.leftClr, Themes.rightClr],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                          child: const Text(
+                            "Học vấn",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                         const SizedBox(
@@ -592,11 +618,25 @@ class _DetailDoctorScreenState extends State<DetailDoctorScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Nơi công tác",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
+                      Container(
+                        margin: const EdgeInsets.only(left: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: const LinearGradient(
+                            colors: [Themes.leftClr, Themes.rightClr],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                        child: const Text(
+                          "Nơi công tác",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),

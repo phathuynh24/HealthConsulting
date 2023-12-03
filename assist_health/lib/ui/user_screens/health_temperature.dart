@@ -175,6 +175,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
   _showBottomSheet(BuildContext context, int index) {
     if (index != -1) {
       _dateController.text = _temperatureDataList[index].date;
+      _time = _temperatureDataList[index].time;
       _temperatureController.text = _temperatureDataList[index].temperature;
     }
 
@@ -427,7 +428,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
+      firstDate: DateTime(2022),
       lastDate: DateTime.now(),
     );
     if (picked != null && picked != _selectedDate) {
@@ -568,7 +569,13 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
     TimeOfDay? pickedTime = await _showTimePicker();
 
     if (pickedTime != null) {
-      String formattedTime = pickedTime.format(context);
+      String formattedTime = DateFormat('HH:mm').format(DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        pickedTime.hour,
+        pickedTime.minute,
+      ));
       setState(() {
         _time = formattedTime;
       });
@@ -578,13 +585,17 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
   }
 
   _showTimePicker() {
+    TimeOfDay initialTime = TimeOfDay.now();
+
+    if (_time.isNotEmpty) {
+      List<int> timeParts = _time.split(':').map(int.parse).toList();
+      initialTime = TimeOfDay(hour: timeParts[0], minute: timeParts[1]);
+    }
+
     return showTimePicker(
       initialEntryMode: TimePickerEntryMode.input,
       context: context,
-      initialTime: TimeOfDay(
-        hour: int.parse(_time.split(":")[0]),
-        minute: int.parse(_time.split(":")[1].split(" ")[0]),
-      ),
+      initialTime: initialTime,
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),

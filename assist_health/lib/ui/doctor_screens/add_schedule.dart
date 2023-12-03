@@ -30,9 +30,8 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
 
   String? _uid;
   DateTime _selectedDate = DateTime.now();
-  String _endTime = "9:30 PM";
-  String _startTime =
-      DateFormat("hh:mm a").format(DateTime.now()).toString();
+  String _endTime = "9:30";
+  String _startTime = DateFormat("HH:mm").format(DateTime.now()).toString();
 
   final List<int> _options = [];
   List<bool> _isSelectedOptions = [];
@@ -128,10 +127,7 @@ class _AddSchedulePageState extends State<AddSchedulePage> {
         ),
       ),
     );
-
-
-}
-
+  }
 
   Future<void> _initialize() async {
     String? uid = _auth.currentUser!.uid;

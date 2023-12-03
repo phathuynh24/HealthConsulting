@@ -6,6 +6,7 @@ import 'package:assist_health/ui/user_screens/health_temperature.dart';
 import 'package:assist_health/ui/user_screens/health_weight.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class HealthMetricsTopNavBar extends StatefulWidget {
   UserProfile userProfile;
 
@@ -24,16 +25,36 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
     'Nhiệt độ'
   ];
   final PageController _pageController = PageController();
+  bool _isSelectingTab = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(_onPageChanged);
+  }
+
+  void _onPageChanged() {
+    if (!_isSelectingTab) {
+      setState(() {
+        _selectedIndex = _pageController.page!.round();
+      });
+    }
+  }
 
   void _onTabSelected(int index) {
     setState(() {
+      _isSelectingTab = true;
       _selectedIndex = index;
     });
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+    _pageController
+        .animateToPage(
+          index,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        )
+        .then((value) => setState(() {
+              _isSelectingTab = false;
+            }));
   }
 
   @override
@@ -63,7 +84,6 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
           SizedBox(
             height: 50,
             child: ListView.builder(
-              shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemCount: _tabLabels.length,
               itemBuilder: (context, index) {
@@ -90,10 +110,11 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
   Widget _buildTabButton(int index) {
     bool isSelected = index == _selectedIndex;
     String label = _tabLabels[index];
-
     return Expanded(
       child: GestureDetector(
-        onTap: () => _onTabSelected(index),
+        onTap: () {
+          _onTabSelected(index);
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           color: isSelected ? Colors.transparent : Colors.grey[200],
@@ -106,7 +127,7 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
                     color: isSelected ? Colors.purple : Colors.black54,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 14),
+                    fontSize: 15),
               ),
               const SizedBox(height: 5),
               isSelected

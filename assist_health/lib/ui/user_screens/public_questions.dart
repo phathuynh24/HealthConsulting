@@ -15,8 +15,9 @@ class PublicQuestionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Cộng đồng hỏi đáp'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Themes.leftClr, Themes.rightClr],
               begin: Alignment.centerLeft,

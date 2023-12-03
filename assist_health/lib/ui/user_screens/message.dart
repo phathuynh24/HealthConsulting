@@ -147,6 +147,7 @@ class _MessageScreenState extends State<MessageScreen>
       appBar: AppBar(
         title: const Text('Hỏi đáp riêng cùng bác sĩ'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -156,14 +157,6 @@ class _MessageScreenState extends State<MessageScreen>
             ),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality
-            },
-          ),
-        ],
       ),
       body: isLoading
           ? SingleChildScrollView(
@@ -254,7 +247,7 @@ class _MessageScreenState extends State<MessageScreen>
                           itemBuilder: (context, index) {
                             Map<String, dynamic> doctor = doctorList[index];
                             return Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 vertical: 5,
                               ),
                               child: ListTile(

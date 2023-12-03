@@ -51,7 +51,7 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
         .collection('users')
         .doc(_uid)
         .collection('health_profiles')
-        .doc(widget.userProfile.idDoc)
+        .doc('main_profile')
         .collection('health_metrics')
         .doc('bmi');
     _loadDataFromFirestore();

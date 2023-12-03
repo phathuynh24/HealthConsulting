@@ -5,14 +5,14 @@ import 'package:assist_health/ui/user_screens/detail_doctor.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ListDoctorScreen extends StatefulWidget {
-  const ListDoctorScreen({super.key});
+class DoctorListScreen extends StatefulWidget {
+  const DoctorListScreen({super.key});
 
   @override
-  State<ListDoctorScreen> createState() => _ListDoctorScreenState();
+  State<DoctorListScreen> createState() => _DoctorListScreenState();
 }
 
-class _ListDoctorScreenState extends State<ListDoctorScreen> {
+class _DoctorListScreenState extends State<DoctorListScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
@@ -22,7 +22,15 @@ class _ListDoctorScreenState extends State<ListDoctorScreen> {
       appBar: AppBar(
         title: const Text('Danh sách bác sĩ'),
         centerTitle: true,
-        backgroundColor: Themes.hearderClr,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.leftClr, Themes.rightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

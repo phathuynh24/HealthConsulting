@@ -353,3 +353,15 @@ String calculateBirthdayToSelectedDate(String doB, String selectedDate) {
 
   return birthdayToNowaday;
 }
+
+String getAbbreviatedName(String text) {
+  List<String> partOfName = text.split(' ');
+  String firstCharacterFromStart = partOfName[0].substring(0, 1);
+  if (partOfName.length - 1 > 0) {
+    String firstCharacterFromEnd =
+        partOfName[partOfName.length - 1].substring(0, 1);
+    return '$firstCharacterFromStart$firstCharacterFromEnd'.toUpperCase();
+  }
+
+  return firstCharacterFromStart.toUpperCase();
+}

@@ -19,7 +19,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   int age = 18;
-  String gender = 'Nam'; // Giá trị mặc định
+  String gender = 'Nam';
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         title: const Text('Đặt câu hỏi'),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Themes.leftClr, Themes.rightClr],
               begin: Alignment.centerLeft,
