@@ -1,4 +1,5 @@
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/admin_screens/doctor_profile_add.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/ui/admin_screens/add_doctor.dart';
@@ -16,7 +17,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 1
     const AddDoctorPage(),
     // Screen 2
-    Container(),
+    const AddDoctorScreen(),
     // Screen 3
     Container(),
     // Screen 4
