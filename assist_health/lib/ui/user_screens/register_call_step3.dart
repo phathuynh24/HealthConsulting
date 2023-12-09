@@ -2,9 +2,7 @@ import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 
 class RegisterCallStep3 extends StatefulWidget {
-  final String uid;
-
-  const RegisterCallStep3(this.uid, {super.key});
+  const RegisterCallStep3({super.key});
 
   @override
   State<RegisterCallStep3> createState() => _RegisterCallStep3();

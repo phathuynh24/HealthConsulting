@@ -1853,6 +1853,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
         _initialSelectedDate = (_isCurrentMonthOfCurrentYear())
             ? DateTime.now()
             : DateTime(_currentYear, _currentMonth, 1);
+        initDate = _initialSelectedDate!.day;
         _selectedDate = _initialSelectedDate;
       });
     });
@@ -1867,10 +1868,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
   }
 
   _isPastTime(int startHour, int startMinute) {
-    if ((startHour >= DateTime.now().hour &&
-            startMinute >= DateTime.now().minute &&
-            _isCurrentDate()) ||
-        !_isCurrentDate()) {
+    if (!_isCurrentDate()) return false;
+    if (startHour > DateTime.now().hour ||
+        (startHour == DateTime.now().hour &&
+            startMinute >= DateTime.now().minute)) {
       return false;
     }
     return true;
@@ -1891,7 +1892,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
   _isAnyTimeFrame({required bool isMorning}) {
     if (!_isCurrentDate()) return true;
     if (isMorning) {
-      if (DateTime.now().hour < 11) {
+      if (DateTime.now().hour < 12) {
         return true;
       }
       if (DateTime.now().hour == 11 && DateTime.now().minute <= 45) {

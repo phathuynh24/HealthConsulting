@@ -1,15 +1,21 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/health_profile_add_edit.dart';
+import 'package:assist_health/ui/user_screens/register_call_step2.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 
 class RegisterCallStep1 extends StatefulWidget {
   const RegisterCallStep1({super.key});
@@ -20,8 +26,8 @@ class RegisterCallStep1 extends StatefulWidget {
 
 class _RegisterCallStep1 extends State<RegisterCallStep1> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   final List<String> _specialties = ['Sản phụ khoa'];
 
@@ -48,6 +54,10 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
   bool _isSun = true;
 
+  int? initDate;
+
+  List<File> _selectedFiles = [];
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +70,18 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
     _updateStartTimeAndEndTime();
 
     _initialSelectedDate = DateTime.now();
-    _selectedDate = DateTime.now();
+    _selectedDate = _initialSelectedDate;
+
+    _initialSelectedDate = _isNotEmptySlot()
+        ? DateTime.now()
+        : DateTime.now().add(const Duration(days: 1));
+    _selectedDate = _initialSelectedDate;
+
+    initDate = _isCurrentMonthOfCurrentYear()
+        ? _isNotEmptySlot()
+            ? DateTime.now().day
+            : DateTime.now().add(const Duration(days: 1)).day
+        : 1;
   }
 
   @override
@@ -479,11 +500,6 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                               ),
                             );
                           },
-                          child: const Text(
-                            'Sửa hồ sơ',
-                            style: TextStyle(
-                                fontSize: 14, color: Themes.gradientDeepClr),
-                          ),
                           style: ButtonStyle(
                             shape: MaterialStateProperty.all<
                                 RoundedRectangleBorder>(
@@ -493,6 +509,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                             ),
                             backgroundColor:
                                 MaterialStateProperty.all<Color>(Colors.white),
+                          ),
+                          child: const Text(
+                            'Sửa hồ sơ',
+                            style: TextStyle(
+                                fontSize: 14, color: Themes.gradientDeepClr),
                           ),
                         ),
                         const SizedBox(
@@ -606,11 +627,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                           child: (_shouldReloadDatePicker)
                               ? DatePicker(
                                   DateTime(
-                                      _currentYear,
-                                      _currentMonth,
-                                      (_isCurrentMonthOfCurrentYear())
-                                          ? DateTime.now().day
-                                          : 1),
+                                      _currentYear, _currentMonth, initDate!),
                                   height: 90,
                                   width: 80,
                                   daysCount: _countTheRestDayOfSelectedMonth(),
@@ -746,7 +763,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                         bottomRight: Radius.circular(20),
                                       ),
                                     ),
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -823,7 +840,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                 ? GridView.builder(
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount:
@@ -904,15 +922,51 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                 ),
                                               ),
                                             )
-                                          : const SizedBox.shrink();
+                                          : Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color:
+                                                      Colors.blueGrey.shade100,
+                                                  width: (isSelectedTime)
+                                                      ? 1.5
+                                                      : 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Colors.grey
+                                                    .withOpacity(0.2),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  time,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                              ),
+                                            );
                                     },
                                   )
-                                : const SizedBox.shrink(),
+                                : Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 13,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'Không có khung giờ vào khoảng thời gian này. Bạn hãy chọn lịch khám vào buổi chiều hoặc chọn một ngày khác',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          height: 1.3,
+                                          color: Colors.black),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                           if (!_isSun)
                             ((_isAnyTimeFrame(isMorning: false)))
                                 ? GridView.builder(
                                     scrollDirection: Axis.vertical,
-                                    physics: NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
@@ -993,19 +1047,324 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                 ),
                                               ),
                                             )
-                                          : const SizedBox.shrink();
+                                          : Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color:
+                                                      Colors.blueGrey.shade100,
+                                                  width: (isSelectedTime)
+                                                      ? 1.5
+                                                      : 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                color: Colors.grey
+                                                    .withOpacity(0.2),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  time,
+                                                  style: const TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                              ),
+                                            );
                                     },
                                   )
-                                : const SizedBox.shrink(),
+                                : Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 13),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'Không có khung giờ vào khoảng thời gian này. Bạn hãy chọn lịch khám vào buổi sáng hoặc chọn một ngày khác',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          height: 1.3,
+                                          color: Colors.black),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                         ],
                       ),
                     ]),
               ),
-
               const SizedBox(
                 height: 15,
               ),
+
+              // Thông tin bổ sung
+              Container(
+                margin: const EdgeInsets.only(left: 15),
+                child: const Row(
+                  children: [
+                    Text(
+                      'Thông tin bổ sung (không bắt buộc)',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 15, top: 5, bottom: 5),
+                alignment: Alignment.center,
+                child: const Text(
+                  'Bạn có thể cung cấp thêm các thông tin như lý do khám, triệu chứng, đơn thuốc sử dụng gần đây',
+                  style: TextStyle(
+                      fontSize: 14, height: 1.3, color: Colors.blueGrey),
+                ),
+              ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 15,
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Text(
+                            'Triệu chứng',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const TextField(
+                            decoration: InputDecoration(
+                              hintText:
+                                  'Lý do khám, triệu chứng, trạng thái, tiền sử bệnh',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
+                            textInputAction: TextInputAction.newline,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: 2,
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          const Text(
+                            'Toa thuốc, hình ảnh',
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Text(
+                            'Toa(đơn) thuốc đang dùng gần đây',
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 10,
+                            ),
+                            child: GridView.builder(
+                              padding: EdgeInsets.zero,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _selectedFiles.length + 1,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 6,
+                                crossAxisSpacing: 6,
+                                childAspectRatio: 1,
+                              ),
+                              itemBuilder: (context, index) {
+                                if (index != _selectedFiles.length) {
+                                  File file = _selectedFiles[index];
+                                  String extension =
+                                      file.path.split('.').last.toLowerCase();
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      OpenFile.open(file.path);
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        LayoutBuilder(builder:
+                                            (BuildContext context,
+                                                BoxConstraints constraints) {
+                                          return Center(
+                                            child: Container(
+                                              height: constraints.maxWidth - 10,
+                                              width: constraints.maxHeight - 10,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                color: Colors.grey,
+                                              ),
+                                              alignment: Alignment.center,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (extension == 'pdf')
+                                                    const Icon(
+                                                        Icons.picture_as_pdf,
+                                                        size: 50),
+                                                  if (extension == 'doc' ||
+                                                      extension == 'docx')
+                                                    const Icon(
+                                                        Icons.description,
+                                                        size: 50),
+                                                  if (extension == 'mp4')
+                                                    const Icon(
+                                                        Icons
+                                                            .play_circle_filled,
+                                                        size: 50),
+                                                  if (extension == 'png' ||
+                                                      extension == 'jpg' ||
+                                                      extension == 'jpeg')
+                                                    SizedBox(
+                                                      height:
+                                                          constraints.maxWidth -
+                                                              10,
+                                                      width: constraints
+                                                              .maxHeight -
+                                                          10,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(6),
+                                                        child: Image.file(
+                                                          file,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          child: InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                File file =
+                                                    _selectedFiles[index];
+                                                // Xóa tệp cục bộ
+                                                file.deleteSync();
+                                                // Xóa tệp khỏi danh sách
+                                                _selectedFiles.removeAt(index);
+                                              });
+                                            },
+                                            child: const CircleAvatar(
+                                              backgroundColor: Colors.red,
+                                              radius: 12,
+                                              child: Icon(
+                                                Icons.remove,
+                                                color: Colors.white,
+                                                size: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      _showImageBottomSheet(context);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.add,
+                                          size: 35,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                  ],
+                ),
+              ),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 70,
+        padding: const EdgeInsets.all(8),
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colors.blueGrey,
+              width: 0.2,
+            ),
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const RegisterCallStep2()));
+          },
+          child: Container(
+            padding: const EdgeInsets.all(13),
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: BoxDecoration(
+              color: Themes.gradientDeepClr,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              'Tiếp tục',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
       ),
@@ -2046,6 +2405,94 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
     );
   }
 
+  void _showImageBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Wrap(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo),
+                  title: const Text('Chọn file từ thư viện'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickMultipleFile();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera),
+                  title: const Text('Chụp ảnh'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    captureImage();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> pickMultipleFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg', 'mp4', 'doc', 'docx', 'pdf'],
+    );
+    if (result != null) {
+      setState(() {
+        _selectedFiles.addAll(result.paths.map((path) => File(path!)));
+      });
+      // for (var file in result.paths.map((path) => File(path!))) {
+      //   await uploadFile(file);
+      // }
+    }
+  }
+
+  Future<void> captureImage() async {
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.camera);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedFiles.add(File(pickedFile.path));
+      });
+      // Chuyển đổi XFile thành File
+      File pickedFileAsFile = File(pickedFile.path);
+      //await uploadFile(pickedFileAsFile);
+    }
+  }
+
+  Future<void> uploadFile(File file) async {
+    try {
+      // Tạo tham chiếu đến Firebase Storage
+      final storageRef = _storage.ref().child(
+          'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}');
+
+      await storageRef.putFile(file);
+
+      // Lấy đường dẫn tới file vừa tải lên
+      String downloadURL = await storageRef.getDownloadURL();
+
+      // Lưu downloadURL vào collection files
+
+      // await _firestore
+      //     .collection('users')
+      //     .doc(_uid)
+      //     .collection('health_profiles')
+      //     .doc(widget.profile.idDoc)
+      //     .collection('fileURLs')
+      //     .doc('data')
+      //     .set({
+      //   'data': FieldValue.arrayUnion([downloadURL]),
+      // }, SetOptions(merge: true));
+    } catch (error) {}
+  }
+
   _setSelectedYear(int selectedYear) {
     setState(() {
       _currentYear = selectedYear;
@@ -2137,6 +2584,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
         _initialSelectedDate = (_isCurrentMonthOfCurrentYear())
             ? DateTime.now()
             : DateTime(_currentYear, _currentMonth, 1);
+        initDate = _initialSelectedDate!.day;
         _selectedDate = _initialSelectedDate;
       });
     });
@@ -2151,10 +2599,10 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
   }
 
   _isPastTime(int startHour, int startMinute) {
-    if ((startHour >= DateTime.now().hour &&
-            startMinute >= DateTime.now().minute &&
-            _isCurrentDate()) ||
-        !_isCurrentDate()) {
+    if (!_isCurrentDate()) return false;
+    if (startHour > DateTime.now().hour ||
+        (startHour == DateTime.now().hour &&
+            startMinute >= DateTime.now().minute)) {
       return false;
     }
     return true;
@@ -2178,11 +2626,10 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
       if (DateTime.now().hour < 12) {
         return true;
       }
-      if (DateTime.now().hour == 12 && DateTime.now().minute <= 45) {
+      if (DateTime.now().hour == 11 && DateTime.now().minute <= 45) {
         return true;
       }
-    }
-    if (!isMorning) {
+    } else {
       if (DateTime.now().hour < endHour!) {
         return true;
       }
@@ -2192,5 +2639,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
       }
     }
     return false;
+  }
+
+  _isNotEmptySlot() {
+    if (_isAnyTimeFrame(isMorning: true) == false &&
+        _isAnyTimeFrame(isMorning: false) == false) return false;
+    return true;
   }
 }
