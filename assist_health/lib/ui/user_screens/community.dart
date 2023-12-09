@@ -31,7 +31,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

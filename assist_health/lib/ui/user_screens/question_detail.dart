@@ -48,7 +48,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

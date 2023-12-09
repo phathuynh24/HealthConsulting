@@ -72,7 +72,7 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -117,30 +117,20 @@ class _HealthMetricsTopNavBarState extends State<HealthMetricsTopNavBar> {
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          color: isSelected ? Colors.transparent : Colors.grey[200],
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                    color: isSelected ? Colors.purple : Colors.black54,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 15),
-              ),
-              const SizedBox(height: 5),
-              isSelected
-                  ? Container(
-                      height: 2,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(2),
-                        color: Colors.purple,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ],
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(
+                    color: Colors.blue, width: (isSelected) ? 1.5 : 0),
+              )),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                  color: isSelected ? Colors.blue : Colors.black,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 16),
+            ),
           ),
         ),
       ),

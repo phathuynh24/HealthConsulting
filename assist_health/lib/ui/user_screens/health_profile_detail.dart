@@ -63,7 +63,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -112,7 +112,10 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                               : Container(
                                   decoration: const BoxDecoration(
                                     gradient: LinearGradient(
-                                      colors: [Themes.leftClr, Themes.rightClr],
+                                      colors: [
+                                        Themes.gradientDeepClr,
+                                        Themes.gradientLightClr
+                                      ],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                     ),
@@ -135,7 +138,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                                 BoxShadow(
                                   color: _currentProfile!.image.isNotEmpty
                                       ? Colors.black26
-                                      : Colors.purple.shade300.withOpacity(0.7),
+                                      : Colors.blue.shade700.withOpacity(0.8),
                                   spreadRadius: 2,
                                   blurRadius: 0,
                                   offset: const Offset(0, 2.5),
@@ -156,8 +159,8 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                                       decoration: const BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            Themes.leftClr,
-                                            Themes.rightClr
+                                            Themes.gradientDeepClr,
+                                            Themes.gradientLightClr
                                           ],
                                           begin: Alignment.bottomCenter,
                                           end: Alignment.topCenter,
@@ -249,6 +252,22 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                     ),
                     const SizedBox(height: 10),
                     const Text(
+                      'Mã bệnh nhân',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.blueGrey,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _currentProfile!.idProfile,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
                       'Họ và tên',
                       style: TextStyle(
                           fontSize: 16,
@@ -332,7 +351,10 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               gradient: const LinearGradient(
-                                colors: [Themes.leftClr, Themes.rightClr],
+                                colors: [
+                                  Themes.gradientDeepClr,
+                                  Themes.gradientLightClr
+                                ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                               ),

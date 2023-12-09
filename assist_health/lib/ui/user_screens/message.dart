@@ -151,7 +151,7 @@ class _MessageScreenState extends State<MessageScreen>
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

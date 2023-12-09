@@ -105,7 +105,7 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
               flexibleSpace: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Themes.leftClr, Themes.rightClr],
+                    colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -187,11 +187,6 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
                     ),
                     TextField(
                         controller: _nameController,
-                        keyboardType: TextInputType.name,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z\s]')),
-                        ],
                         decoration: InputDecoration(
                           hintText: 'Họ và tên của bạn',
                           border: OutlineInputBorder(

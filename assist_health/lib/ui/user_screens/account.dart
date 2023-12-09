@@ -52,7 +52,7 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.withOpacity(0.1),
+      backgroundColor: Colors.blueAccent.withOpacity(0.1),
       appBar: AppBar(
         title: const Text('Tài khoản'),
         elevation: 0,
@@ -61,7 +61,7 @@ class _AccountScreenState extends State<AccountScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Themes.leftClr, Themes.rightClr],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -70,7 +70,7 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
       body: Center(
         child: isLoading
-            ? CircularProgressIndicator() // Hiển thị CircularProgressIndicator nếu đang tải dữ liệu
+            ? const CircularProgressIndicator()
             : SingleChildScrollView(
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -104,8 +104,8 @@ class _AccountScreenState extends State<AccountScreen> {
                                     decoration: const BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          Themes.leftClr,
-                                          Themes.rightClr
+                                          Themes.gradientDeepClr,
+                                          Themes.gradientLightClr
                                         ],
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
@@ -169,7 +169,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                   size: 28,
                                 ),
                                 title: const Text(
-                                  "Hồ sơ y tế",
+                                  "Hồ sơ sức khỏe",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,
