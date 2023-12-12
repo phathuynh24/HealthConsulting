@@ -144,7 +144,9 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
         body: SingleChildScrollView(
           controller: _scrollController,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10,
+            ),
             color: Colors.blueAccent.withOpacity(0.1),
             child: Column(
               children: [
@@ -152,7 +154,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     children: [
                       Row(
@@ -164,8 +167,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             child: Stack(
                               children: [
                                 SizedBox(
-                                  width: 100,
-                                  height: 100,
+                                  width: 80,
+                                  height: 80,
                                   child: ClipOval(
                                     child: Container(
                                       decoration: const BoxDecoration(
@@ -202,7 +205,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                       ),
                                       child: const Icon(
                                         CupertinoIcons.video_camera_solid,
-                                        size: 23,
+                                        size: 18,
                                         color: Colors.white,
                                       ),
                                     )),
@@ -210,7 +213,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             ),
                           ),
                           const SizedBox(
-                            width: 265,
+                            width: 255,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -218,7 +221,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   'ThS. BS. CK1',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     height: 1.5,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -227,7 +230,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   'Nguyễn Văn Á',
                                   style: TextStyle(
                                     color: Colors.black87,
-                                    fontSize: 17,
+                                    fontSize: 16,
                                     height: 1.5,
                                     fontWeight: FontWeight.w500,
                                     overflow: TextOverflow.ellipsis,
@@ -237,7 +240,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   '4 năm kinh nghiệm',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     height: 1.5,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -247,19 +250,22 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                           ),
                         ],
                       ),
+                      SizedBox(
+                        height: 6,
+                      ),
                       Row(
                         children: [
                           const Text(
                             'Chuyên khoa: ',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16,
+                              fontSize: 15,
                               height: 1.5,
                             ),
                           ),
                           SizedBox(
-                              height: 40,
-                              width: 270,
+                              height: 35,
+                              width: 265,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
@@ -268,7 +274,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   final specialty = _specialties[index];
                                   return Container(
                                     margin: const EdgeInsets.symmetric(
-                                        horizontal: 5),
+                                        horizontal: 2),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 9),
                                     decoration: BoxDecoration(
@@ -280,7 +286,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                         specialty,
                                         style: const TextStyle(
                                             color: Colors.black,
-                                            fontSize: 15,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w400),
                                       ),
                                     ),
@@ -299,7 +305,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -328,7 +337,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   'Lịch tư vấn',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -359,7 +368,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                        width: 1, color: Colors.grey)),
+                                        width: 1, color: Colors.grey.shade300)),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -390,26 +399,27 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   ? DatePicker(
                                       DateTime(_currentYear, _currentMonth,
                                           initDate!),
-                                      height: 100,
-                                      width: 80,
+                                      height: 85,
+                                      width: 70,
                                       daysCount:
                                           _countTheRestDayOfSelectedMonth(),
                                       initialSelectedDate: _initialSelectedDate,
                                       locale: 'vi_VN',
-                                      selectionColor: Themes.gradientLightClr,
+                                      selectionColor: Themes.gradientDeepClr
+                                          .withOpacity(0.8),
                                       selectedTextColor: Colors.white,
                                       dateTextStyle: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
                                       ),
                                       dayTextStyle: const TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.black,
+                                        fontSize: 12,
+                                        color: Colors.blueGrey,
                                       ),
                                       monthTextStyle: const TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.black,
+                                        fontSize: 12,
+                                        color: Colors.blueGrey,
                                       ),
                                       onDateChange: (date) {
                                         setState(() {
@@ -422,17 +432,17 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                       },
                                     )
                                   : const SizedBox(
-                                      height: 100,
+                                      height: 85,
                                       child: Center(
                                           child: CircularProgressIndicator()),
                                     ),
                             ),
-                            const SizedBox(
-                              height: 3,
-                            ),
                             Container(
                               width: 140,
-                              padding: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
@@ -458,7 +468,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   Text(
                                     'Còn 48 slot',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.white,
                                     ),
@@ -466,23 +476,26 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(
-                              height: 10,
+                            SizedBox(
+                              height: 5,
                             ),
                             Column(
                               children: [
                                 (_isAnyTimeFrame(isMorning: true))
                                     ? Column(
                                         children: [
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
                                           const Row(
                                             children: [
                                               Icon(
                                                 Icons.sunny,
-                                                size: 20,
+                                                size: 18,
                                                 color: Colors.amber,
                                               ),
                                               SizedBox(
-                                                width: 8,
+                                                width: 10,
                                               ),
                                               Text(
                                                 'Buổi sáng',
@@ -493,7 +506,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                             ],
                                           ),
                                           const SizedBox(
-                                            height: 5,
+                                            height: 8,
                                           ),
                                           SizedBox(
                                             height: 50,
@@ -596,22 +609,22 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                         ],
                                       )
                                     : const SizedBox.shrink(),
-                                const SizedBox(
-                                  height: 10,
-                                ),
                                 ((_isAnyTimeFrame(isMorning: false)))
                                     ? Column(
                                         children: [
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
                                           Row(
                                             children: [
                                               Icon(
                                                 FontAwesomeIcons.cloudSun,
-                                                size: 20,
+                                                size: 18,
                                                 color:
                                                     Colors.blueAccent.shade200,
                                               ),
                                               const SizedBox(
-                                                width: 8,
+                                                width: 12,
                                               ),
                                               const Text(
                                                 'Buổi chiều',
@@ -622,10 +635,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                             ],
                                           ),
                                           const SizedBox(
-                                            height: 5,
+                                            height: 10,
                                           ),
                                           SizedBox(
-                                            height: 50,
+                                            height: 45,
                                             child: ListView.builder(
                                               scrollDirection: Axis.horizontal,
                                               itemCount: ((endHour! - 12) * 60 +
@@ -671,7 +684,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                         child: Container(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(10),
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      15,
+                                                                  vertical: 10),
                                                           margin:
                                                               const EdgeInsets
                                                                   .all(3),
@@ -704,12 +720,15 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                             child: Text(
                                                               time,
                                                               style: TextStyle(
-                                                                  color: (isSelectedTime)
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade800
-                                                                      : Colors
-                                                                          .black),
+                                                                color: (isSelectedTime)
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade800
+                                                                    : Colors
+                                                                        .black,
+                                                                wordSpacing:
+                                                                    1.2,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -754,7 +773,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -776,14 +796,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 size: 20,
                               ),
                               const SizedBox(
-                                width: 16,
+                                width: 12,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Phí dịch vụ',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -793,7 +813,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isFeeServiceVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -806,6 +826,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             top: 5,
                             left: 4,
                             right: 4,
+                            bottom: 6,
                           ),
                           child: const Center(
                             child: Row(
@@ -813,14 +834,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 Text(
                                   'Tư vấn trực tuyến',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                   ),
                                 ),
                                 Spacer(),
                                 Text(
                                   '120.000 vnđ',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -838,7 +859,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -860,14 +882,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 size: 20,
                               ),
                               const SizedBox(
-                                width: 16,
+                                width: 12,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Giờ làm việc',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -877,7 +899,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isWorkTimeVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -890,6 +912,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             top: 5,
                             left: 4,
                             right: 4,
+                            bottom: 6,
                           ),
                           child: const Center(
                             child: Row(
@@ -897,14 +920,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 Text(
                                   'Thứ 2 - Chủ nhật',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                   ),
                                 ),
                                 Spacer(),
                                 Text(
                                   '8:00 - 20:00',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -922,7 +945,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -944,14 +968,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 size: 25,
                               ),
                               const SizedBox(
-                                width: 12,
+                                width: 8,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Giới thiệu',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -961,7 +985,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isInformationVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -974,11 +998,12 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             top: 5,
                             left: 4,
                             right: 4,
+                            bottom: 6,
                           ),
                           child: const Text(
                             'ABCcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                             ),
                           ),
                         ),
@@ -992,7 +1017,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1013,18 +1039,18 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               ),
                               const Icon(
                                 FontAwesomeIcons.starOfLife,
-                                size: 18,
+                                size: 16,
                                 color: Colors.blueGrey,
                               ),
                               const SizedBox(
-                                width: 14,
+                                width: 12,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Chuyên khám',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -1034,7 +1060,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isSpecialtyVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -1045,6 +1071,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Container(
                           padding: const EdgeInsets.only(
                             top: 5,
+                            bottom: 6,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1064,7 +1091,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const Text(
                                     'Nội khoa tổng quát',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1110,7 +1137,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const Text(
                                     'Nội khoa tổng quát',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1128,7 +1155,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1146,7 +1174,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             children: [
                               const Icon(
                                 CupertinoIcons.building_2_fill,
-                                size: 25,
+                                size: 20,
                                 color: Colors.blueGrey,
                               ),
                               const SizedBox(
@@ -1157,7 +1185,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   'Nơi công tác',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -1167,7 +1195,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isWorkPlaceVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -1178,6 +1206,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Container(
                           padding: const EdgeInsets.only(
                             top: 5,
+                            bottom: 6,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1197,7 +1226,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const Text(
                                     'Bệnh viện An Bình',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1215,7 +1244,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1233,18 +1263,18 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             children: [
                               const Icon(
                                 FontAwesomeIcons.graduationCap,
-                                size: 20,
+                                size: 18,
                                 color: Colors.blueGrey,
                               ),
                               const SizedBox(
-                                width: 16,
+                                width: 12,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Quá trình đào tạo',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -1254,7 +1284,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isStudyVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -1265,6 +1295,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Container(
                           padding: const EdgeInsets.only(
                             top: 5,
+                            bottom: 6,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1284,7 +1315,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const Text(
                                     'Bệnh viện An Bình',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1302,7 +1333,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1320,18 +1352,18 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             children: [
                               const Icon(
                                 FontAwesomeIcons.award,
-                                size: 20,
+                                size: 18,
                                 color: Colors.blueGrey,
                               ),
                               const SizedBox(
-                                width: 16,
+                                width: 15,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Kinh nghiệm',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -1341,7 +1373,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isExperienceVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -1352,6 +1384,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Container(
                           padding: const EdgeInsets.only(
                             top: 5,
+                            bottom: 6,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1371,7 +1404,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const Text(
                                     'Bệnh viện An Bình',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ],
@@ -1389,7 +1422,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 Container(
                   color: Colors.white,
                   width: double.infinity,
-                  padding: const EdgeInsets.all(10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1411,14 +1445,14 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 color: Colors.blueGrey,
                               ),
                               const SizedBox(
-                                width: 16,
+                                width: 14,
                               ),
                               const Expanded(
                                 child: Text(
                                   'Hình ảnh',
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     height: 1.5,
                                   ),
@@ -1428,7 +1462,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 (_isImageVisible)
                                     ? FontAwesomeIcons.angleDown
                                     : FontAwesomeIcons.angleUp,
-                                size: 20,
+                                size: 16,
                                 color: Colors.grey,
                               )
                             ],
@@ -1445,7 +1479,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               'Visible',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 16,
                               ),
                             ),
                           ),

@@ -37,10 +37,9 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
           preferredSize: const Size.fromHeight(45),
           child: Container(
             height: 45,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            width: double.infinity,
             color: Colors.white,
             child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               color: Colors.blueAccent.withOpacity(0.1),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -135,6 +134,41 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                     ),
                     const Text(
                       'Thanh toán',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Icon(
+                      Icons.arrow_right_alt_outlined,
+                      size: 30,
+                      color: Colors.blueGrey,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blueGrey,
+                      ),
+                      child: const Text(
+                        '4',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text(
+                      'Nhận lịch hẹn',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blueGrey,
@@ -348,19 +382,20 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                 fontWeight: FontWeight.w500),
                           ),
                           Expanded(
-                              child: Divider(
-                            height: 20,
-                            indent: 10,
-                            endIndent: 6,
-                            thickness: 1,
-                            color: Colors.grey.shade300,
-                          )),
+                            child: Divider(
+                              height: 20,
+                              indent: 10,
+                              endIndent: 6,
+                              thickness: 1,
+                              color: Colors.grey.shade300,
+                            ),
+                          ),
                           Icon(
                             (_isVisibleInformation)
                                 ? Icons.keyboard_arrow_down_rounded
                                 : Icons.keyboard_arrow_up_rounded,
                             size: 25,
-                            color: Colors.grey,
+                            color: Colors.grey.shade400,
                           ),
                         ]),
                       ),
@@ -631,7 +666,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                     'Tổng',
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black87,
+                        color: Colors.red,
                         fontWeight: FontWeight.w500),
                   ),
                   SizedBox(height: 6),
@@ -639,7 +674,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                     '120.995 vnđ',
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black87,
+                        color: Colors.red,
                         fontWeight: FontWeight.w500),
                   ),
                 ],
@@ -653,7 +688,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const RegisterCallStep3()));
+                        builder: (context) => RegisterCallStep3()));
               },
               child: Container(
                 padding: const EdgeInsets.all(13),

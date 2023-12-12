@@ -106,10 +106,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
           preferredSize: const Size.fromHeight(45),
           child: Container(
             height: 45,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            width: double.infinity,
             color: Colors.white,
             child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 10,
+              ),
               color: Colors.blueAccent.withOpacity(0.1),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -204,6 +205,41 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                     ),
                     const Text(
                       'Thanh toán',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blueGrey,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Icon(
+                      Icons.arrow_right_alt_outlined,
+                      size: 30,
+                      color: Colors.blueGrey,
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.blueGrey,
+                      ),
+                      child: const Text(
+                        '4',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text(
+                      'Nhận lịch hẹn',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.blueGrey,
@@ -355,7 +391,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
+                              return Center(
+                                  child: const CircularProgressIndicator());
                             }
 
                             if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -628,25 +665,25 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                               ? DatePicker(
                                   DateTime(
                                       _currentYear, _currentMonth, initDate!),
-                                  height: 90,
-                                  width: 80,
+                                  height: 80,
+                                  width: 70,
                                   daysCount: _countTheRestDayOfSelectedMonth(),
                                   initialSelectedDate: _initialSelectedDate,
                                   locale: 'vi_VN',
                                   selectionColor: Themes.gradientLightClr,
                                   selectedTextColor: Colors.white,
                                   dateTextStyle: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.grey,
+                                    color: Colors.black,
                                   ),
                                   dayTextStyle: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
+                                    fontSize: 11,
+                                    color: Colors.blueGrey,
                                   ),
                                   monthTextStyle: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
+                                    fontSize: 11,
+                                    color: Colors.blueGrey,
                                   ),
                                   onDateChange: (date) {
                                     setState(() {
@@ -668,8 +705,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                           height: 3,
                         ),
                         Container(
-                          width: 140,
-                          padding: const EdgeInsets.all(8),
+                          width: 130,
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [
@@ -695,7 +732,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                               Text(
                                 'Còn 48 slot',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
                                 ),

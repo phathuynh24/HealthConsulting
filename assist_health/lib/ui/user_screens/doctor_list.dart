@@ -253,6 +253,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
 
           return Container(
             color: Colors.blueAccent.withOpacity(0.1),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: ListView.builder(
               itemCount: 20,
               itemBuilder: (context, index) {
@@ -371,7 +372,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                               ),
                             ),
                             SizedBox(
-                              width: 270,
+                              width: 255,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
