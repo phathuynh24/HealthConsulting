@@ -1,5 +1,4 @@
 import 'package:assist_health/others/theme.dart';
-import 'package:assist_health/ui/admin_screens/add_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:flutter/cupertino.dart';
