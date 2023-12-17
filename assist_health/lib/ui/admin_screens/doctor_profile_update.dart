@@ -11,7 +11,8 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 class UpdateDoctorScreen extends StatefulWidget {
   final String doctorId;
 
-  const UpdateDoctorScreen({Key? key, required this.doctorId}) : super(key: key);
+  const UpdateDoctorScreen({Key? key, required this.doctorId})
+      : super(key: key);
 
   @override
   _UpdateDoctorScreenState createState() => _UpdateDoctorScreenState();
@@ -25,9 +26,9 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
   TextEditingController _experiencetextController = TextEditingController();
   TextEditingController _studytextController = TextEditingController();
   File? _selectedImage;
-  String? _imageURL; 
+  String? _imageURL;
   List<String> _selectedSpecialties = [];
-    List<String> _specialties = [
+  List<String> _specialties = [
     'Tai mũi họng',
     'Nội thần kinh',
     'Mắt',
@@ -56,7 +57,8 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
           _experiencetextController.text = doctorSnapshot['experiencetext'];
           _studytextController.text = doctorSnapshot['studytext'];
           _imageURL = doctorSnapshot['imageURL'];
-          _selectedSpecialties = List<String>.from(doctorSnapshot['specialty'] ?? []);
+          _selectedSpecialties =
+              List<String>.from(doctorSnapshot['specialty'] ?? []);
         });
       }
     } catch (e) {
@@ -81,7 +83,8 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
       // Upload and get image URL if a new image is selected
       String? downloadURL;
       if (_selectedImage != null) {
-        downloadURL = await _uploadImageToFirebase(_selectedImage!, widget.doctorId);
+        downloadURL =
+            await _uploadImageToFirebase(_selectedImage!, widget.doctorId);
       }
 
       // Update Firestore document with new data
@@ -90,9 +93,7 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
         'email': _emailController.text,
         'description': _descriptionController.text,
         'workplace': _workplaceController.text,
-        'experiencetext': _experiencetextController.text,
-        'studytext': _studytextController.text,
-        'imageURL': downloadURL ?? _imageURL, 
+        'imageURL': downloadURL ?? _imageURL,
         'specialty': _selectedSpecialties,
 
         // Use the new URL if available, otherwise keep the old one
@@ -106,7 +107,8 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
     }
   }
 
-  Future<String?> _uploadImageToFirebase(File imageFile, String doctorId) async {
+  Future<String?> _uploadImageToFirebase(
+      File imageFile, String doctorId) async {
     try {
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference storageReference = storage.ref().child('images/$doctorId.jpg');
@@ -136,13 +138,14 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
       ),
     );
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cập Nhật Thông Tin Bác Sĩ'),
+        title: const Text('Cập Nhật Thông Tin Bác Sĩ'),
         backgroundColor: Themes.primaryColor,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
       ),
@@ -167,12 +170,14 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
                       child: _selectedImage != null
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(60),
-                              child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                              child: Image.file(_selectedImage!,
+                                  fit: BoxFit.cover),
                             )
                           : _imageURL != null
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(60),
-                                  child: Image.network(_imageURL!, fit: BoxFit.cover),
+                                  child: Image.network(_imageURL!,
+                                      fit: BoxFit.cover),
                                 )
                               : const SizedBox.shrink(),
                     ),
@@ -189,18 +194,17 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
               ),
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Họ tên bác sĩ',
                   border: OutlineInputBorder(),
                 ),
               ),
 
-    
-           const SizedBox(height: 16),
+              const SizedBox(height: 16),
               MultiSelectDialogField(
                 items: _specialties
-                    .map((String value) =>
-                        MultiSelectItem<String>(value, value))
+                    .map(
+                        (String value) => MultiSelectItem<String>(value, value))
                     .toList(),
                 initialValue: _selectedSpecialties,
                 onConfirm: (values) {
@@ -208,13 +212,13 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
                     _selectedSpecialties = values.cast<String>().toList();
                   });
                 },
-                title: Text('Chuyên khoa'),
+                title: const Text('Chuyên khoa'),
               ),
 
               const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
                 ),
@@ -222,7 +226,7 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Mô tả',
                   border: OutlineInputBorder(),
                 ),
@@ -230,28 +234,28 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _workplaceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Nơi công tác',
                   border: OutlineInputBorder(),
                 ),
               ),
               TextField(
-              controller: _experiencetextController,
-              maxLines: 3,
-              decoration: InputDecoration(
-              labelText: 'Kinh nghiệm làm việc',
-              border: OutlineInputBorder(),
-  ),
-),
-const SizedBox(height: 16),
-TextField(
-  controller: _studytextController,
-  maxLines: 3,
-  decoration: InputDecoration(
-    labelText: 'Học vấn',
-    border: OutlineInputBorder(),
-  ),
-),
+                controller: _experiencetextController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Kinh nghiệm làm việc',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _studytextController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Học vấn',
+                  border: OutlineInputBorder(),
+                ),
+              ),
 
               // Your other UI components here
               ElevatedButton(

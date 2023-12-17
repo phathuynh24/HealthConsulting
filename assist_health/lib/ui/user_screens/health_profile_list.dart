@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
@@ -21,15 +23,14 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
 
   late String _uid;
 
-  List<UserProfile> _userProfiles = [];
-
-  bool _isLoading = true;
+  final StreamController<List<UserProfile>> _userStreamController =
+      StreamController<List<UserProfile>>.broadcast();
 
   @override
   void initState() {
     super.initState();
     _uid = _auth.currentUser!.uid;
-    _loadDataFromFirestore();
+    _userStreamController.addStream(getProfileUsers(_uid));
   }
 
   @override
@@ -66,7 +67,6 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
               );
 
               if (isAdded != null && isAdded == true) {
-                _loadDataFromFirestore();
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Lưu hồ sơ thành công!'),
@@ -78,27 +78,39 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
         ],
       ),
       body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.grey.withOpacity(0.1),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: ListView.builder(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.grey.withOpacity(0.1),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: StreamBuilder<List<UserProfile>>(
+                stream: _userStreamController.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: const CircularProgressIndicator());
+                  }
+
+                  List<UserProfile> userProfiles = snapshot.data!;
+                  return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: _userProfiles.length,
+                    itemCount: userProfiles.length,
                     itemBuilder: (context, index) {
-                      UserProfile profile = _userProfiles[index];
+                      UserProfile profile = userProfiles[index];
                       return Container(
                         margin: EdgeInsets.only(
                           top: 15,
-                          bottom: (index == _userProfiles.length - 1) ? 15 : 0,
+                          bottom: (index == userProfiles.length - 1) ? 15 : 0,
+                          left: 5,
+                          right: 5,
                         ),
                         padding: const EdgeInsets.symmetric(
                           vertical: 10,
-                          horizontal: 15,
+                          horizontal: 12,
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -107,12 +119,11 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                         child: InkWell(
                           onTap: () {
                             Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            HealthProfileDetailScreen(
-                                                profile: profile)))
-                                .then((value) => _loadDataFromFirestore());
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        HealthProfileDetailScreen(
+                                            profile: profile)));
                           },
                           child: Row(
                             children: [
@@ -125,28 +136,25 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                       left: 0,
                                       bottom: 2,
                                       child: ClipOval(
-                                        child: (profile.image != '')
-                                            ? Image.network(
-                                                profile.image,
-                                                fit: BoxFit.cover,
-                                                width: 65,
-                                                height: 65,
-                                              )
-                                            : Container(
-                                                width: 65,
-                                                height: 65,
-                                                decoration: const BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Themes.gradientDeepClr,
-                                                      Themes.gradientLightClr
-                                                    ],
-                                                    begin:
-                                                        Alignment.bottomCenter,
-                                                    end: Alignment.topCenter,
-                                                  ),
-                                                ),
-                                                child: Center(
+                                        child: Container(
+                                          width: 65,
+                                          height: 65,
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Themes.gradientDeepClr,
+                                                Themes.gradientLightClr
+                                              ],
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                            ),
+                                          ),
+                                          child: (profile.image != '')
+                                              ? Image.network(
+                                                  profile.image,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Center(
                                                   child: Text(
                                                     getAbbreviatedName(
                                                         profile.name),
@@ -158,7 +166,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                        ),
                                       ),
                                     ),
                                     Positioned(
@@ -170,8 +178,8 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                         decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(20),
-                                            color:
-                                                Colors.grey.withOpacity(0.8)),
+                                            color: Themes.gradientDeepClr
+                                                .withOpacity(0.8)),
                                         child: Text(
                                           profile.relationship,
                                           style: const TextStyle(
@@ -185,7 +193,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                 ),
                               ),
                               const SizedBox(
-                                width: 20,
+                                width: 15,
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +201,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                   Text(
                                     profile.name,
                                     style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       color: Colors.black,
                                     ),
                                   ),
@@ -203,7 +211,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                   Text(
                                     profile.idProfile,
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.black54,
                                     ),
                                   ),
@@ -213,7 +221,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                   Text(
                                     profile.doB,
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.black54,
                                     ),
                                   ),
@@ -224,24 +232,11 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                         ),
                       );
                     },
-                  ),
-                ),
-              ),
+                  );
+                }),
+          ),
+        ),
       ),
     );
-  }
-
-  _loadDataFromFirestore() async {
-    try {
-      List<UserProfile> userProfiles = await getProfileUsers(_uid);
-      userProfiles = userProfiles.reversed.toList();
-
-      setState(() {
-        _userProfiles = userProfiles;
-        _isLoading = false;
-      });
-    } catch (error) {
-      // Xử lý lỗi tại đây (nếu cần)
-    }
   }
 }

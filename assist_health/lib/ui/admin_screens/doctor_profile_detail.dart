@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DoctorDetailScreen extends StatelessWidget {
+class DoctorProfileDetailScreen extends StatelessWidget {
   final String doctorUid;
 
-  DoctorDetailScreen({required this.doctorUid});
+  const DoctorProfileDetailScreen({super.key, required this.doctorUid});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,8 @@ class DoctorDetailScreen extends StatelessWidget {
         title: Text('Thông tin Bác sĩ'),
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(doctorUid).get(),
+        future:
+            FirebaseFirestore.instance.collection('users').doc(doctorUid).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(

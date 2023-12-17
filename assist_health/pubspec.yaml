@@ -52,7 +52,8 @@ dependencies:
   multi_image_picker: ^4.8.1
   carousel_slider: ^4.2.1
   dots_indicator: ^3.0.0
-  multi_select_flutter: ^4.0.0
+  multi_select_flutter: ^4.1.3
+  flutter_styled_toast: ^2.2.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -90,6 +91,14 @@ flutter:
      - assets/doctor4.jpg
      - assets/doctors.png
      - assets/lined heart.png
+     - assets/guidanceVietQR.png
+     - assets/slider1.jpg
+     - assets/slider2.jpg
+     - assets/slider3.jpeg
+     - assets/no_result_search_icon.png
+     - assets/empty-box.png
+     - assets/sample_image.jpeg
+     - assets/sample_image.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

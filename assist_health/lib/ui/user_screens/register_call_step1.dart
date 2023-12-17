@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
@@ -10,15 +11,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 
+// ignore: must_be_immutable
 class RegisterCallStep1 extends StatefulWidget {
-  const RegisterCallStep1({super.key});
+  DoctorInfo doctorInfo;
+  DateTime? selectedDate;
+  String? time;
+  bool? isMorning;
+
+  RegisterCallStep1(
+      {super.key,
+      required this.doctorInfo,
+      this.selectedDate,
+      this.time,
+      this.isMorning});
 
   @override
   State<RegisterCallStep1> createState() => _RegisterCallStep1();
@@ -27,36 +38,30 @@ class RegisterCallStep1 extends StatefulWidget {
 class _RegisterCallStep1 extends State<RegisterCallStep1> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-
-  final List<String> _specialties = ['Sản phụ khoa'];
 
   String? _uid;
   UserProfile? _userProfile;
   String? _idDoc;
-
   int _currentYear = DateTime.now().year;
   int _currentMonth = DateTime.now().month;
-
-  DateTime? _selectedDate;
-  DateTime? _initialSelectedDate;
+  DateTime _selectedDate = DateTime.now();
+  DateTime _initialSelectedDate = DateTime.now();
   bool _shouldReloadDatePicker = true;
-
   String? _selectedTime;
-
   String? _startTime;
   String? _endTime;
-
   int? endHour;
   int? endMinute;
   int? startHour;
   int? startMinute;
-
-  bool _isSun = true;
-
+  bool isMorning = true;
   int? initDate;
+  List<File>? _selectedFiles;
+  TextEditingController? _reasonForExaminationController;
 
-  List<File> _selectedFiles = [];
+  DoctorInfo? _doctorInfo;
+
+  StreamController<DocumentSnapshot>? _userProfileStreamController;
 
   @override
   void initState() {
@@ -69,23 +74,53 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
     _updateStartTimeAndEndTime();
 
-    _initialSelectedDate = DateTime.now();
-    _selectedDate = _initialSelectedDate;
+    if (widget.time != null) {
+      isMorning = widget.isMorning!;
+      _initialSelectedDate = widget.selectedDate!;
 
-    _initialSelectedDate = _isNotEmptySlot()
-        ? DateTime.now()
-        : DateTime.now().add(const Duration(days: 1));
-    _selectedDate = _initialSelectedDate;
+      _selectedDate = _initialSelectedDate;
 
-    initDate = _isCurrentMonthOfCurrentYear()
-        ? _isNotEmptySlot()
-            ? DateTime.now().day
-            : DateTime.now().add(const Duration(days: 1)).day
-        : 1;
+      initDate = _isCurrentMonthOfCurrentYear() ? _initialSelectedDate.day : 1;
+
+      _selectedTime = widget.time!;
+    } else {
+      _initialSelectedDate = _isNotEmptySlot()
+          ? DateTime.now()
+          : DateTime.now().add(const Duration(days: 1));
+
+      _selectedDate = _initialSelectedDate;
+
+      initDate = _isCurrentMonthOfCurrentYear() ? _initialSelectedDate.day : 1;
+    }
+
+    _doctorInfo = widget.doctorInfo;
+
+    _selectedFiles = [];
+
+    _reasonForExaminationController = TextEditingController();
+
+    _userProfileStreamController = StreamController<DocumentSnapshot>();
+  }
+
+  @override
+  void dispose() {
+    _reasonForExaminationController!.dispose();
+    _userProfileStreamController!.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _firestore
+        .collection('users')
+        .doc(_uid!)
+        .collection('health_profiles')
+        .doc(_idDoc!)
+        .snapshots()
+        .listen((snapshot) {
+      _userProfileStreamController!.add(snapshot);
+    });
+
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
@@ -108,7 +143,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
             height: 45,
             color: Colors.white,
             child: Container(
-              padding: EdgeInsets.symmetric(
+              padding: const EdgeInsets.symmetric(
                 horizontal: 10,
               ),
               color: Colors.blueAccent.withOpacity(0.1),
@@ -287,16 +322,29 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                 end: Alignment.topCenter,
                               ),
                             ),
-                            child: Center(
-                              child: Text(
-                                getAbbreviatedName('HAHAHA AHHAHA'),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            child: (_doctorInfo!.imageURL != '')
+                                ? Image.network(_doctorInfo!.imageURL,
+                                    fit: BoxFit.cover, errorBuilder:
+                                        (BuildContext context, Object exception,
+                                            StackTrace? stackTrace) {
+                                    return const Center(
+                                      child: Icon(
+                                        FontAwesomeIcons.userDoctor,
+                                        size: 50,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  })
+                                : Center(
+                                    child: Text(
+                                      getAbbreviatedName(_doctorInfo!.name),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
                       ),
@@ -306,24 +354,25 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Thạc sĩ, Bác sĩ',
-                            style: TextStyle(
+                          Text(
+                            _doctorInfo!.careerTitiles,
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 14,
                               height: 1.5,
                             ),
                           ),
-                          const Text(
-                            'Nguyễn Văn Á',
-                            style: TextStyle(
+                          Text(
+                            _doctorInfo!.name,
+                            style: const TextStyle(
                               color: Colors.black87,
+                              fontWeight: FontWeight.bold,
                               fontSize: 15,
                               height: 1.4,
                             ),
                           ),
                           Text(
-                            'Chuyên khoa: ${_getAllOfSpecialties()}',
+                            'Chuyên khoa: ${getAllOfSpecialties(_doctorInfo!.specialty)}',
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 14,
@@ -378,12 +427,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(15)),
                         child: StreamBuilder<DocumentSnapshot>(
-                          stream: _firestore
-                              .collection('users')
-                              .doc(_uid!)
-                              .collection('health_profiles')
-                              .doc(_idDoc!)
-                              .snapshots(),
+                          stream: _userProfileStreamController!.stream,
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
@@ -391,8 +435,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Center(
-                                  child: const CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
 
                             if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -689,8 +733,9 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                     setState(() {
                                       _selectedDate = date;
                                       _initialSelectedDate = date;
-                                      _startTime = '7:30';
-                                      _endTime = '20:45';
+                                      _startTime = '08:30';
+                                      _endTime = '20:00';
+                                      _selectedTime = '';
                                     });
                                     _updateStartTimeAndEndTime();
                                   },
@@ -784,15 +829,15 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    if (_isSun) return;
+                                    if (isMorning) return;
                                     setState(() {
-                                      _isSun = true;
+                                      isMorning = true;
                                     });
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
-                                      color: (_isSun)
+                                      color: (isMorning)
                                           ? Colors.white
                                           : Colors.blueAccent.withOpacity(0.2),
                                       borderRadius: const BorderRadius.only(
@@ -826,15 +871,15 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    if (!_isSun) return;
+                                    if (!isMorning) return;
                                     setState(() {
-                                      _isSun = false;
+                                      isMorning = false;
                                     });
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(15),
                                     decoration: BoxDecoration(
-                                      color: (!_isSun)
+                                      color: (!isMorning)
                                           ? Colors.white
                                           : Colors.blueAccent.withOpacity(0.2),
                                       borderRadius: const BorderRadius.only(
@@ -872,7 +917,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                           const SizedBox(
                             height: 10,
                           ),
-                          if (_isSun)
+                          if (isMorning)
                             (_isAnyTimeFrame(isMorning: true))
                                 ? GridView.builder(
                                     scrollDirection: Axis.vertical,
@@ -998,7 +1043,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
-                          if (!_isSun)
+                          if (!isMorning)
                             ((_isAnyTimeFrame(isMorning: false)))
                                 ? GridView.builder(
                                     scrollDirection: Axis.vertical,
@@ -1183,8 +1228,9 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                           const SizedBox(
                             height: 10,
                           ),
-                          const TextField(
-                            decoration: InputDecoration(
+                          TextField(
+                            controller: _reasonForExaminationController!,
+                            decoration: const InputDecoration(
                               hintText:
                                   'Lý do khám, triệu chứng, trạng thái, tiền sử bệnh',
                               hintStyle: TextStyle(
@@ -1222,14 +1268,14 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                           ),
                           Container(
                             margin: const EdgeInsets.symmetric(
-                              vertical: 10,
+                              vertical: 8,
                             ),
                             child: GridView.builder(
                               padding: EdgeInsets.zero,
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _selectedFiles.length + 1,
+                              itemCount: _selectedFiles!.length + 1,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
@@ -1238,8 +1284,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                 childAspectRatio: 1,
                               ),
                               itemBuilder: (context, index) {
-                                if (index != _selectedFiles.length) {
-                                  File file = _selectedFiles[index];
+                                if (index != _selectedFiles!.length) {
+                                  File file = _selectedFiles![index];
                                   String extension =
                                       file.path.split('.').last.toLowerCase();
 
@@ -1312,11 +1358,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                             onTap: () {
                                               setState(() {
                                                 File file =
-                                                    _selectedFiles[index];
+                                                    _selectedFiles![index];
                                                 // Xóa tệp cục bộ
                                                 file.deleteSync();
                                                 // Xóa tệp khỏi danh sách
-                                                _selectedFiles.removeAt(index);
+                                                _selectedFiles!.removeAt(index);
                                               });
                                             },
                                             child: const CircleAvatar(
@@ -1359,18 +1405,18 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                         ],
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
                   ],
                 ),
+              ),
+              const SizedBox(
+                height: 10,
               ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
-        height: 70,
+        height: 65,
         padding: const EdgeInsets.all(8),
         decoration: const BoxDecoration(
           border: Border(
@@ -1382,10 +1428,40 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
         ),
         child: GestureDetector(
           onTap: () {
+            if (_selectedTime == null || _selectedTime!.isEmpty) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Thông báo'),
+                    content: Text('Vui lòng chọn ngày và giờ đặt lịch.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Đóng'),
+                      ),
+                    ],
+                  );
+                },
+              );
+              return;
+            }
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const RegisterCallStep2()));
+                    builder: (context) => RegisterCallStep2(
+                          doctorInfo: _doctorInfo!,
+                          userProfile: _userProfile!,
+                          reasonForExamination:
+                              _reasonForExaminationController!.text,
+                          listOfHealthInformationFiles: _selectedFiles!,
+                          selectedDate: _selectedDate,
+                          time: _selectedTime!,
+                          isMorning: isMorning,
+                        )));
           },
           child: Container(
             padding: const EdgeInsets.all(13),
@@ -1920,14 +1996,14 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                               children: [
                                                 Container(
                                                   margin: const EdgeInsets.only(
-                                                    right: 15,
+                                                    right: 10,
                                                   ),
                                                   child: Column(
                                                     children: [
                                                       Stack(
                                                         children: [
                                                           SizedBox(
-                                                            height: 70,
+                                                            width: 90,
                                                             child: Column(
                                                               children: [
                                                                 SizedBox(
@@ -1962,10 +2038,15 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                                                 ),
                                                                               ),
                                                                             )
-                                                                          : Image.network(
-                                                                              userProfile.image,
-                                                                              fit: BoxFit.cover,
-                                                                            ),
+                                                                          : Image.network(userProfile.image, fit: BoxFit.cover, errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                                                              return const Center(
+                                                                                child: Icon(
+                                                                                  CupertinoIcons.person_circle_fill,
+                                                                                  size: 50,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              );
+                                                                            }),
                                                                     ),
                                                                   ),
                                                                 ),
@@ -1973,8 +2054,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                             ),
                                                           ),
                                                           Positioned(
-                                                            bottom: 0,
-                                                            left: 0,
+                                                            top: 0,
                                                             right: 0,
                                                             child: Row(
                                                               mainAxisAlignment:
@@ -1985,15 +2065,15 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                                   padding: const EdgeInsets
                                                                       .symmetric(
                                                                       vertical:
-                                                                          4,
+                                                                          2,
                                                                       horizontal:
-                                                                          8),
+                                                                          4),
                                                                   decoration:
                                                                       BoxDecoration(
                                                                           borderRadius: BorderRadius.circular(
                                                                               15),
-                                                                          color: Themes
-                                                                              .gradientDeepClr,
+                                                                          color: Themes.gradientDeepClr.withOpacity(
+                                                                              0.9),
                                                                           border:
                                                                               Border.all(
                                                                             color:
@@ -2024,7 +2104,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                                 Stack(
                                                   children: [
                                                     SizedBox(
-                                                      width: 280,
+                                                      width: 260,
                                                       child: Column(
                                                         crossAxisAlignment:
                                                             CrossAxisAlignment
@@ -2375,6 +2455,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                                         _setSelectedYear(tempYear);
                                         _setSelectedMonth(month);
 
+                                        _selectedTime = '';
+
                                         _updateInitDate();
                                       }
                                       Navigator.of(context).pop();
@@ -2482,11 +2564,8 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
     );
     if (result != null) {
       setState(() {
-        _selectedFiles.addAll(result.paths.map((path) => File(path!)));
+        _selectedFiles!.addAll(result.paths.map((path) => File(path!)));
       });
-      // for (var file in result.paths.map((path) => File(path!))) {
-      //   await uploadFile(file);
-      // }
     }
   }
 
@@ -2496,38 +2575,9 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
     if (pickedFile != null) {
       setState(() {
-        _selectedFiles.add(File(pickedFile.path));
+        _selectedFiles!.add(File(pickedFile.path));
       });
-      // Chuyển đổi XFile thành File
-      File pickedFileAsFile = File(pickedFile.path);
-      //await uploadFile(pickedFileAsFile);
     }
-  }
-
-  Future<void> uploadFile(File file) async {
-    try {
-      // Tạo tham chiếu đến Firebase Storage
-      final storageRef = _storage.ref().child(
-          'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}');
-
-      await storageRef.putFile(file);
-
-      // Lấy đường dẫn tới file vừa tải lên
-      String downloadURL = await storageRef.getDownloadURL();
-
-      // Lưu downloadURL vào collection files
-
-      // await _firestore
-      //     .collection('users')
-      //     .doc(_uid)
-      //     .collection('health_profiles')
-      //     .doc(widget.profile.idDoc)
-      //     .collection('fileURLs')
-      //     .doc('data')
-      //     .set({
-      //   'data': FieldValue.arrayUnion([downloadURL]),
-      // }, SetOptions(merge: true));
-    } catch (error) {}
   }
 
   _setSelectedYear(int selectedYear) {
@@ -2540,18 +2590,6 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
     setState(() {
       _currentMonth = selectedMonth;
     });
-  }
-
-  _getAllOfSpecialties() {
-    String allOfSpecialties = '';
-    for (int i = 0; i < _specialties.length; i++) {
-      if (i == 0) {
-        allOfSpecialties = _specialties[i];
-      } else {
-        allOfSpecialties = '$allOfSpecialties, ${_specialties[i]}';
-      }
-    }
-    return allOfSpecialties;
   }
 
   _updateSelectedProfile(UserProfile selectedProfile) {
@@ -2618,18 +2656,25 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _shouldReloadDatePicker = true;
-        _initialSelectedDate = (_isCurrentMonthOfCurrentYear())
-            ? DateTime.now()
-            : DateTime(_currentYear, _currentMonth, 1);
-        initDate = _initialSelectedDate!.day;
+
+        if (!_isCurrentMonthOfCurrentYear()) {
+          _initialSelectedDate = DateTime(_currentYear, _currentMonth, 1);
+        } else {
+          _initialSelectedDate = DateTime.now();
+          if (_isNotEmptySlot()) {
+            _initialSelectedDate = DateTime.now().add(const Duration(days: 1));
+          }
+        }
+
+        initDate = _initialSelectedDate.day;
         _selectedDate = _initialSelectedDate;
       });
     });
 
     Future.delayed(const Duration(milliseconds: 400), () {
       setState(() {
-        _startTime = '09:30';
-        _endTime = '19:00';
+        _startTime = '08:30';
+        _endTime = '20:00';
       });
       _updateStartTimeAndEndTime();
     });
@@ -2646,7 +2691,7 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
   }
 
   _isCurrentDate() {
-    DateTime selectedDate = _selectedDate!;
+    DateTime selectedDate = _selectedDate;
 
     DateTime now = DateTime.now();
 

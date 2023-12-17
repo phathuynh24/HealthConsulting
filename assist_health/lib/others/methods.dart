@@ -6,6 +6,7 @@ import 'package:assist_health/models/doctor/doctor_schedule.dart';
 import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
 import 'package:assist_health/models/doctor/doctor_timeline.dart';
+import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_bmi.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/models/user/user_height.dart';
@@ -15,6 +16,7 @@ import 'package:assist_health/ui/other_screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:intl/intl.dart';
 
 FirebaseAuth _auth = FirebaseAuth.instance;
@@ -82,25 +84,22 @@ Future<String> getUrl(String fileName) async {
   return url;
 }
 
-Future<List<DoctorInfo>> getInfoDoctors() async {
-  final doctorDocs = await _firestore
+Stream<List<DoctorInfo>> getInfoDoctors() {
+  return _firestore
       .collection('users')
       .where('role', isEqualTo: 'doctor')
-      .get();
-  final doctorInfos = await Future.wait(doctorDocs.docs.map((doctorDoc) async {
-    final infoRef = _firestore
-        .collection('users')
-        .doc(doctorDoc.id)
-        .collection('info')
-        .get();
-    final doctorInfo = await infoRef
-        .then((value) => DoctorInfo.fromJson(value.docs.first.data()));
-    doctorInfo.image = await getUrl(doctorInfo.image);
-    doctorInfo.uid = doctorDoc.id;
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<DoctorInfo> doctorInfos = [];
 
-    return doctorInfo;
-  }));
-  return doctorInfos;
+    querySnapshot.docs.forEach((doctorDoc) {
+      final doctorData = doctorDoc.data() as Map<String, dynamic>?;
+      final DoctorInfo doctorInfo = DoctorInfo.fromJson(doctorData!);
+      doctorInfos.add(doctorInfo);
+    });
+
+    return doctorInfos;
+  });
 }
 
 Future<List<DoctorExperience>> getExperiencesDoctor(String uid) async {
@@ -210,16 +209,16 @@ Future<DoctorSchedule> getSchedulesDoctor(
   return doctorSchedule;
 }
 
-Future<List<UserProfile>> getProfileUsers(String uid) async {
+Stream<List<UserProfile>> getProfileUsers(String uid) async* {
   List<UserProfile> doctorProfiles = [];
 
-  final docRef = await _firestore
+  final docSnapshot = await _firestore
       .collection('users')
       .doc(uid)
       .collection('health_profiles')
       .get();
 
-  final listOfProfiles = docRef.docs.map((healthProfileDoc) {
+  final listOfProfiles = docSnapshot.docs.map((healthProfileDoc) {
     if (healthProfileDoc.exists) {
       final data = healthProfileDoc.data();
       final doctorProfile = UserProfile.fromJson(data);
@@ -231,7 +230,7 @@ Future<List<UserProfile>> getProfileUsers(String uid) async {
 
   doctorProfiles.addAll(listOfProfiles);
 
-  return doctorProfiles;
+  yield doctorProfiles.reversed.toList();
 }
 
 Future<List<UserHeight>> getHeightDataUser(String uid, String idDoc) async {
@@ -364,4 +363,61 @@ String getAbbreviatedName(String text) {
   }
 
   return firstCharacterFromStart.toUpperCase();
+}
+
+String getAllOfSpecialties(List<String> specialties) {
+  String allOfSpecialties = '';
+  for (int i = 0; i < specialties.length; i++) {
+    if (i == 0) {
+      allOfSpecialties = specialties[i];
+    } else {
+      allOfSpecialties = '$allOfSpecialties, ${specialties[i]}';
+    }
+  }
+  return allOfSpecialties;
+}
+
+Stream<List<AppointmentSchedule>> getAppointmentSchdedules() {
+  return _firestore
+      .collection('appointment_schedule')
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<AppointmentSchedule> appointmentSchedules = [];
+
+    for (var appointmentScheduleDoc in querySnapshot.docs) {
+      final appointmentScheduleData =
+          appointmentScheduleDoc.data() as Map<String, dynamic>?;
+      final AppointmentSchedule appointmentSchedule =
+          AppointmentSchedule.fromJson(appointmentScheduleData!);
+      appointmentSchedules.add(appointmentSchedule);
+    }
+
+    return appointmentSchedules;
+  });
+}
+
+showToastMessage(BuildContext context, String message) {
+  showToast(message,
+      context: context,
+      animation: StyledToastAnimation.slideFromBottomFade,
+      reverseAnimation: StyledToastAnimation.slideToBottomFade,
+      startOffset: const Offset(0, 3),
+      reverseEndOffset: const Offset(0, 3),
+      position: StyledToastPosition.bottom,
+      duration: const Duration(seconds: 4),
+      animDuration: const Duration(seconds: 1),
+      curve: Curves.elasticOut,
+      reverseCurve: Curves.fastOutSlowIn);
+}
+
+Color getStatusColor(String status) {
+  Map<String, Color> statusColors = {
+    'Chờ duyệt': Colors.orange,
+    'Đã duyệt': Colors.green,
+    'Đã khám': Colors.blue,
+    'Quá hẹn': Colors.red,
+    'Đã hủy': Colors.grey,
+  };
+
+  return statusColors[status] ?? Colors.black;
 }

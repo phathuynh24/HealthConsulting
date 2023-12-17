@@ -1,19 +1,66 @@
+import 'dart:io';
+
+import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/register_call_step3.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 
+// ignore: must_be_immutable
 class RegisterCallStep2 extends StatefulWidget {
-  const RegisterCallStep2({super.key});
+  DoctorInfo doctorInfo;
+  UserProfile userProfile;
+  String reasonForExamination;
+  List<File> listOfHealthInformationFiles;
+
+  DateTime selectedDate;
+  String time;
+  bool isMorning;
+
+  RegisterCallStep2(
+      {required this.doctorInfo,
+      required this.userProfile,
+      required this.reasonForExamination,
+      required this.listOfHealthInformationFiles,
+      required this.selectedDate,
+      required this.time,
+      required this.isMorning,
+      super.key});
 
   @override
   State<RegisterCallStep2> createState() => _RegisterCallStep2();
 }
 
 class _RegisterCallStep2 extends State<RegisterCallStep2> {
-  final List<String> _specialties = ['Sản phụ khoa'];
-
   bool _isVisibleInformation = true;
+  bool _isVisibleReasonForExamination = true;
+
+  DoctorInfo? _doctorInfo;
+  UserProfile? _userProfile;
+  String? _reasonForExamination;
+  List<File>? _listOfHealthInformationFiles;
+
+  DateTime? _selectedDate;
+  String? _time;
+  bool? _isMorning;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _doctorInfo = widget.doctorInfo;
+    _userProfile = widget.userProfile;
+    _reasonForExamination = widget.reasonForExamination;
+    _listOfHealthInformationFiles = widget.listOfHealthInformationFiles;
+
+    _selectedDate = widget.selectedDate;
+    _time = widget.time;
+    _isMorning = widget.isMorning;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,10 +228,10 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height - 220,
-          color: Colors.blueAccent.withOpacity(0.1),
+      body: Container(
+        height: double.infinity,
+        color: Colors.blueAccent.withOpacity(0.1),
+        child: SingleChildScrollView(
           child: Column(
             children: [
               // Thông tin đăng ký
@@ -237,16 +284,31 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                       end: Alignment.topCenter,
                                     ),
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      getAbbreviatedName('HAHAHA AHHAHA'),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
+                                  child: (_doctorInfo!.imageURL != '')
+                                      ? Image.network(_doctorInfo!.imageURL,
+                                          fit: BoxFit.cover, errorBuilder:
+                                              (BuildContext context,
+                                                  Object exception,
+                                                  StackTrace? stackTrace) {
+                                          return const Center(
+                                            child: Icon(
+                                              FontAwesomeIcons.userDoctor,
+                                              size: 50,
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                        })
+                                      : Center(
+                                          child: Text(
+                                            getAbbreviatedName(
+                                                _doctorInfo!.name),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 30,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
@@ -256,24 +318,24 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Thạc sĩ, Bác sĩ',
-                                  style: TextStyle(
+                                Text(
+                                  _doctorInfo!.careerTitiles,
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 14,
                                     height: 1.5,
                                   ),
                                 ),
-                                const Text(
-                                  'Nguyễn Văn Á',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 15,
-                                    height: 1.4,
-                                  ),
+                                Text(
+                                  _doctorInfo!.name,
+                                  style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 15,
+                                      height: 1.4,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'Chuyên khoa: ${_getAllOfSpecialties()}',
+                                  'Chuyên khoa: ${getAllOfSpecialties(_doctorInfo!.specialty)}',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 14,
@@ -290,8 +352,8 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                       thickness: 1,
                       color: Colors.grey.shade100,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 15,
                         vertical: 10,
                       ),
@@ -302,20 +364,20 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Giờ tư vấn',
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                  '08:00 - 08:15',
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  _time!.replaceAll('-', ' - '),
+                                  style: const TextStyle(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.black,
                                   ),
@@ -328,20 +390,21 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Ngày tư vấn',
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.grey,
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                  'CN 10/12/2023',
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  DateFormat('EEEE - dd/MM/yyyy', 'vi_VN')
+                                      .format(_selectedDate!),
+                                  style: const TextStyle(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.black,
                                   ),
@@ -355,7 +418,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                     Container(
                       margin: const EdgeInsets.only(left: 15),
                       child: Text(
-                        'Buổi sáng',
+                        (_isMorning!) ? 'Buổi sáng' : 'Buổi chiều',
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.greenAccent.shade700,
@@ -365,6 +428,8 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                     const SizedBox(
                       height: 20,
                     ),
+
+                    // Thông tin bệnh nhân
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -400,12 +465,12 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                         ]),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Visibility(
                       visible: _isVisibleInformation,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: const Column(
+                        child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
@@ -417,17 +482,17 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Họ và tên',
                                           style: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey,
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Text(
-                                          'Huỳnh Tiến Phát',
-                                          style: TextStyle(
+                                          _userProfile!.name,
+                                          style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400),
@@ -440,17 +505,17 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Giới tính',
                                           style: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey,
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Text(
-                                          'Nam',
-                                          style: TextStyle(
+                                          _userProfile!.gender,
+                                          style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400),
@@ -460,7 +525,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 16),
+                              const SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -470,17 +535,17 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Số điện thoại',
                                           style: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey,
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Text(
-                                          '0362309724',
-                                          style: TextStyle(
+                                          _userProfile!.phone,
+                                          style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400),
@@ -493,17 +558,17 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Ngày sinh',
                                           style: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey,
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        SizedBox(height: 6),
+                                        const SizedBox(height: 6),
                                         Text(
-                                          '24/09/2003',
-                                          style: TextStyle(
+                                          _userProfile!.doB,
+                                          style: const TextStyle(
                                               fontSize: 14,
                                               color: Colors.black,
                                               fontWeight: FontWeight.w400),
@@ -513,10 +578,227 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                             ]),
                       ),
                     ),
+
+                    // Lý do khám
+                    if (_isNotEmptyReasonForExamination())
+                      Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isVisibleReasonForExamination =
+                                    !_isVisibleReasonForExamination;
+                              });
+                            },
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Row(children: [
+                                const Text(
+                                  'LÝ DO KHÁM',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    height: 20,
+                                    indent: 10,
+                                    endIndent: 6,
+                                    thickness: 1,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                ),
+                                Icon(
+                                  (_isVisibleReasonForExamination)
+                                      ? Icons.keyboard_arrow_down_rounded
+                                      : Icons.keyboard_arrow_up_rounded,
+                                  size: 25,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ]),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Visibility(
+                            visible: _isVisibleReasonForExamination,
+                            child: Container(
+                              width: double.infinity,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Lý do khám, triệu chứng',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      _reasonForExamination! == ''
+                                          ? 'Trống'
+                                          : _reasonForExamination!,
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    const SizedBox(
+                                      height: 16,
+                                    ),
+                                    const Text(
+                                      'Hình ảnh, toa thuốc',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    (_listOfHealthInformationFiles!.isNotEmpty)
+                                        ? Container(
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            child: GridView.builder(
+                                              padding: EdgeInsets.zero,
+                                              scrollDirection: Axis.vertical,
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              itemCount:
+                                                  _listOfHealthInformationFiles!
+                                                      .length,
+                                              gridDelegate:
+                                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 4,
+                                                mainAxisSpacing: 6,
+                                                crossAxisSpacing: 6,
+                                                childAspectRatio: 1,
+                                              ),
+                                              itemBuilder: (context, index) {
+                                                if (index !=
+                                                    _listOfHealthInformationFiles!
+                                                        .length) {
+                                                  File file =
+                                                      _listOfHealthInformationFiles![
+                                                          index];
+                                                  String extension = file.path
+                                                      .split('.')
+                                                      .last
+                                                      .toLowerCase();
+
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      OpenFile.open(file.path);
+                                                    },
+                                                    child: LayoutBuilder(
+                                                        builder: (BuildContext
+                                                                context,
+                                                            BoxConstraints
+                                                                constraints) {
+                                                      return Center(
+                                                        child: Container(
+                                                          height: constraints
+                                                                  .maxWidth -
+                                                              10,
+                                                          width: constraints
+                                                                  .maxHeight -
+                                                              10,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        6),
+                                                            color: Colors.grey,
+                                                          ),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              if (extension ==
+                                                                  'pdf')
+                                                                const Icon(
+                                                                    Icons
+                                                                        .picture_as_pdf,
+                                                                    size: 50),
+                                                              if (extension ==
+                                                                      'doc' ||
+                                                                  extension ==
+                                                                      'docx')
+                                                                const Icon(
+                                                                    Icons
+                                                                        .description,
+                                                                    size: 50),
+                                                              if (extension ==
+                                                                  'mp4')
+                                                                const Icon(
+                                                                    Icons
+                                                                        .play_circle_filled,
+                                                                    size: 50),
+                                                              if (extension == 'png' ||
+                                                                  extension ==
+                                                                      'jpg' ||
+                                                                  extension ==
+                                                                      'jpeg')
+                                                                SizedBox(
+                                                                  height: constraints
+                                                                          .maxWidth -
+                                                                      10,
+                                                                  width: constraints
+                                                                          .maxHeight -
+                                                                      10,
+                                                                  child:
+                                                                      ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(6),
+                                                                    child: Image
+                                                                        .file(
+                                                                      file,
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          )
+                                        : Container(
+                                            margin: EdgeInsets.only(
+                                              top: 6,
+                                            ),
+                                            child: Text(
+                                              'Trống',
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                    const SizedBox(height: 20),
+                                  ]),
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
@@ -541,89 +823,91 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
               ),
               Container(
                 width: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                margin: const EdgeInsets.only(
+                    top: 5, bottom: 15, left: 15, right: 15),
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15)),
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Phí khám',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w400),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            '120.000 vnđ',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6),
-                      Divider(
-                        thickness: 1,
-                        color: Colors.grey.shade100,
-                      ),
-                      SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Phí tiện ích',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w400),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            '995 vnđ',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 6),
-                      Divider(
-                        thickness: 1,
-                        color: Colors.grey.shade100,
-                      ),
-                      SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Tổng thanh toán',
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w500),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            '120.995 vnđ',
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    ]),
-              )
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Phí khám',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
+                          style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Divider(
+                      thickness: 1,
+                      color: Colors.grey.shade100,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Phí tiện ích',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
+                          style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Divider(
+                      thickness: 1,
+                      color: Colors.grey.shade100,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Tổng thanh toán',
+                          style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                          style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -658,21 +942,21 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Tổng',
                     style: TextStyle(
                         fontSize: 16,
                         color: Colors.red,
                         fontWeight: FontWeight.w500),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    '120.995 vnđ',
-                    style: TextStyle(
+                    '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                    style: const TextStyle(
                         fontSize: 16,
                         color: Colors.red,
                         fontWeight: FontWeight.w500),
@@ -680,7 +964,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8,
             ),
             GestureDetector(
@@ -688,7 +972,16 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RegisterCallStep3()));
+                        builder: (context) => RegisterCallStep3(
+                              doctorInfo: _doctorInfo!,
+                              userProfile: _userProfile!,
+                              reasonForExamination: _reasonForExamination!,
+                              listOfHealthInformationFiles:
+                                  _listOfHealthInformationFiles!,
+                              selectedDate: _selectedDate!,
+                              time: _time!,
+                              isMorning: _isMorning!,
+                            )));
               },
               child: Container(
                 padding: const EdgeInsets.all(13),
@@ -713,15 +1006,9 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
     );
   }
 
-  _getAllOfSpecialties() {
-    String allOfSpecialties = '';
-    for (int i = 0; i < _specialties.length; i++) {
-      if (i == 0) {
-        allOfSpecialties = _specialties[i];
-      } else {
-        allOfSpecialties = '$allOfSpecialties, ${_specialties[i]}';
-      }
-    }
-    return allOfSpecialties;
+  _isNotEmptyReasonForExamination() {
+    if (_reasonForExamination!.isNotEmpty ||
+        _listOfHealthInformationFiles!.isNotEmpty) return true;
+    return false;
   }
 }

@@ -21,8 +21,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _workplaceController = TextEditingController();
-  TextEditingController _experiencetextController=TextEditingController();
-  TextEditingController _studytextController=TextEditingController();
+  TextEditingController _experiencetextController = TextEditingController();
+  TextEditingController _studytextController = TextEditingController();
   File? _selectedImage;
   List<String> _selectedSpecialties = [];
   List<String> _specialties = [
@@ -42,8 +42,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     _emailController = TextEditingController();
     _descriptionController = TextEditingController();
     _workplaceController = TextEditingController();
-    _experiencetextController=TextEditingController();
-    _studytextController=TextEditingController();
+    _experiencetextController = TextEditingController();
+    _studytextController = TextEditingController();
   }
 
   @override
@@ -125,8 +125,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               MultiSelectDialogField(
                 items: _specialties
-                    .map((String value) =>
-                        MultiSelectItem<String>(value, value))
+                    .map(
+                        (String value) => MultiSelectItem<String>(value, value))
                     .toList(),
                 initialValue: _selectedSpecialties,
                 onConfirm: (values) {
@@ -164,7 +164,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               // Experience input for each entry
               for (int i = 0; i < _experiences.length; i++)
                 _buildExperienceInput(i),
-                 const SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: _experiencetextController,
                 decoration: InputDecoration(
@@ -178,7 +178,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               // Education input for each entry
               for (int i = 0; i < _educations.length; i++)
                 _buildEducationInput(i),
-                  const SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: _studytextController,
                 decoration: InputDecoration(
@@ -362,7 +362,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
     // Thêm mô tả thời gian mới vào danh sách trong Experience
     currentExperience.timelineDescriptions.add(timelineDescription);
-    _experiencetextController.text=currentExperience.timelineDescriptions.join('\n');
+    _experiencetextController.text =
+        currentExperience.timelineDescriptions.join('\n');
   }
 
   void _addEducationDescription(int index) {
@@ -374,7 +375,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
     // Thêm mô tả học vấn mới vào danh sách trong Education
     currentEducation.educationDescriptions.add(educationDescription);
-    _studytextController.text=currentEducation.educationDescriptions.join('\n');
+    _studytextController.text =
+        currentEducation.educationDescriptions.join('\n');
   }
 
   Future<String?> _uploadImageToFirebase(File imageFile, String uid) async {
@@ -383,16 +385,14 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
       FirebaseStorage storage = FirebaseStorage.instance;
 
       // Create a reference to the image file
-      Reference storageReference =
-          storage.ref().child('images/$uid.jpg');
+      Reference storageReference = storage.ref().child('images/$uid.jpg');
 
       // Upload the image file to Firebase Storage
       UploadTask uploadTask = storageReference.putFile(imageFile);
       TaskSnapshot taskSnapshot = await uploadTask;
 
       // Get the download URL of the uploaded image
-      String downloadURL =
-          await taskSnapshot.ref.getDownloadURL();
+      String downloadURL = await taskSnapshot.ref.getDownloadURL();
       return downloadURL;
     } catch (e) {
       print('Error uploading image to Firebase Storage: $e');
@@ -407,8 +407,6 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
       String email = _emailController.text.trim();
       String description = _descriptionController.text.trim();
       String workplace = _workplaceController.text.trim();
-      String experienceText=_experiencetextController.text.trim();
-      String StudyText=_studytextController.text.trim();
 
       // Validate that all required fields are filled
       if (name.isEmpty ||
@@ -416,8 +414,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
           description.isEmpty ||
           workplace.isEmpty ||
           _selectedImage == null) {
-        _showErrorSnackBar(
-            'Please fill in all fields and select an image.');
+        _showErrorSnackBar('Please fill in all fields and select an image.');
         return;
       }
 
@@ -436,43 +433,39 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
         return;
       }
 
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text,
+        password: '123456',
+      );
+
       // Create a new document in the 'users' collection with the generated UID
       DocumentReference doctorRef =
-          await firestore.collection('users').doc(uid);
+          await firestore.collection('users').doc(userCredential.user!.uid);
       String? downloadURL;
       if (_selectedImage != null) {
-        downloadURL = await _uploadImageToFirebase(
-            _selectedImage!, uid);
+        downloadURL = await _uploadImageToFirebase(_selectedImage!, uid);
       }
 
       // Set data for the doctor document
       await doctorRef.set({
-        'uid': uid,
+        'uid': userCredential.user!.uid,
         'name': _nameController.text,
         'email': email,
         'specialty': _selectedSpecialties,
         'role': 'doctor',
         'description': _descriptionController.text,
         'workplace': _workplaceController.text,
-        'experiencetext':_experiencetextController.text,
-        'studytext':_studytextController.text,
         'experiences': _experiences
-            .map((experience) =>
-                experience.timelineDescriptions)
+            .map((experience) => experience.timelineDescriptions)
             .expand((descriptions) => descriptions)
             .toList(),
         'educations': _educations
-            .map((education) =>
-                education.educationDescriptions)
+            .map((education) => education.educationDescriptions)
             .expand((descriptions) => descriptions)
             .toList(),
         'imageURL': downloadURL,
       });
-
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: '123456',
-      );
 
       _showSuccessSnackBar('Doctor information saved successfully!');
       Navigator.pop(context);
@@ -484,8 +477,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
   _pickImage() async {
     final picker = ImagePicker();
-    final pickedImage =
-        await picker.pickImage(source: ImageSource.gallery);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       setState(() {
         _selectedImage = File(pickedImage.path);

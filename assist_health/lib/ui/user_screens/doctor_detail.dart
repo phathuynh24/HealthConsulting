@@ -1,3 +1,4 @@
+import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/register_call_step1.dart';
@@ -6,9 +7,12 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class DoctorDetailScreen extends StatefulWidget {
-  const DoctorDetailScreen({super.key});
+  DoctorInfo doctorInfo;
+  DoctorDetailScreen({required this.doctorInfo, super.key});
 
   @override
   State<DoctorDetailScreen> createState() => _DoctorDetailScreenState();
@@ -29,17 +33,11 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
   bool _isExperienceVisible = true;
   bool _isImageVisible = true;
 
-  final List<String> _specialties = [
-    'Nội tổng quát',
-    'Ngoại thần kinh',
-    'Nội thần kinh'
-  ];
-
   int _currentYear = DateTime.now().year;
   int _currentMonth = DateTime.now().month;
 
-  DateTime? _selectedDate;
-  DateTime? _initialSelectedDate;
+  DateTime _selectedDate = DateTime.now();
+  DateTime _initialSelectedDate = DateTime.now();
   bool _shouldReloadDatePicker = true;
 
   String? _selectedTime;
@@ -54,15 +52,13 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
 
   int? initDate;
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
+  DoctorInfo? _doctorInfo;
 
   @override
   void initState() {
     super.initState();
+
+    _doctorInfo = widget.doctorInfo;
 
     _scrollController.addListener(() {
       setState(() {
@@ -75,15 +71,19 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
 
     _updateStartTimeAndEndTime();
 
-    _initialSelectedDate = DateTime.now();
+    _initialSelectedDate = _isNotEmptySlot()
+        ? DateTime.now()
+        : DateTime.now().add(Duration(days: 1));
 
-    _selectedDate = DateTime.now();
+    _selectedDate = _initialSelectedDate;
 
-    initDate = _isCurrentMonthOfCurrentYear()
-        ? _isNotEmptySlot()
-            ? DateTime.now().day
-            : DateTime.now().add(Duration(days: 1)).day
-        : 1;
+    initDate = _isCurrentMonthOfCurrentYear() ? _initialSelectedDate.day : 1;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -181,16 +181,31 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                           end: Alignment.topCenter,
                                         ),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          getAbbreviatedName('HAHAHA AHHAHA'),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 30,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
+                                      child: (_doctorInfo!.imageURL != '')
+                                          ? Image.network(_doctorInfo!.imageURL,
+                                              fit: BoxFit.cover, errorBuilder:
+                                                  (BuildContext context,
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                              return Center(
+                                                child: Icon(
+                                                  FontAwesomeIcons.userDoctor,
+                                                  size: 60,
+                                                  color: Colors.white,
+                                                ),
+                                              );
+                                            })
+                                          : Center(
+                                              child: Text(
+                                                getAbbreviatedName(
+                                                    _doctorInfo!.name),
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 30,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -212,13 +227,13 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(
+                          SizedBox(
                             width: 255,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'ThS. BS. CK1',
+                                  _doctorInfo!.careerTitiles,
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
@@ -227,7 +242,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   ),
                                 ),
                                 Text(
-                                  'Nguyễn Văn Á',
+                                  _doctorInfo!.name,
                                   style: TextStyle(
                                     color: Colors.black87,
                                     fontSize: 16,
@@ -237,7 +252,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '4 năm kinh nghiệm',
+                                  '${DateTime.now().year - _doctorInfo!.graduationYear} năm kinh nghiệm',
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
@@ -269,9 +284,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
-                                itemCount: _specialties.length,
+                                itemCount: _doctorInfo!.specialty.length,
                                 itemBuilder: (context, index) {
-                                  final specialty = _specialties[index];
+                                  final specialty =
+                                      _doctorInfo!.specialty[index];
                                   return Container(
                                     margin: const EdgeInsets.symmetric(
                                         horizontal: 2),
@@ -405,7 +421,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                           _countTheRestDayOfSelectedMonth(),
                                       initialSelectedDate: _initialSelectedDate,
                                       locale: 'vi_VN',
-                                      selectionColor: Themes.gradientDeepClr
+                                      selectionColor: Themes.gradientLightClr
                                           .withOpacity(0.8),
                                       selectedTextColor: Colors.white,
                                       dateTextStyle: const TextStyle(
@@ -425,8 +441,9 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                         setState(() {
                                           _selectedDate = date;
                                           _initialSelectedDate = date;
-                                          _startTime = '7:30';
-                                          _endTime = '20:45';
+                                          _startTime = '8:30';
+                                          _endTime = '20:00';
+                                          _selectedTime = '';
                                         });
                                         _updateStartTimeAndEndTime();
                                       },
@@ -509,7 +526,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                             height: 8,
                                           ),
                                           SizedBox(
-                                            height: 50,
+                                            height: 45,
                                             child: ListView.builder(
                                               scrollDirection: Axis.horizontal,
                                               itemCount:
@@ -554,12 +571,26 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                           setState(() {
                                                             _selectedTime =
                                                                 time;
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            RegisterCallStep1(
+                                                                              doctorInfo: _doctorInfo!,
+                                                                              selectedDate: _selectedDate,
+                                                                              time: _selectedTime,
+                                                                              isMorning: true,
+                                                                            )));
                                                           });
                                                         },
                                                         child: Container(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(10),
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      15,
+                                                                  vertical: 10),
                                                           margin:
                                                               const EdgeInsets
                                                                   .all(3),
@@ -592,12 +623,15 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                             child: Text(
                                                               time,
                                                               style: TextStyle(
-                                                                  color: (isSelectedTime)
-                                                                      ? Colors
-                                                                          .blue
-                                                                          .shade800
-                                                                      : Colors
-                                                                          .black),
+                                                                color: (isSelectedTime)
+                                                                    ? Colors
+                                                                        .blue
+                                                                        .shade800
+                                                                    : Colors
+                                                                        .black,
+                                                                wordSpacing:
+                                                                    1.2,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -679,6 +713,17 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                           setState(() {
                                                             _selectedTime =
                                                                 time;
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder:
+                                                                        (context) =>
+                                                                            RegisterCallStep1(
+                                                                              doctorInfo: _doctorInfo!,
+                                                                              selectedDate: _selectedDate,
+                                                                              time: _selectedTime,
+                                                                              isMorning: false,
+                                                                            )));
                                                           });
                                                         },
                                                         child: Container(
@@ -828,7 +873,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             right: 4,
                             bottom: 6,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Row(
                               children: [
                                 Text(
@@ -839,7 +884,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 ),
                                 Spacer(),
                                 Text(
-                                  '120.000 vnđ',
+                                  '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
@@ -1000,10 +1045,11 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             right: 4,
                             bottom: 6,
                           ),
-                          child: const Text(
-                            'ABCcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+                          child: Text(
+                            _doctorInfo!.description,
                             style: TextStyle(
                               fontSize: 15,
+                              height: 1.5,
                             ),
                           ),
                         ),
@@ -1223,8 +1269,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  const Text(
-                                    'Bệnh viện An Bình',
+                                  Text(
+                                    _doctorInfo!.workplace,
                                     style: TextStyle(
                                       fontSize: 15,
                                     ),
@@ -1605,8 +1651,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const RegisterCallStep1()));
+                                builder: (context) => RegisterCallStep1(
+                                    doctorInfo: _doctorInfo!)));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(15),
@@ -1757,6 +1803,8 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                         _setSelectedYear(tempYear);
                                         _setSelectedMonth(month);
 
+                                        _selectedTime = '';
+
                                         _updateInitDate();
                                       }
                                       Navigator.of(context).pop();
@@ -1884,18 +1932,25 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _shouldReloadDatePicker = true;
-        _initialSelectedDate = (_isCurrentMonthOfCurrentYear())
-            ? DateTime.now()
-            : DateTime(_currentYear, _currentMonth, 1);
-        initDate = _initialSelectedDate!.day;
+
+        if (!_isCurrentMonthOfCurrentYear()) {
+          _initialSelectedDate = DateTime(_currentYear, _currentMonth, 1);
+        } else {
+          _initialSelectedDate = DateTime.now();
+          if (_isNotEmptySlot()) {
+            _initialSelectedDate = DateTime.now().add(Duration(days: 1));
+          }
+        }
+
+        initDate = _initialSelectedDate.day;
         _selectedDate = _initialSelectedDate;
       });
     });
 
     Future.delayed(const Duration(milliseconds: 400), () {
       setState(() {
-        _startTime = '09:30';
-        _endTime = '19:00';
+        _startTime = '08:00';
+        _endTime = '20:30';
       });
       _updateStartTimeAndEndTime();
     });
@@ -1912,7 +1967,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
   }
 
   _isCurrentDate() {
-    DateTime selectedDate = _selectedDate!;
+    DateTime selectedDate = _selectedDate;
 
     DateTime now = DateTime.now();
 

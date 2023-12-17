@@ -13,7 +13,10 @@ class DoctorProfileList extends StatelessWidget {
         title: Text('Danh sách Bác sĩ'),
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('users').where('role', isEqualTo: 'doctor').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('role', isEqualTo: 'doctor')
+            .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasData) {
             final doctors = snapshot.data!.docs;
@@ -45,8 +48,11 @@ class DoctorProfileList extends StatelessWidget {
 
   Widget _buildDoctorItem(BuildContext context, QueryDocumentSnapshot doctor) {
     final data = doctor.data() as Map<String, dynamic>?;
-    final name = data != null && data.containsKey('name') ? data['name'] as String : '';
-    final imageURL = data != null && data.containsKey('imageURL') ? data['imageURL'] as String : '';
+    final name =
+        data != null && data.containsKey('name') ? data['name'] as String : '';
+    final imageURL = data != null && data.containsKey('imageURL')
+        ? data['imageURL'] as String
+        : '';
     final specialties = data != null && data.containsKey('specialty')
         ? (data['specialty'] is String
             ? [data['specialty'] as String]
@@ -55,7 +61,8 @@ class DoctorProfileList extends StatelessWidget {
     List<Widget> specialtyChips = [];
     for (var specialty in specialties) {
       specialtyChips.add(
-        Chip(label: Text(
+        Chip(
+            label: Text(
           specialty,
           style: TextStyle(fontSize: 12.0),
         )),
@@ -103,7 +110,7 @@ class DoctorProfileList extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DoctorDetailScreen(
+              builder: (context) => DoctorProfileDetailScreen(
                 doctorUid: data?['uid'],
               ),
             ),
@@ -121,7 +128,8 @@ class DoctorProfileList extends StatelessWidget {
     }
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, String doctorId, String? doctorUid) {
+  void _showDeleteConfirmationDialog(
+      BuildContext context, String doctorId, String? doctorUid) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -148,20 +156,22 @@ class DoctorProfileList extends StatelessWidget {
     );
   }
 
-  void _navigateToUpdatePage(BuildContext context, QueryDocumentSnapshot doctor) {
-  final data = doctor.data() as Map<String, dynamic>;
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => UpdateDoctorScreen(doctorId: doctor.id),
-    ),
-  );
-}
-
+  void _navigateToUpdatePage(
+      BuildContext context, QueryDocumentSnapshot doctor) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateDoctorScreen(doctorId: doctor.id),
+      ),
+    );
+  }
 
   void _deleteDoctor(String doctorId, String? doctorUid) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(doctorId).delete();
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(doctorId)
+          .delete();
       if (doctorUid != null) {
         await FirebaseAuth.instance.currentUser!.delete();
       }

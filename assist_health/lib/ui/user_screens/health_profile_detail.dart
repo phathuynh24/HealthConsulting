@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
@@ -259,12 +260,30 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                           fontWeight: FontWeight.w400),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      _currentProfile!.idProfile,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _currentProfile!.idProfile,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final data =
+                                ClipboardData(text: _currentProfile!.idProfile);
+                            Clipboard.setData(data);
+                            showToastMessage(
+                                context, 'Mã bệnh nhân đã được sao chép');
+                          },
+                          child: const Icon(
+                            Icons.content_copy,
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -458,7 +477,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                                       });
                                     },
                                     child: const CircleAvatar(
-                                      backgroundColor: Themes.iconClr,
+                                      backgroundColor: Colors.red,
                                       radius: 12,
                                       child: Icon(
                                         Icons.close,
@@ -656,15 +675,13 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
           documentSnapshot.data() as Map<String, dynamic>;
       final List<dynamic> dataList = List.from(data['data'] ?? []);
       if (dataList.length > index) {
-        //final String fileId = dataList[index]['fileId'];
+        //Xóa tệp từ Firebase Storage
+        final Reference storageRef = _storage.refFromURL(dataList[index]);
+        await storageRef.delete();
 
         // Xóa phần tử trong Firestore
         dataList.removeAt(index);
         await fileURLsDocument.update({'data': dataList});
-
-        // Xóa tệp từ Firebase Storage
-        //final Reference storageRef = FirebaseStorage.instance.ref().child(fileId);
-        //await storageRef.delete();
       }
     }
   }
@@ -683,7 +700,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
       // Quay lại trang trước đó tại đây
       Navigator.pop(context);
       // Hiển thị thông báo xóa thành công
-      showDeleteSuccessSnackBar();
+      showToastMessage(context, 'Xóa hồ sơ thành công');
       await documentReference.delete();
     }
   }
@@ -718,15 +735,5 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
     });
 
     return confirmDelete;
-  }
-
-  void showDeleteSuccessSnackBar() {
-    const snackBar = SnackBar(
-      content: Text('Xóa tài liệu thành công'),
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 2),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

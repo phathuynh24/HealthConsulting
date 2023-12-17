@@ -215,7 +215,7 @@ class _MessageScreenState extends State<MessageScreen>
                   SizedBox(
                     height: size.height / 30,
                   ),
-                  FutureBuilder<List<DoctorInfo>>(
+                  /*FutureBuilder<List<DoctorInfo>>(
                     future: getInfoDoctors(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
@@ -311,6 +311,7 @@ class _MessageScreenState extends State<MessageScreen>
                       );
                     },
                   ),
+                */
                 ],
               ),
             ),

@@ -35,11 +35,11 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () {
                       logIn('huynhphat2405@gmail.com', '123456').then((user) {
                         print("Login Successfull");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const UserNavBar(),
-                            ));
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const UserNavBar()),
+                          (route) => false,
+                        );
                       });
                     },
                     child: const Text(
@@ -57,11 +57,12 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () {
                       logIn('2409huynhphat@gmail.com', '123456').then((user) {
                         print("Login Successfull");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DoctorNavBar(),
-                            ));
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const DoctorNavBar()),
+                          (route) => false,
+                        );
                       });
                     },
                     child: const Text(
@@ -79,11 +80,12 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () {
                       logIn('21520388@gm.uit.edu.vn', '123456').then((user) {
                         print("Login Successfull");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AdminNavBar(),
-                            ));
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const AdminNavBar()),
+                          (route) => false,
+                        );
                       });
                     },
                     child: const Text(
