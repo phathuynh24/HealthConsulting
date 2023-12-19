@@ -5,7 +5,7 @@ import 'package:assist_health/models/other/question.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 
 class CommunityScreen extends StatefulWidget {
-  const CommunityScreen({super.key});
+  const CommunityScreen({Key? key}) : super(key: key);
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
@@ -13,13 +13,80 @@ class CommunityScreen extends StatefulWidget {
 
 class _CommunityScreenState extends State<CommunityScreen> {
   bool isMaleSelected = true;
-
-  final List<Question> questions = [];
-
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
   int age = 18;
   String gender = 'Nam';
+
+  final List<String> selectedCategories = [];
+  final List<String> categories = [
+    'Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'
+    ];
+
+  final List<Question> questions = [];
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
+
+  // Method to show the category selection dialog
+  Future<void> _showCategoryDialog() async {
+  List<String> selectedCategoriesCopy = List.from(selectedCategories);
+
+  await showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Chọn chuyên khoa thẩm mĩ'),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: categories.map((category) {
+                final isSelected = selectedCategoriesCopy.contains(category);
+                return CheckboxListTile(
+                  title: Row(
+                    children: [
+                      Text(category),
+                      if (isSelected) const Icon(Icons.check),
+                    ],
+                  ),
+                  value: isSelected,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value != null) {
+                        if (value) {
+                          selectedCategoriesCopy.add(category);
+                        } else {
+                          selectedCategoriesCopy.remove(category);
+                        }
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            );
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Hủy'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                selectedCategories.clear();
+                selectedCategories.addAll(selectedCategoriesCopy);
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +164,47 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
+                    'Chuyên khoa:',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Wrap(
+                    children: selectedCategories.map((category) {
+                      return Chip(
+                        label: Text(category),
+                        onDeleted: () {
+                          setState(() {
+                            selectedCategories.remove(category);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 5),
+                  ElevatedButton(
+                    onPressed: _showCategoryDialog,
+                    child: const Text('Chọn chuyên khoa'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(
+                horizontal: 15,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
                     'Tiêu đề:',
                     style: TextStyle(
                       fontSize: 20,
@@ -160,8 +268,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   id: id,
                   gender: gender,
                   age: age,
+                  answerCount: 0,
                   title: titleController.text,
                   content: contentController.text,
+                  categories: selectedCategories,
                 );
 
                 FirebaseFirestore.instance.collection('questions').doc(id).set({
@@ -169,22 +279,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   'age': question.age,
                   'title': question.title,
                   'content': question.content,
+                  'categories': FieldValue.arrayUnion(question.categories),
                 });
 
-                FirebaseFirestore.instance
-                    .collection('public_questions')
-                    .doc(id)
-                    .set({
+                FirebaseFirestore.instance.collection('public_questions').doc(id).set({
                   'gender': question.gender,
                   'age': question.age,
                   'title': question.title,
                   'content': question.content,
+                  'categories': FieldValue.arrayUnion(question.categories),
                 });
 
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (_) => const PublicQuestionsScreen()),
+                  MaterialPageRoute(builder: (_) => const PublicQuestionsScreen()),
                 );
 
                 setState(() {
@@ -214,7 +322,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  _genderToggleGender() {
+  Widget _genderToggleGender() {
     return Container(
       height: 40,
       width: 300,
@@ -310,7 +418,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
-  _sliderAge() {
+  Widget _sliderAge() {
     return SliderTheme(
       data: const SliderThemeData(
         trackHeight: 10,
