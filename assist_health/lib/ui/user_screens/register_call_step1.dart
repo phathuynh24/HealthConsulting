@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
@@ -23,9 +24,13 @@ class RegisterCallStep1 extends StatefulWidget {
   DateTime? selectedDate;
   String? time;
   bool? isMorning;
+  bool isEdit;
+  AppointmentSchedule? appointmentSchedule;
 
   RegisterCallStep1(
       {super.key,
+      this.appointmentSchedule,
+      required this.isEdit,
       required this.doctorInfo,
       this.selectedDate,
       this.time,
@@ -63,17 +68,31 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
   StreamController<DocumentSnapshot>? _userProfileStreamController;
 
+  AppointmentSchedule? _appointmentSchedule;
+
   @override
   void initState() {
     super.initState();
     _uid = _auth.currentUser!.uid;
-    _idDoc = 'main_profile';
-
     _startTime = '08:30';
     _endTime = '20:00';
-
     _updateStartTimeAndEndTime();
+    _reasonForExaminationController = TextEditingController();
+    _userProfileStreamController = StreamController<DocumentSnapshot>();
 
+    if (widget.isEdit) {
+      _appointmentSchedule = widget.appointmentSchedule!;
+      _idDoc = _appointmentSchedule!.userProfile!.idDoc;
+      _selectedFiles = _appointmentSchedule!.listOfHealthInformationFiles;
+      _doctorInfo = _appointmentSchedule!.doctorInfo;
+      _reasonForExaminationController!.text =
+          _appointmentSchedule!.reasonForExamination!;
+      _selectedFiles = _appointmentSchedule!.listOfHealthInformationFiles;
+    } else {
+      _idDoc = 'main_profile';
+      _selectedFiles = [];
+      _doctorInfo = widget.doctorInfo;
+    }
     if (widget.time != null) {
       isMorning = widget.isMorning!;
       _initialSelectedDate = widget.selectedDate!;
@@ -92,14 +111,6 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
 
       initDate = _isCurrentMonthOfCurrentYear() ? _initialSelectedDate.day : 1;
     }
-
-    _doctorInfo = widget.doctorInfo;
-
-    _selectedFiles = [];
-
-    _reasonForExaminationController = TextEditingController();
-
-    _userProfileStreamController = StreamController<DocumentSnapshot>();
   }
 
   @override
@@ -140,9 +151,11 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(45),
           child: Container(
+            width: double.infinity,
             height: 45,
             color: Colors.white,
             child: Container(
+              height: 45,
               padding: const EdgeInsets.symmetric(
                 horizontal: 10,
               ),
@@ -213,6 +226,47 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                     const SizedBox(
                       width: 5,
                     ),
+                    (!widget.isEdit)
+                        ? Row(
+                            children: [
+                              const Icon(
+                                Icons.arrow_right_alt_outlined,
+                                size: 30,
+                                color: Colors.blueGrey,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.blueGrey,
+                                ),
+                                child: const Text(
+                                  '3',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Text(
+                                'Thanh toán',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                            ],
+                          )
+                        : SizedBox(),
+                    const SizedBox(
+                      width: 5,
+                    ),
                     const Icon(
                       Icons.arrow_right_alt_outlined,
                       size: 30,
@@ -227,48 +281,21 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                         shape: BoxShape.circle,
                         color: Colors.blueGrey,
                       ),
-                      child: const Text(
-                        '3',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Thanh toán',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueGrey,
-                      ),
-                      child: const Text(
-                        '4',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: (!widget.isEdit)
+                          ? const Text(
+                              '4',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              '3',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                     const SizedBox(
                       width: 5,
@@ -1449,19 +1476,39 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
               );
               return;
             }
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => RegisterCallStep2(
-                          doctorInfo: _doctorInfo!,
-                          userProfile: _userProfile!,
-                          reasonForExamination:
-                              _reasonForExaminationController!.text,
-                          listOfHealthInformationFiles: _selectedFiles!,
-                          selectedDate: _selectedDate,
-                          time: _selectedTime!,
-                          isMorning: isMorning,
-                        )));
+            if (widget.isEdit) {
+              _appointmentSchedule!.userProfile = _userProfile!;
+              _appointmentSchedule!.reasonForExamination =
+                  _reasonForExaminationController!.text;
+              _appointmentSchedule!.listOfHealthInformationFiles =
+                  _selectedFiles!;
+              _appointmentSchedule!.selectedDate = _selectedDate;
+              _appointmentSchedule!.time = _selectedTime!;
+              _appointmentSchedule!.isMorning = isMorning;
+
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RegisterCallStep2(
+                            isEdit: true,
+                            appointmentSchedule: _appointmentSchedule,
+                          )));
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RegisterCallStep2(
+                            isEdit: false,
+                            doctorInfo: _doctorInfo!,
+                            userProfile: _userProfile!,
+                            reasonForExamination:
+                                _reasonForExaminationController!.text,
+                            listOfHealthInformationFiles: _selectedFiles!,
+                            selectedDate: _selectedDate,
+                            time: _selectedTime!,
+                            isMorning: isMorning,
+                          )));
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(13),

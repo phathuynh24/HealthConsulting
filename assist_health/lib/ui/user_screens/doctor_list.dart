@@ -625,6 +625,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => RegisterCallStep1(
+                                            isEdit: false,
                                             doctorInfo: doctor)));
                               },
                               child: Container(

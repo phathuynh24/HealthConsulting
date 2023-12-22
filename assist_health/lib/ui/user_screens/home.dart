@@ -9,6 +9,7 @@ import 'package:assist_health/ui/user_screens/health_profile_list.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
+import 'package:assist_health/video_call/pages/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -54,12 +55,25 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   int currentIndex = 0;
 
+  late final NotificationService notificationService;
+
   @override
   void initState() {
     super.initState();
-    // Lắng nghe sự thay đổi dữ liệu trên Firebase Firestore
+    notificationService = NotificationService();
+    //listenToNotificationStream();
+    notificationService.initializePlatformNotifications();
     _doctorStreamController.addStream(getInfoDoctors());
   }
+
+  // void listenToNotificationStream() =>
+  //     notificationService.behaviorSubject.listen((payload) {
+  //       Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => Container()
+  //               //MySecondScreen(payload: payload)
+  //               ));
+  //     });
 
   @override
   void dispose() {
@@ -560,6 +574,15 @@ class _MyHomeScreen extends State<HomeScreen> {
                       );
                     },
                   ),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await notificationService.showLocalNotification(
+                        id: 0,
+                        title: "Drink Water",
+                        body: "Time to drink some water!");
+                  },
+                  child: const Text("Drink Now"),
                 ),
               ],
             ),

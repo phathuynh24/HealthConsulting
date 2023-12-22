@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print, file_names
 
+import 'dart:async';
+
 import 'package:assist_health/models/doctor/doctor_experience.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/doctor/doctor_schedule.dart';
@@ -380,6 +382,7 @@ String getAllOfSpecialties(List<String> specialties) {
 Stream<List<AppointmentSchedule>> getAppointmentSchdedules() {
   return _firestore
       .collection('appointment_schedule')
+      .where('idDocUser', isEqualTo: _auth.currentUser!.uid)
       .snapshots()
       .map((QuerySnapshot querySnapshot) {
     final List<AppointmentSchedule> appointmentSchedules = [];
@@ -415,9 +418,66 @@ Color getStatusColor(String status) {
     'Chờ duyệt': Colors.orange,
     'Đã duyệt': Colors.green,
     'Đã khám': Colors.blue,
-    'Quá hẹn': Colors.red,
-    'Đã hủy': Colors.grey,
+    'Quá hẹn': Colors.purple,
+    'Đã hủy': Colors.red,
   };
 
   return statusColors[status] ?? Colors.black;
+}
+
+Color getPaymentStatusColor(String status) {
+  Map<String, Color> statusColors = {
+    'Chờ xác nhận': Colors.orange,
+    'Thanh toán thành công': Colors.green,
+    'Thanh toán thất bại': Colors.red,
+    'Hết hạn thanh toán': Colors.grey,
+  };
+
+  return statusColors[status] ?? Colors.black;
+}
+
+int calculateSecondsFromNow(DateTime dateTime) {
+  DateTime now = DateTime.now();
+  Duration difference = now.difference(dateTime);
+  int seconds = difference.inSeconds;
+  // 1 giờ thanh toán + 30 phút chờ
+  return 3600 - seconds;
+}
+
+bool isWithinTimeRange(String time, DateTime selectedDate) {
+  // Chuyển đổi chuỗi thời gian thành đối tượng DateTime
+  List<String> timeParts = time.split('-');
+  String startTimeString = timeParts[0].trim();
+  String endTimeString = timeParts[1].trim();
+  List<int> startTimeParts = startTimeString.split(':').map(int.parse).toList();
+  List<int> endTimeParts = endTimeString.split(':').map(int.parse).toList();
+  DateTime startTime = selectedDate
+      .add(Duration(hours: startTimeParts[0], minutes: startTimeParts[1]));
+  DateTime endTime = selectedDate
+      .add(Duration(hours: endTimeParts[0], minutes: endTimeParts[1]));
+
+  // Lấy thời gian hiện tại
+  DateTime now = DateTime.now();
+
+  // Kiểm tra xem thời gian hiện tại có nằm trong khoảng thời gian đã cho hay không
+  return now.isAfter(startTime) && now.isBefore(endTime);
+}
+
+bool isAfterEndTime(String time, DateTime selectedDate) {
+  // Chuyển đổi chuỗi thời gian thành đối tượng DateTime
+  List<String> timeParts = time.split('-');
+  String endTimeString = timeParts[1].trim();
+  List<int> endTimeParts = endTimeString.split(':').map(int.parse).toList();
+  selectedDate = selectedDate.subtract(Duration(
+    hours: selectedDate.hour,
+    minutes: selectedDate.minute,
+    seconds: selectedDate.second,
+  ));
+  DateTime endTime = selectedDate
+      .add(Duration(hours: endTimeParts[0], minutes: endTimeParts[1]));
+  // Lấy thời gian hiện tại
+  DateTime now = DateTime.now();
+
+  // Kiểm tra xem thời gian hiện tại có sau endTime hay không
+  return now.isAfter(endTime);
 }

@@ -4,6 +4,8 @@ import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/widgets/half_circle.dart';
+import 'package:assist_health/ui/widgets/my_separator.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -142,9 +144,6 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                     children: [
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(
-                          10,
-                        ),
                         margin: const EdgeInsets.only(
                           bottom: 10,
                         ),
@@ -154,6 +153,9 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                         ),
                         child: Column(
                           children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
                             const Text(
                               'STT',
                               style: TextStyle(
@@ -172,14 +174,32 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Divider(
-                              height: 20,
-                              indent: 10,
-                              endIndent: 6,
-                              thickness: 1,
-                              color: Colors.grey.shade300,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                HalfCircle(
+                                    height: 20,
+                                    weight: 10,
+                                    color: Colors.blueAccent.withOpacity(0.1),
+                                    isLeft: true),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                MySeparator(color: Colors.grey.shade400),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                HalfCircle(
+                                    height: 20,
+                                    weight: 10,
+                                    color: Colors.blueAccent.withOpacity(0.1),
+                                    isLeft: false),
+                              ],
                             ),
                             Container(
+                              padding: const EdgeInsets.only(
+                                bottom: 10,
+                              ),
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15)),
@@ -187,247 +207,268 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Thông tin lịch khám
-                                  Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Row(
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    child: Column(
                                       children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            right: 15,
-                                          ),
-                                          child: SizedBox(
-                                            width: 60,
-                                            height: 60,
-                                            child: ClipOval(
-                                              child: Container(
-                                                decoration: const BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                    colors: [
-                                                      Themes.gradientDeepClr,
-                                                      Themes.gradientLightClr
-                                                    ],
-                                                    begin:
-                                                        Alignment.bottomCenter,
-                                                    end: Alignment.topCenter,
-                                                  ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                  right: 15,
                                                 ),
-                                                child: (_appointmentSchedule!
-                                                            .doctorInfo!
-                                                            .imageURL !=
-                                                        '')
-                                                    ? Image.network(
-                                                        _appointmentSchedule!
-                                                            .doctorInfo!
-                                                            .imageURL,
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder:
-                                                            (BuildContext
-                                                                    context,
-                                                                Object
-                                                                    exception,
-                                                                StackTrace?
-                                                                    stackTrace) {
-                                                        return const Center(
-                                                          child: Icon(
-                                                            FontAwesomeIcons
-                                                                .userDoctor,
-                                                            size: 50,
-                                                            color: Colors.white,
-                                                          ),
-                                                        );
-                                                      })
-                                                    : Center(
-                                                        child: Text(
-                                                          getAbbreviatedName(
-                                                              _appointmentSchedule!
-                                                                  .doctorInfo!
-                                                                  .name),
-                                                          style:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 25,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                child: SizedBox(
+                                                  width: 60,
+                                                  height: 60,
+                                                  child: ClipOval(
+                                                    child: Container(
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        gradient:
+                                                            LinearGradient(
+                                                          colors: [
+                                                            Themes
+                                                                .gradientDeepClr,
+                                                            Themes
+                                                                .gradientLightClr
+                                                          ],
+                                                          begin: Alignment
+                                                              .bottomCenter,
+                                                          end: Alignment
+                                                              .topCenter,
                                                         ),
                                                       ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 255,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                _appointmentSchedule!
-                                                    .doctorInfo!.careerTitiles,
-                                                style: const TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 15,
-                                                  height: 1.5,
+                                                      child: (_appointmentSchedule!
+                                                                  .doctorInfo!
+                                                                  .imageURL !=
+                                                              '')
+                                                          ? Image.network(
+                                                              _appointmentSchedule!
+                                                                  .doctorInfo!
+                                                                  .imageURL,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder: (BuildContext
+                                                                      context,
+                                                                  Object
+                                                                      exception,
+                                                                  StackTrace?
+                                                                      stackTrace) {
+                                                              return const Center(
+                                                                child: Icon(
+                                                                  FontAwesomeIcons
+                                                                      .userDoctor,
+                                                                  size: 50,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              );
+                                                            })
+                                                          : Center(
+                                                              child: Text(
+                                                                getAbbreviatedName(
+                                                                    _appointmentSchedule!
+                                                                        .doctorInfo!
+                                                                        .name),
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 25,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                              Text(
-                                                _appointmentSchedule!
-                                                    .doctorInfo!.name,
-                                                style: const TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: 16,
-                                                  height: 1.4,
+                                              SizedBox(
+                                                width: 255,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      _appointmentSchedule!
+                                                          .doctorInfo!
+                                                          .careerTitiles,
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 15,
+                                                        height: 1.5,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      _appointmentSchedule!
+                                                          .doctorInfo!.name,
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontSize: 16,
+                                                        height: 1.4,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 7,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              'Mã lịch khám',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                              ),
-                                            )),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              final data = ClipboardData(
-                                                  text: _appointmentSchedule!
-                                                      .appointmentCode!);
-                                              Clipboard.setData(data);
-                                              showToastMessage(context,
-                                                  'Mã lịch khám đã được sao chép');
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  _appointmentSchedule!
-                                                      .appointmentCode!,
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 7,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    'Mã lịch khám',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  )),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    final data = ClipboardData(
+                                                        text: _appointmentSchedule!
+                                                            .appointmentCode!);
+                                                    Clipboard.setData(data);
+                                                    showToastMessage(context,
+                                                        'Mã lịch khám đã được sao chép');
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      Text(
+                                                        _appointmentSchedule!
+                                                            .appointmentCode!,
+                                                        style: const TextStyle(
+                                                          fontSize: 15,
+                                                        ),
+                                                        textAlign:
+                                                            TextAlign.right,
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      const Icon(
+                                                        Icons.content_copy,
+                                                        size: 20,
+                                                      ),
+                                                    ],
                                                   ),
-                                                  textAlign: TextAlign.right,
                                                 ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                const Icon(
-                                                  Icons.content_copy,
-                                                  size: 20,
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 7,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              'Ngày khám',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                              ),
-                                            )),
-                                        Expanded(
-                                            child: Text(
-                                          DateFormat(
-                                                  'EEEE - dd/MM/yyyy', 'vi_VN')
-                                              .format(_appointmentSchedule!
-                                                  .selectedDate!),
-                                          style: const TextStyle(
-                                            fontSize: 15,
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 7,
                                           ),
-                                          textAlign: TextAlign.right,
-                                        ))
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 7,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              'Giờ khám',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                              ),
-                                            )),
-                                        Expanded(
-                                            child: Text(
-                                          (_appointmentSchedule!.isMorning!)
-                                              ? '${_appointmentSchedule!.time!.replaceAll('-', ' - ')} (Buổi sáng)'
-                                              : '${_appointmentSchedule!.time!.replaceAll('-', ' - ')} (Buổi chiều)',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.greenAccent.shade400,
-                                            fontWeight: FontWeight.w500,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    'Ngày khám',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  )),
+                                              Expanded(
+                                                  child: Text(
+                                                DateFormat('EEEE - dd/MM/yyyy',
+                                                        'vi_VN')
+                                                    .format(
+                                                        _appointmentSchedule!
+                                                            .selectedDate!),
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                                textAlign: TextAlign.right,
+                                              ))
+                                            ],
                                           ),
-                                          textAlign: TextAlign.right,
-                                        ))
-                                      ],
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 7,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const SizedBox(
-                                            width: 100,
-                                            child: Text(
-                                              'Chuyên khoa',
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                              ),
-                                            )),
-                                        Expanded(
-                                            child: Text(
-                                          getAllOfSpecialties(
-                                              _appointmentSchedule!
-                                                  .doctorInfo!.specialty),
-                                          style: const TextStyle(
-                                            fontSize: 15,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 7,
                                           ),
-                                          textAlign: TextAlign.right,
-                                        ))
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    'Giờ khám',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  )),
+                                              Expanded(
+                                                  child: Text(
+                                                (_appointmentSchedule!
+                                                        .isMorning!)
+                                                    ? '${_appointmentSchedule!.time!.replaceAll('-', ' - ')} (Buổi sáng)'
+                                                    : '${_appointmentSchedule!.time!.replaceAll('-', ' - ')} (Buổi chiều)',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors
+                                                      .greenAccent.shade400,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                                textAlign: TextAlign.right,
+                                              ))
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 7,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const SizedBox(
+                                                  width: 100,
+                                                  child: Text(
+                                                    'Chuyên khoa',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  )),
+                                              Expanded(
+                                                  child: Text(
+                                                getAllOfSpecialties(
+                                                    _appointmentSchedule!
+                                                        .doctorInfo!.specialty),
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                                textAlign: TextAlign.right,
+                                              ))
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -443,41 +484,52 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                             !_isVisibleInformation;
                                       });
                                     },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Row(children: [
-                                        const Text(
-                                          'THÔNG TIN BỆNH NHÂN',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Expanded(
-                                          child: Divider(
-                                            height: 20,
-                                            indent: 10,
-                                            endIndent: 6,
-                                            thickness: 1,
-                                            color: Colors.grey.shade300,
-                                          ),
-                                        ),
-                                        Icon(
-                                          (_isVisibleInformation)
-                                              ? Icons
-                                                  .keyboard_arrow_down_rounded
-                                              : Icons.keyboard_arrow_up_rounded,
-                                          size: 27,
-                                          color: Colors.grey.shade400,
-                                        ),
-                                      ]),
-                                    ),
+                                    child: Row(children: [
+                                      HalfCircle(
+                                          height: 20,
+                                          weight: 10,
+                                          color: Colors.blueAccent
+                                              .withOpacity(0.1),
+                                          isLeft: true),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const Text(
+                                        'THÔNG TIN BỆNH NHÂN',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      MySeparator(color: Colors.grey.shade400),
+                                      Icon(
+                                        (_isVisibleInformation)
+                                            ? Icons.keyboard_arrow_down_rounded
+                                            : Icons.keyboard_arrow_up_rounded,
+                                        size: 27,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      HalfCircle(
+                                          height: 20,
+                                          weight: 10,
+                                          color: Colors.blueAccent
+                                              .withOpacity(0.1),
+                                          isLeft: false),
+                                    ]),
                                   ),
                                   const SizedBox(height: 5),
                                   Visibility(
                                     visible: _isVisibleInformation,
                                     child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -641,38 +693,47 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                                   !_isVisibleReasonForExamination;
                                             });
                                           },
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Row(children: [
-                                              const Text(
-                                                'LÝ DO KHÁM',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.grey,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              Expanded(
-                                                child: Divider(
-                                                  height: 20,
-                                                  indent: 10,
-                                                  endIndent: 6,
-                                                  thickness: 1,
-                                                  color: Colors.grey.shade300,
-                                                ),
-                                              ),
-                                              Icon(
-                                                (_isVisibleReasonForExamination)
-                                                    ? Icons
-                                                        .keyboard_arrow_down_rounded
-                                                    : Icons
-                                                        .keyboard_arrow_up_rounded,
-                                                size: 27,
-                                                color: Colors.grey.shade400,
-                                              ),
-                                            ]),
-                                          ),
+                                          child: Row(children: [
+                                            HalfCircle(
+                                                height: 20,
+                                                weight: 10,
+                                                color: Colors.blueAccent
+                                                    .withOpacity(0.1),
+                                                isLeft: true),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            const Text(
+                                              'LÝ DO KHÁM',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            const SizedBox(
+                                              width: 6,
+                                            ),
+                                            MySeparator(
+                                                color: Colors.grey.shade400),
+                                            Icon(
+                                              (_isVisibleReasonForExamination)
+                                                  ? Icons
+                                                      .keyboard_arrow_down_rounded
+                                                  : Icons
+                                                      .keyboard_arrow_up_rounded,
+                                              size: 27,
+                                              color: Colors.grey.shade400,
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            HalfCircle(
+                                                height: 20,
+                                                weight: 10,
+                                                color: Colors.blueAccent
+                                                    .withOpacity(0.1),
+                                                isLeft: false),
+                                          ]),
                                         ),
                                         const SizedBox(height: 10),
                                         Visibility(
@@ -681,7 +742,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                           child: Container(
                                             width: double.infinity,
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
+                                                horizontal: 20),
                                             child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -835,12 +896,13 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                                         )
                                                       : Container(
                                                           margin:
-                                                              EdgeInsets.only(
+                                                              const EdgeInsets
+                                                                  .only(
                                                             top: 6,
                                                           ),
-                                                          child: Text(
+                                                          child: const Text(
                                                             'Trống',
-                                                            style: const TextStyle(
+                                                            style: TextStyle(
                                                                 fontSize: 14,
                                                                 color: Colors
                                                                     .black,
@@ -855,7 +917,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                         ),
                                       ],
                                     ),
-
+                                  const SizedBox(height: 15),
                                   // Thông tin thanh toán
                                   GestureDetector(
                                     onTap: () {
@@ -863,41 +925,52 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                         _isVisiblePayment = !_isVisiblePayment;
                                       });
                                     },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Row(children: [
-                                        const Text(
-                                          'THÔNG TIN THANH TOÁN',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        Expanded(
-                                          child: Divider(
-                                            height: 20,
-                                            indent: 10,
-                                            endIndent: 6,
-                                            thickness: 1,
-                                            color: Colors.grey.shade300,
-                                          ),
-                                        ),
-                                        Icon(
-                                          (_isVisibleInformation)
-                                              ? Icons
-                                                  .keyboard_arrow_down_rounded
-                                              : Icons.keyboard_arrow_up_rounded,
-                                          size: 27,
-                                          color: Colors.grey.shade400,
-                                        ),
-                                      ]),
-                                    ),
+                                    child: Row(children: [
+                                      HalfCircle(
+                                          height: 20,
+                                          weight: 10,
+                                          color: Colors.blueAccent
+                                              .withOpacity(0.1),
+                                          isLeft: true),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const Text(
+                                        'THÔNG TIN THANH TOÁN',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      MySeparator(color: Colors.grey.shade400),
+                                      Icon(
+                                        (_isVisibleInformation)
+                                            ? Icons.keyboard_arrow_down_rounded
+                                            : Icons.keyboard_arrow_up_rounded,
+                                        size: 27,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      HalfCircle(
+                                          height: 20,
+                                          weight: 10,
+                                          color: Colors.blueAccent
+                                              .withOpacity(0.1),
+                                          isLeft: false),
+                                    ]),
                                   ),
                                   const SizedBox(height: 5),
                                   Visibility(
                                     visible: _isVisiblePayment,
                                     child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                      ),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -932,7 +1005,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: EdgeInsets.symmetric(
+                                            padding: const EdgeInsets.symmetric(
                                               horizontal: 10,
                                               vertical: 7,
                                             ),
@@ -941,7 +1014,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                SizedBox(
+                                                const SizedBox(
                                                     width: 100,
                                                     child: Text(
                                                       'Trạng thái',
@@ -955,7 +1028,9 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                                   style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.orange,
+                                                    color: getPaymentStatusColor(
+                                                        _appointmentSchedule!
+                                                            .status!),
                                                   ),
                                                   textAlign: TextAlign.right,
                                                 ))
@@ -1406,9 +1481,8 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                             child: Container(
                               width: double.infinity,
                               height: 50,
-                              margin: const EdgeInsets.only(
-                                left: 20,
-                                right: 10,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 20,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.grey.withOpacity(0.2),

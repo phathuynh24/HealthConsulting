@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/register_call_step3.dart';
+import 'package:assist_health/ui/user_screens/register_call_step4.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -12,23 +14,27 @@ import 'package:open_file/open_file.dart';
 
 // ignore: must_be_immutable
 class RegisterCallStep2 extends StatefulWidget {
-  DoctorInfo doctorInfo;
-  UserProfile userProfile;
-  String reasonForExamination;
-  List<File> listOfHealthInformationFiles;
+  DoctorInfo? doctorInfo;
+  UserProfile? userProfile;
+  String? reasonForExamination;
+  List<File>? listOfHealthInformationFiles;
+  DateTime? selectedDate;
+  String? time;
+  bool? isMorning;
 
-  DateTime selectedDate;
-  String time;
-  bool isMorning;
+  bool isEdit;
+  AppointmentSchedule? appointmentSchedule;
 
   RegisterCallStep2(
-      {required this.doctorInfo,
-      required this.userProfile,
-      required this.reasonForExamination,
-      required this.listOfHealthInformationFiles,
-      required this.selectedDate,
-      required this.time,
-      required this.isMorning,
+      {required this.isEdit,
+      this.appointmentSchedule,
+      this.doctorInfo,
+      this.userProfile,
+      this.reasonForExamination,
+      this.listOfHealthInformationFiles,
+      this.selectedDate,
+      this.time,
+      this.isMorning,
       super.key});
 
   @override
@@ -52,14 +58,27 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
   void initState() {
     super.initState();
 
-    _doctorInfo = widget.doctorInfo;
-    _userProfile = widget.userProfile;
-    _reasonForExamination = widget.reasonForExamination;
-    _listOfHealthInformationFiles = widget.listOfHealthInformationFiles;
+    if (widget.isEdit) {
+      _doctorInfo = widget.appointmentSchedule!.doctorInfo;
+      _userProfile = widget.appointmentSchedule!.userProfile;
+      _reasonForExamination = widget.appointmentSchedule!.reasonForExamination;
+      _listOfHealthInformationFiles =
+          widget.appointmentSchedule!.listOfHealthInformationFiles;
 
-    _selectedDate = widget.selectedDate;
-    _time = widget.time;
-    _isMorning = widget.isMorning;
+      _selectedDate = widget.appointmentSchedule!.selectedDate;
+      _time = widget.appointmentSchedule!.time;
+      _isMorning = widget.appointmentSchedule!.isMorning;
+    } else {
+      _doctorInfo = widget.doctorInfo;
+      _userProfile = widget.userProfile;
+      _reasonForExamination = widget.reasonForExamination;
+      _listOfHealthInformationFiles = widget.listOfHealthInformationFiles;
+
+      _selectedDate = widget.selectedDate;
+      _time = widget.time;
+
+      _isMorning = widget.isMorning;
+    }
   }
 
   @override
@@ -83,6 +102,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(45),
           child: Container(
+            width: double.infinity,
             height: 45,
             color: Colors.white,
             child: Container(
@@ -151,6 +171,50 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                         color: Colors.blueAccent.shade700,
                       ),
                     ),
+                    (!widget.isEdit)
+                        ? Row(
+                            children: [
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Icon(
+                                Icons.arrow_right_alt_outlined,
+                                size: 30,
+                                color: Colors.blueGrey,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.blueGrey,
+                                ),
+                                child: const Text(
+                                  '3',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              const Text(
+                                'Thanh toán',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                            ],
+                          )
+                        : SizedBox(),
                     const SizedBox(
                       width: 5,
                     ),
@@ -168,48 +232,21 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                         shape: BoxShape.circle,
                         color: Colors.blueGrey,
                       ),
-                      child: const Text(
-                        '3',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Thanh toán',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueGrey,
-                      ),
-                      child: const Text(
-                        '4',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
+                      child: (!widget.isEdit)
+                          ? const Text(
+                              '4',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              '3',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                     const SizedBox(
                       width: 5,
@@ -782,12 +819,12 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                             ),
                                           )
                                         : Container(
-                                            margin: EdgeInsets.only(
+                                            margin: const EdgeInsets.only(
                                               top: 6,
                                             ),
-                                            child: Text(
+                                            child: const Text(
                                               'Trống',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 14,
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.w400),
@@ -913,7 +950,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
         ),
       ),
       bottomNavigationBar: Container(
-        height: 150,
+        height: (widget.isEdit) ? 70 : 150,
         padding: const EdgeInsets.symmetric(
           vertical: 8,
           horizontal: 15,
@@ -928,60 +965,90 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
         ),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 6, bottom: 10),
-              child: Text(
-                'Hiện tại chỉ có thể thanh toán bằng cách quét mã thanh toán sau khi thực hiện xác nhận đăng ký',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade600,
-                  height: 1.3,
-                  wordSpacing: 1.2,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Tổng',
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
-                    style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
+            (!widget.isEdit)
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 6, bottom: 10),
+                    child: Text(
+                      'Hiện tại chỉ có thể thanh toán bằng cách quét mã thanh toán sau khi thực hiện xác nhận đăng ký',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                        height: 1.3,
+                        wordSpacing: 1.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : SizedBox(),
+            (!widget.isEdit)
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Tổng',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox(),
+            (!widget.isEdit)
+                ? const SizedBox(
+                    height: 8,
+                  )
+                : SizedBox(),
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => RegisterCallStep3(
-                              doctorInfo: _doctorInfo!,
-                              userProfile: _userProfile!,
-                              reasonForExamination: _reasonForExamination!,
-                              listOfHealthInformationFiles:
-                                  _listOfHealthInformationFiles!,
-                              selectedDate: _selectedDate!,
-                              time: _time!,
-                              isMorning: _isMorning!,
-                            )));
+                if (widget.isEdit) {
+                  widget.userProfile = _userProfile!;
+                  widget.appointmentSchedule!.reasonForExamination !=
+                      _reasonForExamination!;
+                  widget.appointmentSchedule!.listOfHealthInformationFiles !=
+                      _listOfHealthInformationFiles!;
+                  widget.appointmentSchedule!.selectedDate = _selectedDate!;
+                  widget.appointmentSchedule!.time = _time!;
+                  widget.appointmentSchedule!.isMorning = _isMorning;
+                  widget.appointmentSchedule!.reasonForExamination =
+                      _reasonForExamination;
+                  widget.appointmentSchedule!.status = 'Đã duyệt';
+                  widget.appointmentSchedule!.updateAppointmentStatus(
+                      widget.appointmentSchedule!.status!);
+                  widget.appointmentSchedule!.updateAppointmentInFirestore(
+                      widget.appointmentSchedule!.idDoc!);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegisterCallStep4(
+                              appointmentSchedule:
+                                  widget.appointmentSchedule!)));
+                } else {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegisterCallStep3(
+                                doctorInfo: _doctorInfo!,
+                                userProfile: _userProfile!,
+                                reasonForExamination: _reasonForExamination!,
+                                listOfHealthInformationFiles:
+                                    _listOfHealthInformationFiles!,
+                                selectedDate: _selectedDate!,
+                                time: _time!,
+                                isMorning: _isMorning!,
+                              )));
+                }
               },
               child: Container(
                 padding: const EdgeInsets.all(13),

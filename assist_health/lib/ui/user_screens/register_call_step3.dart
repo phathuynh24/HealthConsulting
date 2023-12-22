@@ -10,6 +10,8 @@ import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/register_call_step4.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -66,8 +68,8 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
 
     _doctorInfo = widget.doctorInfo;
     _userProfile = widget.userProfile;
-    _reasonForExamination = widget.reasonForExamination ?? '';
-    _listOfHealthInformationFiles = widget.listOfHealthInformationFiles ?? [];
+    _reasonForExamination = widget.reasonForExamination;
+    _listOfHealthInformationFiles = widget.listOfHealthInformationFiles;
 
     _selectedDate = widget.selectedDate;
     _time = widget.time;
@@ -127,6 +129,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(45),
               child: Container(
+                width: double.infinity,
                 height: 45,
                 color: Colors.white,
                 child: Container(
@@ -597,7 +600,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
           Positioned.fill(
             child: Container(
               color: Colors.black54,
-              child: Center(
+              child: const Center(
                 child: AlertDialog(
                   title: Text('Tạo phiếu khám'),
                   content: SingleChildScrollView(
@@ -717,7 +720,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
         List.generate(8, (_) => random.nextInt(10).toString()).join();
 
     // Ghép nó với "MDK"
-    String appointmentCode = 'MDK' + randomDigits;
+    String appointmentCode = 'MDK$randomDigits';
 
     return appointmentCode;
   }
@@ -728,6 +731,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     AppointmentSchedule appointmentSchedule = AppointmentSchedule(
       doctorInfo: _doctorInfo,
       userProfile: _userProfile,
+      idDocUser: FirebaseAuth.instance.currentUser!.uid,
       reasonForExamination: _reasonForExamination,
       listOfHealthInformationFiles: _listOfHealthInformationFiles,
       selectedDate: _selectedDate,
@@ -739,6 +743,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
       receivedAppointmentTime: getFormattedDateTime(),
       paymentStartTime: _paymentStartTime,
       status: 'Chờ duyệt',
+      paymentStatus: 'Chờ xác nhận',
     );
 
     try {

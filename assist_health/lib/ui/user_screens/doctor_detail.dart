@@ -577,6 +577,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                                     builder:
                                                                         (context) =>
                                                                             RegisterCallStep1(
+                                                                              isEdit: false,
                                                                               doctorInfo: _doctorInfo!,
                                                                               selectedDate: _selectedDate,
                                                                               time: _selectedTime,
@@ -719,6 +720,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                                     builder:
                                                                         (context) =>
                                                                             RegisterCallStep1(
+                                                                              isEdit: false,
                                                                               doctorInfo: _doctorInfo!,
                                                                               selectedDate: _selectedDate,
                                                                               time: _selectedTime,
@@ -1652,7 +1654,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => RegisterCallStep1(
-                                    doctorInfo: _doctorInfo!)));
+                                    isEdit: false, doctorInfo: _doctorInfo!)));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(15),
