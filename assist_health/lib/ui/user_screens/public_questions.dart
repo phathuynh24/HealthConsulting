@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
@@ -18,7 +19,9 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   final List<String> categories = [
     'Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'
   ];
-  
+  late String currentUserId;
+  bool showUserQuestions = false; // Step 2: Add a variable to track button state
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,10 +52,31 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               }
             },
           ),
+          Switch(
+            value: showUserQuestions,
+            onChanged: (value) {
+              setState(() {
+                showUserQuestions = value;
+                User? user = FirebaseAuth.instance.currentUser;
+                String currentUserId = user?.uid ?? '';
+                print('showUserQuestions: $showUserQuestions'); // Add this line
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              setState(() {
+                // Toggle the button state
+                showUserQuestions = !showUserQuestions;
+              });
+            },
+          ),
         ],
       ),
+      // bug
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('public_questions').snapshots(),
+        stream: FirebaseFirestore.instance.collection('questions').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(
@@ -62,8 +86,12 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
 
           final List<Question> questions = [];
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          User? user = FirebaseAuth.instance.currentUser;
+          currentUserId = user?.uid ?? ''; // Use the null-aware operator and provide a default value
+
           for (var document in documents) {
             final List<dynamic> categories = document['categories'];
+         
             final question = Question(
               id: document.id,
               gender: document['gender'],
@@ -72,6 +100,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               content: document['content'],
               categories: categories.cast<String>().toList(),
               answerCount: 0,
+              questionUserId:  document['questionUserId'], // Use currentUserId here
             );
 
             questions.add(question);
@@ -80,8 +109,11 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
 
           final filteredQuestions = questions
               .where((question) =>
-                  selectedFilterCategories.isEmpty ||
-                  question.categories.any((category) => selectedFilterCategories.contains(category)))
+                  (!showUserQuestions ||
+                      (showUserQuestions && question.questionUserId == currentUserId)) &&
+                  (selectedFilterCategories.isEmpty ||
+                      question.categories.any((category) =>
+                          selectedFilterCategories.contains(category))))
               .toList();
 
           return ListView.builder(
@@ -160,6 +192,13 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                             },
                           ),
                           const Divider(),
+                          Text(
+                            'Answers: ${filteredQuestions[index].answerCount}', // Display answer count
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.green,
+                            ),
+                          ),
                         ],
                       ),
                     ),

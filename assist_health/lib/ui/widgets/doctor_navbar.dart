@@ -1,6 +1,7 @@
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/doctor_screens/message_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
-import 'package:assist_health/ui/user_screens/message.dart';
+import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,9 +16,9 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    Container(),
+    const PublicQuestionsScreen(),
     // Screen 2
-    const MessageScreen(),
+    const MessageDoctorScreen(),
     // Screen 3
     const SetScheduleScreen(),
     // Screen 4

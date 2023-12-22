@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({Key? key}) : super(key: key);
@@ -17,76 +18,72 @@ class _CommunityScreenState extends State<CommunityScreen> {
   String gender = 'Nam';
 
   final List<String> selectedCategories = [];
-  final List<String> categories = [
-    'Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'
-    ];
+  final List<String> categories = ['Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'];
 
   final List<Question> questions = [];
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
 
-  // Method to show the category selection dialog
   Future<void> _showCategoryDialog() async {
-  List<String> selectedCategoriesCopy = List.from(selectedCategories);
+    List<String> selectedCategoriesCopy = List.from(selectedCategories);
 
-  await showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Chọn chuyên khoa thẩm mĩ'),
-        content: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: categories.map((category) {
-                final isSelected = selectedCategoriesCopy.contains(category);
-                return CheckboxListTile(
-                  title: Row(
-                    children: [
-                      Text(category),
-                      if (isSelected) const Icon(Icons.check),
-                    ],
-                  ),
-                  value: isSelected,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      if (value != null) {
-                        if (value) {
-                          selectedCategoriesCopy.add(category);
-                        } else {
-                          selectedCategoriesCopy.remove(category);
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Chọn chuyên khoa thẩm mĩ'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: categories.map((category) {
+                  final isSelected = selectedCategoriesCopy.contains(category);
+                  return CheckboxListTile(
+                    title: Row(
+                      children: [
+                        Text(category),
+                        if (isSelected) const Icon(Icons.check),
+                      ],
+                    ),
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value != null) {
+                          if (value) {
+                            selectedCategoriesCopy.add(category);
+                          } else {
+                            selectedCategoriesCopy.remove(category);
+                          }
                         }
-                      }
-                    });
-                  },
-                );
-              }).toList(),
-            );
-          },
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
+                      });
+                    },
+                  );
+                }).toList(),
+              );
             },
-            child: const Text('Hủy'),
           ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                selectedCategories.clear();
-                selectedCategories.addAll(selectedCategoriesCopy);
-              });
-              Navigator.of(context).pop();
-            },
-            child: const Text('Xác nhận'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedCategories.clear();
+                  selectedCategories.addAll(selectedCategoriesCopy);
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Xác nhận'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,46 +258,49 @@ class _CommunityScreenState extends State<CommunityScreen> {
             const SizedBox(
               height: 30,
             ),
+            
             ActionChip(
-              onPressed: () {
-                final id = DateTime.now().millisecondsSinceEpoch.toString();
-                final question = Question(
-                  id: id,
-                  gender: gender,
-                  age: age,
-                  answerCount: 0,
-                  title: titleController.text,
-                  content: contentController.text,
-                  categories: selectedCategories,
-                );
+              onPressed: () async {
+                // Get the current user
+                User? user = FirebaseAuth.instance.currentUser;
 
-                FirebaseFirestore.instance.collection('questions').doc(id).set({
-                  'gender': question.gender,
-                  'age': question.age,
-                  'title': question.title,
-                  'content': question.content,
-                  'categories': FieldValue.arrayUnion(question.categories),
-                });
+                if (user != null) {
+                  String currentUserId = user.uid;
 
-                FirebaseFirestore.instance.collection('public_questions').doc(id).set({
-                  'gender': question.gender,
-                  'age': question.age,
-                  'title': question.title,
-                  'content': question.content,
-                  'categories': FieldValue.arrayUnion(question.categories),
-                });
+                  final id = DateTime.now().millisecondsSinceEpoch.toString();
+                  final question = Question(
+                    id: id,
+                    gender: gender,
+                    age: age,
+                    answerCount: 0,
+                    title: titleController.text,
+                    content: contentController.text,
+                    categories: selectedCategories,
+                    questionUserId: currentUserId, // Add this line
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const PublicQuestionsScreen()),
-                );
+                  );
 
-                setState(() {
-                  questions.add(question);
-                });
+                  await FirebaseFirestore.instance.collection('questions').doc(id).set({
+                    'gender': question.gender,
+                    'age': question.age,
+                    'title': question.title,
+                    'content': question.content,
+                    'categories': FieldValue.arrayUnion(question.categories),
+                    'questionUserId':currentUserId,
+                  });
 
-                titleController.clear();
-                contentController.clear();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PublicQuestionsScreen()),
+                  );
+
+                  setState(() {
+                    questions.add(question);
+                  });
+
+                  titleController.clear();
+                  contentController.clear();
+                }
               },
               avatar: const Icon(
                 Icons.send,

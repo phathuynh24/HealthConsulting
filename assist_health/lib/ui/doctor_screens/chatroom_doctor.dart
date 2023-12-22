@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,17 +8,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-class ChatRoom extends StatefulWidget {
+class ChatRoomDoctor extends StatefulWidget {
   final Map<String, dynamic> userMap;
   final String chatRoomId;
 
-  const ChatRoom({super.key, required this.chatRoomId, required this.userMap});
+  const ChatRoomDoctor({super.key, required this.chatRoomId, required this.userMap});
 
   @override
-  State<ChatRoom> createState() => _ChatRoomState();
+  State<ChatRoomDoctor> createState() => _ChatRoomDoctorState();
 }
 
-class _ChatRoomState extends State<ChatRoom> {
+class _ChatRoomDoctorState extends State<ChatRoomDoctor> {
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
