@@ -21,14 +21,18 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   ];
   late String currentUserId;
   bool showUserQuestions = false; // Step 2: Add a variable to track button state
+  void toggleLikeStatus(Question question) {
+  FirebaseFirestore.instance.collection('questions').doc(question.id).update({
+    'isLiked': question.isLiked,
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
-        title: const Text('Cộng đồng hỏi đáp'),
-        centerTitle: true,
+      title: Text(showUserQuestions ? 'Câu hỏi của bạn' : 'Hỏi đáp cộng đồng'),        centerTitle: true,
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -63,15 +67,15 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               });
             },
           ),
-          IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {
-              setState(() {
-                // Toggle the button state
-                showUserQuestions = !showUserQuestions;
-              });
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.person),
+          //   onPressed: () {
+          //     setState(() {
+          //       // Toggle the button state
+          //       showUserQuestions = !showUserQuestions;
+          //     });
+          //   },
+          // ),
         ],
       ),
       // bug
@@ -102,11 +106,9 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               answerCount: 0,
               questionUserId:  document['questionUserId'], // Use currentUserId here
             );
-
             questions.add(question);
             isLikedList.add(false);
           }
-
           final filteredQuestions = questions
               .where((question) =>
                   (!showUserQuestions ||
@@ -186,10 +188,13 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                               color: isLiked ? Colors.red : Colors.grey,
                             ),
                             onPressed: () {
-                              setState(() {
+                                 setState(() {
                                 isLikedList[index] = !isLikedList[index];
+                                filteredQuestions[index].isLiked = isLikedList[index];
+                                toggleLikeStatus(filteredQuestions[index]);
                               });
                             },
+
                           ),
                           const Divider(),
                           Text(

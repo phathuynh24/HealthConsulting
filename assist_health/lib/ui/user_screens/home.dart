@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
@@ -11,6 +10,7 @@ import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,9 +26,24 @@ class HomeScreen extends StatefulWidget {
 class _MyHomeScreen extends State<HomeScreen> {
   final FirebaseStorage storage = FirebaseStorage.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final StreamController<List<DoctorInfo>> _doctorStreamController =
       StreamController<List<DoctorInfo>>.broadcast();
+    Future<void> setOffline() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user != null) {
+        // Assuming you have a 'users' collection in Firestore
+        final CollectionReference users =
+            FirebaseFirestore.instance.collection('users');
+        
+        await users.doc(user.uid).update({'status': 'offline'});
+      }
+    } catch (e) {
+      print('Error setting user status offline: $e');
+    }
+  }
 
   List symptoms = [
     "Tay mũi họng",
@@ -63,6 +78,7 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   @override
   void dispose() {
+      setOffline();
     _doctorStreamController.close();
     super.dispose();
   }
