@@ -24,6 +24,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isLoading = false;
   final TextEditingController _name = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  late DocumentReference documentReference;
+
+  Future<void> setOffline() async {
+    if (documentReference != null) {
+      await documentReference.update({'status': 'offline'});
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -125,11 +132,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     builder: (_) => const AdminNavBar()));
                             break;
                         }
+                        await documentReference.update({'status': 'online'});
+ 
                       });
                     } else {
                       print("Please fill");
                     }
                   },
+                  
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     width: double.infinity,
@@ -157,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -193,5 +204,11 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+   @override
+  void dispose() {
+    // Call setOffline when the widget is disposed (e.g., when user logs out or closes the app)
+    setOffline();
+    super.dispose();
   }
 }

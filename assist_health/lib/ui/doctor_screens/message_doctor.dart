@@ -1,25 +1,24 @@
-import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class MessageScreen extends StatefulWidget {
-  const MessageScreen({Key? key}) : super(key: key);
+class MessageDoctorScreen extends StatefulWidget {
+  const MessageDoctorScreen({Key? key}) : super(key: key);
 
   @override
-  State<MessageScreen> createState() => _MessageScreenState();
+  State<MessageDoctorScreen> createState() => _MessageDoctorScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserver {
-  List<Map<String, dynamic>> doctorList = [];
+class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsBindingObserver {
+  List<Map<String, dynamic>> userList = [];
   bool isLoading = false;
   Map<String, dynamic>? userMap;
   final TextEditingController _search = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  bool showChattedUsers = false;
   @override
   void initState() {
     super.initState();
@@ -61,6 +60,66 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
         ? "$user1$user2"
         : "$user2$user1";
   }
+  void toggleChattedUsers() {
+    setState(() {
+      showChattedUsers = !showChattedUsers;
+      if (showChattedUsers) {
+        filterChattedUsers();
+      } else {
+        onLoadDoctors();
+      }
+    });
+  }
+
+  void filterChattedUsers() async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  setState(() {
+    isLoading = true;
+  });
+
+  // Fetch the list of chat rooms for the current user
+  QuerySnapshot chatRoomsSnapshot = await firestore
+      .collection('chatroom')
+      .where('users', arrayContains: _auth.currentUser!.uid)
+      .get();
+
+  // Extract doctor IDs from the chat rooms
+  List<String> doctorIds = [];
+  for (QueryDocumentSnapshot room in chatRoomsSnapshot.docs) {
+    List<dynamic> users = room['users'];
+    doctorIds.addAll(users.where((id) => id != _auth.currentUser!.uid).whereType<String>());
+  }
+
+  doctorIds = doctorIds.toSet().toList();
+
+  if (doctorIds.isNotEmpty) {
+    // Fetch the details of doctors based on the filtered IDs
+    await firestore
+        .collection('users')
+        .where("role", isEqualTo: "user")
+        .where(FieldPath.documentId, whereIn: doctorIds)
+        .get()
+        .then((value) {
+      if (value.docs.isNotEmpty) {
+        setState(() {
+          userList = value.docs.map((doc) => doc.data()).toList();
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          userList = [];
+          isLoading = false;
+        });
+      }
+    });
+  } else {
+    setState(() {
+      userList = [];
+      isLoading = false;
+    });
+  }
+}
 
   void onSearch() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -80,11 +139,11 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
 
     await firestore
         .collection('users')
-        .where("role", isEqualTo: "doctor")
+        .where("role", isEqualTo: "user")
         .get()
         .then((value) {
       setState(() {
-        doctorList = value.docs
+        userList = value.docs
             .where((doc) => doc['name'].toLowerCase().contains(searchText))
             .map((doc) => doc.data())
             .toList();
@@ -102,17 +161,17 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
 
     await firestore
         .collection('users')
-        .where("role", isEqualTo: "doctor")
+        .where("role", isEqualTo: "user")
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {
         setState(() {
-          doctorList = value.docs.map((doc) => doc.data()).toList();
+          userList = value.docs.map((doc) => doc.data()).toList();
           isLoading = false;
         });
       } else {
         setState(() {
-          doctorList = [];
+          userList = [];
           isLoading = false;
         });
       }
@@ -183,14 +242,27 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                   SizedBox(
                     height: size.height / 60,
                   ),
-
-                  if (doctorList.isNotEmpty)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Themes.buttonClr,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: toggleChattedUsers,
+                    child: Text(
+                      showChattedUsers ? "Hiển thị tất cả" : "Chỉ hiển thị đã chat",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  
+                  if (userList.isNotEmpty)
                     Container(
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: doctorList.length,
+                        itemCount: userList.length,
                         itemBuilder: (context, index) {
-                          Map<String, dynamic> doctor = doctorList[index];
+                          Map<String, dynamic> user = userList[index];
                           return Container(
                             padding: const EdgeInsets.symmetric(
                               vertical: 5,
@@ -199,13 +271,13 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                               onTap: () {
                                 String roomId = chatRoomId(
                                   _auth.currentUser!.displayName!,
-                                  doctor['name'],
+                                  user['name'],
                                 );
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) => ChatRoom(
                                       chatRoomId: roomId,
-                                      userMap: doctor,
+                                      userMap: user,
                                     ),
                                   ),
                                 );
@@ -215,7 +287,7 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                                   CircleAvatar(
                                     radius: 30,
                                     backgroundImage: NetworkImage(
-                                      doctor['imageURL'],
+                                      user['imageURL'],
                                     ),
                                   ),
                                   Positioned(
@@ -227,7 +299,7 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: getStatusDotColor(
-                                          doctor['status'] == 'online',
+                                          user['status'] == 'online',
                                         ),
                                       ),
                                     ),
@@ -235,7 +307,7 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                                 ],
                               ),
                               title: Text(
-                                doctor['name'],
+                                user['name'],
                                 style: const TextStyle(
                                   color: Colors.black,
                                   height: 1.5,
@@ -243,6 +315,13 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
+                              // subtitle: Text(
+                              //   doctor['email'],
+                              //   style: const TextStyle(
+                              //     color: Colors.black54,
+                              //     height: 1.5,
+                              //   ),
+                              // ),
                               trailing: const Icon(Icons.chat, color: Colors.black),
                             ),
                           );

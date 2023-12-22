@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,79 +8,75 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-class ChatRoom extends StatefulWidget {
+class ChatRoomDoctor extends StatefulWidget {
   final Map<String, dynamic> userMap;
   final String chatRoomId;
 
-  const ChatRoom({super.key, required this.chatRoomId, required this.userMap});
+  const ChatRoomDoctor({super.key, required this.chatRoomId, required this.userMap});
 
   @override
-  State<ChatRoom> createState() => _ChatRoomState();
+  State<ChatRoomDoctor> createState() => _ChatRoomDoctorState();
 }
 
-class _ChatRoomState extends State<ChatRoom> {
+class _ChatRoomDoctorState extends State<ChatRoomDoctor> {
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  List<File>? imageFiles = [];
+  File? imageFile;
 
-  Future getImages() async {
+  Future getImage() async {
     ImagePicker picker = ImagePicker();
 
-    await picker.pickMultiImage().then((List<XFile> xFiles) {
-      if (xFiles.isNotEmpty) {
-        imageFiles = xFiles.map((xFile) => File(xFile.path)).toList();
-        _uploadImages();
+    await picker.pickImage(source: ImageSource.gallery).then((xFile) {
+      if (xFile != null) {
+        imageFile = File(xFile.path);
+        uploadImage();
       }
     });
   }
 
-  Future _uploadImages() async {
-    for (File imageFile in imageFiles!) {
-      String fileName = const Uuid().v1();
-      int status = 1;
+  Future uploadImage() async {
+    String fileName = const Uuid().v1();
+    int status = 1;
+
+    await _firestore
+        .collection('chatroom')
+        .doc(widget.chatRoomId)
+        .collection('chats')
+        .doc(fileName)
+        .set({
+      "sendby": _auth.currentUser!.displayName,
+      "message": "",
+      "type": "img",
+      "time": FieldValue.serverTimestamp(),
+    });
+
+    var ref =
+        FirebaseStorage.instance.ref().child('images').child("$fileName.jpg");
+
+    // ignore: body_might_complete_normally_catch_error
+    var uploadTask = await ref.putFile(imageFile!).catchError((error) async {
+      _firestore
+          .collection('chatroom')
+          .doc(widget.chatRoomId)
+          .collection('chats')
+          .doc(fileName)
+          .delete();
+      status = 0;
+    });
+
+    if (status == 1) {
+      String imageUrl = await uploadTask.ref.getDownloadURL();
 
       await _firestore
           .collection('chatroom')
           .doc(widget.chatRoomId)
           .collection('chats')
           .doc(fileName)
-          .set({
-        "sendby": _auth.currentUser!.displayName,
-        "message": "",
-        "type": "img",
-        "time": FieldValue.serverTimestamp(),
-      });
+          .update({"message": imageUrl});
 
-      var ref = FirebaseStorage.instance
-          .ref()
-          .child('images')
-          .child("$fileName.jpg");
-
-      // ignore: body_might_complete_normally_catch_error
-      var uploadTask = await ref.putFile(imageFile).catchError((error) async {
-        _firestore
-            .collection('chatroom')
-            .doc(widget.chatRoomId)
-            .collection('chats')
-            .doc(fileName)
-            .delete();
-        status = 0;
-      });
-
-      if (status == 1) {
-        String imageUrl = await uploadTask.ref.getDownloadURL();
-
-        await _firestore
-            .collection('chatroom')
-            .doc(widget.chatRoomId)
-            .collection('chats')
-            .doc(fileName)
-            .update({"message": imageUrl});
-
-        print(imageUrl);
-      }
+      print(imageUrl);
     }
   }
 
@@ -172,23 +169,23 @@ class _ChatRoomState extends State<ChatRoom> {
                 },
               ),
             ),
-           Container(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-            bottomLeft: Radius.circular(25),
-            bottomRight: Radius.circular(25)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: getImages,
-            icon: const Icon(Icons.image),
-            color: Colors.blue,
-          ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(25),
+                    topRight: Radius.circular(25),
+                    bottomLeft: Radius.circular(25),
+                    bottomRight: Radius.circular(25)),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: getImage,
+                    icon: const Icon(Icons.image),
+                    color: Colors.blue,
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _message,
