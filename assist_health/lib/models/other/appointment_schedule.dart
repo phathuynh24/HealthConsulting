@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class AppointmentSchedule {
@@ -51,6 +52,7 @@ class AppointmentSchedule {
   Future<void> saveAppointmentToFirestore() async {
     try {
       String idDoc = '${DateTime.now()}';
+      String idDocUser = FirebaseAuth.instance.currentUser!.uid;
       // Upload files and get URLs
       List<String> fileUrls =
           await uploadFilesToStorage(listOfHealthInformationFiles!);
@@ -63,6 +65,7 @@ class AppointmentSchedule {
         {
           'doctorInfo': doctorInfo?.toMap(),
           'userProfile': userProfile?.toMap(),
+          'idDocUser': idDocUser,
           'reasonForExamination': reasonForExamination,
           'listOfHealthInformationFiles': fileUrls,
           'selectedDate': selectedDate,

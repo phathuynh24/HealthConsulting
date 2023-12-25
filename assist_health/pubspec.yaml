@@ -33,7 +33,6 @@ dependencies:
     sdk: flutter
 
   http: ^0.13.3
-  flutter_bloc: ^7.0.0
   firebase_core: ^2.17.0
   firebase_auth: ^4.10.1
   firebase_storage: ^11.3.1
@@ -60,7 +59,8 @@ dependencies:
   permission_handler: ^11.0.1
   flutter_local_notifications: ^16.2.0
   rxdart: ^0.27.7
-  #timezone: ^0.9.2
+  timezone: ^0.9.2
+  flutter_timezone: ^1.0.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -106,6 +106,8 @@ flutter:
      - assets/empty-box.png
      - assets/sample_image.jpeg
      - assets/sample_image.png
+     - assets/health_care_logo.jpg
+     - assets/health_care_logo_nobg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

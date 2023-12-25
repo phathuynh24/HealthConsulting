@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
@@ -236,19 +237,17 @@ class _CallPageState extends State<CallPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agora'),
+        title: const Text('Cuộc gọi'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
-        actions: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                viewPanel = !viewPanel;
-              });
-            },
-            icon: const Icon(Icons.info_outline),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
           ),
-        ],
+        ),
       ),
       backgroundColor: Colors.black,
       body: Center(

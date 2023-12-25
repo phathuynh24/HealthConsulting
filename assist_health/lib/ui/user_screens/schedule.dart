@@ -39,8 +39,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   void initState() {
-    super.initState();
     _appointmentScheduleController!.addStream(getAppointmentSchdedules());
+    super.initState();
   }
 
   @override
@@ -103,14 +103,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     for (int index = 0; index < appointmentScheduleList.length; index++) {
       if (isAfterEndTime(appointmentScheduleList[index].time!,
           appointmentScheduleList[index].selectedDate!)) {
-        print(isAfterEndTime(appointmentScheduleList[index].time!,
-                appointmentScheduleList[index].selectedDate!)
-            .toString());
-        setState(() {
-          appointmentScheduleList[index].status = 'Quá hẹn';
-          appointmentScheduleList[index]
-              .updateAppointmentStatus(appointmentScheduleList[index].status!);
-        });
+        AppointmentSchedule tempAppointmentSchedule =
+            appointmentScheduleList[index];
+        try {
+          setState(() {
+            appointmentScheduleList.removeAt(index);
+            tempAppointmentSchedule.status = 'Quá hẹn';
+            tempAppointmentSchedule
+                .updateAppointmentStatus(tempAppointmentSchedule.status!);
+          });
+        } catch (e) {}
       }
     }
   }
@@ -352,6 +354,49 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
                       if (appointmentSchedulesStatus[0].status == 'Đã duyệt') {
                         checkOutOfDateApproved(appointmentSchedulesStatus);
+                      }
+
+                      if (appointmentSchedulesStatus.isEmpty) {
+                        return Center(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            height: 500,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/empty-box.png',
+                                  width: 250,
+                                  height: 250,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(
+                                  height: 12,
+                                ),
+                                const Text(
+                                  'Bạn chưa có lịch khám ở mục này',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueGrey,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                const Text(
+                                  'Lịch khám của bạn sẽ được hiển thị tại đây.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blueGrey,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
                       }
 
                       // Lọc theo search

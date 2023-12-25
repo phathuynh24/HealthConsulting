@@ -1,16 +1,22 @@
+import 'dart:developer';
+
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/video_call/pages/call.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
 class ScheduleCard extends StatelessWidget {
   AppointmentSchedule appointmentSchedule;
   ScheduleCard({required this.appointmentSchedule, super.key});
-
+  final String _channel = 'video_call';
+  final ClientRole _role = ClientRole.Broadcaster;
   @override
   Widget build(BuildContext context) {
     initializeDateFormatting('vi_VN', null);
@@ -199,6 +205,35 @@ class ScheduleCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 5),
+                  (appointmentSchedule.status == 'Đã duyệt' &&
+                          isWithinTimeRange(appointmentSchedule.time!,
+                              appointmentSchedule.selectedDate!))
+                      ? Center(
+                          child: Container(
+                            width: 200,
+                            height: 45,
+                            margin: EdgeInsets.only(top: 8, bottom: 10),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                onJoin(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                'Vào cuộc gọi',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : SizedBox(),
                 ],
               ),
             ),
@@ -206,5 +241,23 @@ class ScheduleCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  onJoin(BuildContext context) async {
+    await _handleCameraAndMic(Permission.camera);
+    await _handleCameraAndMic(Permission.microphone);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CallPage(
+                channelName: _channel,
+                role: _role,
+              )),
+    );
+  }
+
+  Future<void> _handleCameraAndMic(Permission permission) async {
+    final status = await permission.request();
+    log(status.toString());
   }
 }

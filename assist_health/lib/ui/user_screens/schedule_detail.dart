@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
@@ -11,7 +13,7 @@ import 'package:assist_health/ui/user_screens/schedule_feedback.dart';
 import 'package:assist_health/ui/user_screens/schedule_qr.dart';
 import 'package:assist_health/ui/widgets/half_circle.dart';
 import 'package:assist_health/ui/widgets/my_separator.dart';
-import 'package:assist_health/video_call/pages/index.dart';
+import 'package:assist_health/video_call/pages/call.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
@@ -39,6 +42,9 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
   String? _buttonContext;
 
+  final String _channel = 'video_call';
+  final ClientRole _role = ClientRole.Broadcaster;
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +52,13 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     loadFileFromStorage();
     if (_appointmentSchedule!.status == 'Chờ duyệt' ||
         _appointmentSchedule!.status == 'Đã duyệt') {
-      _buttonContext = 'Hủy lịch khám';
+      if (_appointmentSchedule!.status == 'Đã duyệt' &&
+          isWithinTimeRange(_appointmentSchedule!.time!,
+              _appointmentSchedule!.selectedDate!)) {
+        _buttonContext = 'Vào cuộc gọi';
+      } else {
+        _buttonContext = 'Hủy lịch khám';
+      }
     } else if (_appointmentSchedule!.status == 'Đã khám' ||
         _appointmentSchedule!.status == 'Đã hủy' ||
         _appointmentSchedule!.status == 'Quá hẹn') {
@@ -138,17 +150,6 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           color: Colors.blueAccent.withOpacity(0.1),
           child: Column(
             children: [
-              (_appointmentSchedule!.status == 'Đã duyệt')
-                  ? ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => IndexPage()),
-                        );
-                      },
-                      child: Text('jajaj'),
-                    )
-                  : SizedBox(),
               (_appointmentSchedule!.status == 'Đã hủy')
                   ? Container(
                       padding: const EdgeInsets.symmetric(
@@ -296,6 +297,37 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                         ),
                       ),
                       Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10, bottom: 15, left: 10, right: 10),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              FontAwesomeIcons.solidPenToSquare,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Ngày tạo phiếu',
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            const Spacer(),
+                            Center(
+                              child: Text(
+                                _appointmentSchedule!.receivedAppointmentTime!,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
                         padding: const EdgeInsets.all(10),
                         child: Row(
                           children: [
@@ -305,7 +337,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                               color: Colors.grey,
                             ),
                             const SizedBox(
-                              width: 10,
+                              width: 8,
                             ),
                             GestureDetector(
                               onTap: () {
@@ -1145,7 +1177,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           ),
         ),
       ),
-      bottomNavigationBar: (_buttonContext == 'Đặt khám lại')
+      bottomNavigationBar: (_buttonContext == 'Đặt khám lại' ||
+              _buttonContext == 'Vào cuộc gọi')
           ? Container(
               height: 70,
               width: double.infinity,
@@ -1163,21 +1196,29 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterCallStep1(
-                                      isEdit: true,
-                                      appointmentSchedule: _appointmentSchedule,
-                                      doctorInfo:
-                                          _appointmentSchedule!.doctorInfo!,
-                                    )));
+                        if (_buttonContext == 'Đặt khám lại') {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RegisterCallStep1(
+                                        isEdit: true,
+                                        appointmentSchedule:
+                                            _appointmentSchedule,
+                                        doctorInfo:
+                                            _appointmentSchedule!.doctorInfo!,
+                                      )));
+                        }
+                        if (_buttonContext == 'Vào cuộc gọi') {
+                          onJoin();
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.all(13),
                         margin: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Themes.gradientDeepClr,
+                          color: (_buttonContext == 'Vào cuộc gọi')
+                              ? Colors.green
+                              : Themes.gradientDeepClr,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         alignment: Alignment.center,
@@ -1738,5 +1779,23 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
         .collection('feedback')
         .doc(docId)
         .snapshots();
+  }
+
+  Future<void> onJoin() async {
+    await _handleCameraAndMic(Permission.camera);
+    await _handleCameraAndMic(Permission.microphone);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CallPage(
+                channelName: _channel,
+                role: _role,
+              )),
+    );
+  }
+
+  Future<void> _handleCameraAndMic(Permission permission) async {
+    final status = await permission.request();
+    log(status.toString());
   }
 }

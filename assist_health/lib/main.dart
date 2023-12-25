@@ -1,13 +1,33 @@
 import 'package:assist_health/firebase_options.dart';
+import 'package:assist_health/ui/user_screens/schedule.dart';
+import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/ui/other_screens/welcome.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await LocalNotifications.init();
+
+  //  handle in terminated state
+  var initialNotification =
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  if (initialNotification?.didNotificationLaunchApp == true) {
+    // LocalNotifications.onClickNotification.stream.listen((event) {
+    Future.delayed(Duration(seconds: 1), () {
+      // print(event);
+      // navigatorKey.currentState!.pushNamed('/another',
+      //     arguments: initialNotification?.notificationResponse?.payload);
+    });
+  }
   runApp(const MyApp());
 }
 
@@ -16,7 +36,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       home: WelcomeScreen(),
     );

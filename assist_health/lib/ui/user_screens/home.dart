@@ -8,7 +8,7 @@ import 'package:assist_health/ui/user_screens/health_profile_list.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
-import 'package:assist_health/video_call/pages/notification_service.dart';
+import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,14 +31,13 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   final StreamController<List<DoctorInfo>> _doctorStreamController =
       StreamController<List<DoctorInfo>>.broadcast();
-    Future<void> setOffline() async {
+  Future<void> setOffline() async {
     try {
       final User? user = _auth.currentUser;
       if (user != null) {
-        // Assuming you have a 'users' collection in Firestore
         final CollectionReference users =
             FirebaseFirestore.instance.collection('users');
-        
+
         await users.doc(user.uid).update({'status': 'offline'});
       }
     } catch (e) {
@@ -70,29 +69,26 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   int currentIndex = 0;
 
-  late final NotificationService notificationService;
-
   @override
   void initState() {
     super.initState();
-    notificationService = NotificationService();
-    //listenToNotificationStream();
-    notificationService.initializePlatformNotifications();
+    listenToNotifications();
+
     _doctorStreamController.addStream(getInfoDoctors());
   }
 
-  // void listenToNotificationStream() =>
-  //     notificationService.behaviorSubject.listen((payload) {
-  //       Navigator.push(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => Container()
-  //               //MySecondScreen(payload: payload)
-  //               ));
-  //     });
+  // to listen to any notification clicked or not
+  listenToNotifications() {
+    print("Listening to notification");
+    LocalNotifications.onClickNotification.stream.listen((event) {
+      print(event);
+      Navigator.pushNamed(context, '/another', arguments: event);
+    });
+  }
 
   @override
   void dispose() {
-      setOffline();
+    setOffline();
     _doctorStreamController.close();
     super.dispose();
   }
@@ -500,8 +496,14 @@ class _MyHomeScreen extends State<HomeScreen> {
                                                         .data![index])));
                                   },
                                   child: Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 4, vertical: 10),
+                                    margin: EdgeInsets.only(
+                                        left: 4,
+                                        right:
+                                            (index != snapshot.data!.length - 1)
+                                                ? 4
+                                                : 15,
+                                        top: 10,
+                                        bottom: 10),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
@@ -590,15 +592,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                       );
                     },
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await notificationService.showLocalNotification(
-                        id: 0,
-                        title: "Drink Water",
-                        body: "Time to drink some water!");
-                  },
-                  child: const Text("Drink Now"),
                 ),
               ],
             ),
