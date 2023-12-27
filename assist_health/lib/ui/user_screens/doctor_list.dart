@@ -299,7 +299,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
 
           // Xử lý lọc tìm kiếm tên bác sĩ
           List<DoctorInfo> filterDoctorWithName;
-          if (_searchName! != '') {
+          if (_searchName!.trim() != '') {
             filterDoctorWithName = filterDoctorWithStatus
                 .where((doctor) => doctor.name
                     .toLowerCase()

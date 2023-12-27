@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
@@ -10,14 +11,17 @@ import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
 
 import '../utils/settings.dart';
 
+// ignore: must_be_immutable
 class CallPage extends StatefulWidget {
   final String? channelName;
   final ClientRole? role;
-  const CallPage({
-    Key? key,
+  AppointmentSchedule appointmentSchedule;
+  CallPage({
+    super.key,
     this.channelName,
     this.role,
-  }) : super(key: key);
+    required this.appointmentSchedule,
+  });
 
   @override
   _CallPageState createState() => _CallPageState();
@@ -28,6 +32,7 @@ class _CallPageState extends State<CallPage> {
   final _infoStrings = <String>[];
   bool muted = false;
   bool viewPanel = false;
+  AppointmentSchedule? appointmentSchedule;
   late RtcEngine _engine;
 
   @override
@@ -150,7 +155,58 @@ class _CallPageState extends State<CallPage> {
           ),
           // Call
           RawMaterialButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Bạn có muốn thoát cuộc gọi không?'),
+                  actions: [
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 15, right: 15, bottom: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Text(
+                                'Không',
+                                style: TextStyle(
+                                  color: Colors.greenAccent.shade700
+                                      .withOpacity(0.7),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            onTap: () => Navigator.pop(context),
+                          ),
+                          InkWell(
+                              child: const Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'Thoát',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                appointmentSchedule!
+                                    .updateAppointmentIsExaminated(true);
+                                Navigator.of(context)
+                                    .popUntil((route) => route.isFirst);
+                              }),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
             shape: const CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.redAccent,
@@ -239,6 +295,7 @@ class _CallPageState extends State<CallPage> {
       appBar: AppBar(
         title: const Text('Cuộc gọi'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
