@@ -7,6 +7,7 @@ import 'package:assist_health/ui/user_screens/doctor_list.dart';
 import 'package:assist_health/ui/user_screens/health_profile_list.dart';
 import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
+import 'package:assist_health/ui/widgets/appbar_home.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -75,11 +76,16 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   int currentIndex = 0;
 
+  bool isPressed = false;
+
+  String name = '...';
+  String imageURL = '';
+
   @override
   void initState() {
     super.initState();
     listenToNotifications();
-
+    getUserData(_auth.currentUser!.uid);
     _doctorStreamController.addStream(getInfoDoctors());
   }
 
@@ -151,67 +157,9 @@ class _MyHomeScreen extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Colors.transparent,
-                  child: Icon(
-                    Icons.person,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Chào bạn!",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white,
-                      letterSpacing: 1.1,
-                      wordSpacing: 1.2,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    "Huỳnh Tiến Phát",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                      letterSpacing: 1.1,
-                      wordSpacing: 1.2,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          automaticallyImplyLeading: false,
+          toolbarHeight: 105,
           elevation: 0,
+          centerTitle: true,
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -221,16 +169,152 @@ class _MyHomeScreen extends State<HomeScreen> {
               ),
             ),
           ),
-          actions: const [
-            IconButton(
-              icon: Icon(
-                CupertinoIcons.bell_fill,
-                color: Colors.white,
-              ),
-              iconSize: 26,
-              onPressed: null,
+          title: GestureDetector(
+            onTap: () {
+              print('jjdj');
+            },
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: ClipOval(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Themes.gradientLightClr.withOpacity(0.4),
+                                Themes.gradientLightClr
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: (imageURL != '')
+                              ? Image.network(imageURL, fit: BoxFit.cover,
+                                  errorBuilder: (BuildContext context,
+                                      Object exception,
+                                      StackTrace? stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      FontAwesomeIcons.userDoctor,
+                                      size: 40,
+                                      color: Colors.white,
+                                    ),
+                                  );
+                                })
+                              : const Center(
+                                  child: CircleAvatar(
+                                    radius: 25,
+                                    backgroundColor: Colors.transparent,
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 25,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Chào bạn!",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white,
+                            letterSpacing: 1.1,
+                            wordSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 2,
+                        ),
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                            letterSpacing: 1.1,
+                            wordSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    const IconButton(
+                      icon: Icon(
+                        CupertinoIcons.bell_fill,
+                        color: Colors.white,
+                      ),
+                      iconSize: 26,
+                      onPressed: null,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const DoctorListScreen()),
+                    );
+                  },
+                  child: Container(
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Icon(
+                          CupertinoIcons.search,
+                          color: Colors.blueGrey.shade300,
+                          size: 23,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          'Tên bác sĩ, chuyên khoa',
+                          style: TextStyle(
+                              color: Colors.blueGrey.shade400,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
         body: SingleChildScrollView(
           child: Container(
@@ -424,7 +508,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 Container(
@@ -450,6 +534,57 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
+                              ),
+                            ),
+                            const Spacer(),
+                            InkWell(
+                              onTapDown: (details) {
+                                setState(() {
+                                  isPressed = true;
+                                });
+                              },
+                              onTapUp: (details) {
+                                setState(() {
+                                  isPressed = false;
+                                });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const DoctorListScreen()),
+                                );
+                              },
+                              onTapCancel: () {
+                                setState(() {
+                                  isPressed = false;
+                                });
+                              },
+                              onTap: () {
+                                // Xử lý khi nút được nhấn (ví dụ: mở rộng nội dung)
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 12, top: 8, bottom: 8),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Xem thêm',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: isPressed
+                                            ? Colors.grey
+                                            : Colors.black54,
+                                        // Các thuộc tính khác của văn bản
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right_outlined,
+                                      color: isPressed
+                                          ? Colors.grey
+                                          : Colors.black54,
+                                      size: 22,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -677,4 +812,25 @@ class _MyHomeScreen extends State<HomeScreen> {
           ),
         ),
       );
+
+  Future<void> getUserData(String uid) async {
+    try {
+      DocumentSnapshot snapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      if (snapshot.exists) {
+        setState(() {
+          imageURL = snapshot.get('imageURL');
+          name = snapshot.get('name');
+        });
+
+        print('User imageURL: $imageURL');
+        print('User name: $name');
+      } else {
+        print('User does not exist');
+      }
+    } catch (error) {
+      print('Failed to fetch user data: $error');
+    }
+  }
 }

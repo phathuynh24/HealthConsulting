@@ -26,6 +26,7 @@ class AppointmentSchedule {
   String? paymentStatus;
   String? idDoc;
   String? idFeedback;
+  bool? isExamined;
 
   AppointmentSchedule({
     this.doctorInfo,
@@ -47,6 +48,7 @@ class AppointmentSchedule {
     this.paymentStatus,
     this.idDoc,
     this.idFeedback,
+    this.isExamined,
   });
 
   Future<void> saveAppointmentToFirestore() async {
@@ -80,6 +82,7 @@ class AppointmentSchedule {
           'statusReasonCanceled': statusReasonCanceled,
           'paymentStatus': paymentStatus,
           'idDoc': idDoc,
+          'isExamined': false,
         },
       );
     } catch (e) {
@@ -114,6 +117,7 @@ class AppointmentSchedule {
         'status': status,
         'statusReasonCanceled': statusReasonCanceled,
         'paymentStatus': paymentStatus,
+        'isExamined': isExamined,
       });
 
       print('Appointment updated in Firestore successfully.');
@@ -174,6 +178,7 @@ class AppointmentSchedule {
       paymentStatus: json['paymentStatus'],
       idDoc: json['idDoc'],
       idFeedback: json['idFeedback'] ?? '',
+      isExamined: json['isExamined'] ?? false,
     );
   }
 
@@ -209,6 +214,19 @@ class AppointmentSchedule {
 
     appointmentScheduleCollection.doc(idDoc!).update({
       'statusReasonCanceled': newStatus,
+    }).then((value) {
+      print('Cập nhật thành công');
+    }).catchError((error) {
+      print('Cập nhật thất bại: $error');
+    });
+  }
+
+  void updateAppointmentIsExaminated(bool isExamined) {
+    CollectionReference appointmentScheduleCollection =
+        FirebaseFirestore.instance.collection('appointment_schedule');
+
+    appointmentScheduleCollection.doc(idDoc!).update({
+      'isExamined': isExamined,
     }).then((value) {
       print('Cập nhật thành công');
     }).catchError((error) {

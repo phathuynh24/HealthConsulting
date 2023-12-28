@@ -462,12 +462,6 @@ bool isWithinTimeRange(String time, DateTime selectedDate) {
 
   // Lấy thời gian hiện tại
   DateTime now = DateTime.now();
-  print(selectedDate.toString());
-
-  print(now.isAfter(startTime));
-  print(startTime.toString());
-  print(now.isBefore(endTime));
-  print(endTime.toString());
 
   // Kiểm tra xem thời gian hiện tại có nằm trong khoảng thời gian đã cho hay không
   return now.isAfter(startTime) && now.isBefore(endTime);
@@ -478,11 +472,8 @@ bool isAfterEndTime(String time, DateTime selectedDate) {
   List<String> timeParts = time.split('-');
   String endTimeString = timeParts[1].trim();
   List<int> endTimeParts = endTimeString.split(':').map(int.parse).toList();
-  selectedDate = selectedDate.subtract(Duration(
-    hours: selectedDate.hour,
-    minutes: selectedDate.minute,
-    seconds: selectedDate.second,
-  ));
+  selectedDate = DateTime(
+      selectedDate.year, selectedDate.month, selectedDate.day, 0, 0, 0);
   DateTime endTime = selectedDate
       .add(Duration(hours: endTimeParts[0], minutes: endTimeParts[1]));
   // Lấy thời gian hiện tại
