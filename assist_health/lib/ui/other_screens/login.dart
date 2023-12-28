@@ -9,7 +9,7 @@ import 'package:assist_health/ui/user_screens/phone.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
 import 'package:assist_health/ui/widgets/doctor_navbar.dart';
 import 'package:assist_health/ui/widgets/admin_navbar.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -31,6 +31,48 @@ class _LoginScreenState extends State<LoginScreen> {
       await documentReference.update({'status': 'offline'});
     }
   }
+  void resetPassword(String email) async {
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    // Thành công: Hiển thị thông báo cho người dùng rằng email đã được gửi thành công
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Thành công"),
+          content: const Text("Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn."),
+          actions: [
+            TextButton(
+              child: const Text("Đóng"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  } catch (error) {
+    // Xử lý lỗi: Hiển thị thông báo lỗi cho người dùng
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Lỗi"),
+          content: Text("Đã xảy ra lỗi: $error"),
+          actions: [
+            TextButton(
+              child: const Text("Đóng"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -199,6 +241,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
+              InkWell(
+                onTap: () {
+                  // Call resetPassword when the user clicks "Quên mật khẩu"
+                  if (_name.text.isNotEmpty) {
+                    resetPassword(_name.text);
+                  } else {
+                    // Show an error or prompt the user to enter an email
+                    print("Vui lòng nhập email của bạn");
+                  }
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Quên mật khẩu?",
+                    style: TextStyle(
+                      color: Themes.primaryColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

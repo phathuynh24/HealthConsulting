@@ -51,7 +51,13 @@ class _MyHomeScreen extends State<HomeScreen> {
     "Nội thần kinh",
     "Mắt",
     "Nha khoa",
-    "Chấn khương chỉnh hình",
+    "Chấn thương chỉnh hình",
+    "Tim mạch",
+    "Tiêu hóa",
+    "Hô hấp",
+    "Huyết học",
+    "Nội tiết",
+
   ];
 
   List imgs = [

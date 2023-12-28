@@ -126,10 +126,14 @@ class _ChatRoomState extends State<ChatRoom> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var userData = snapshot.data!.data() as Map<String, dynamic>;
+              String name=widget.userMap['name'];
+              if (userData['role'] == 'admin') {
+                  name = 'Chăm Sóc Khách Hàng'; // Set your fixed admin name here
+               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.userMap['name']),
+                  Text(name),
                   Text(
                     userData['status'],
                     style: const TextStyle(fontSize: 14),

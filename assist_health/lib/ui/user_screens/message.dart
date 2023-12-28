@@ -14,6 +14,7 @@ class MessageScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserver {
   List<Map<String, dynamic>> doctorList = [];
+  List<Map<String, dynamic>> adminList = [];
   bool isLoading = false;
   Map<String, dynamic>? userMap;
   final TextEditingController _search = TextEditingController();
@@ -31,7 +32,7 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
         setStatus("offline");
       }
     });
-    onLoadDoctors();
+    onLoadUsers();
   }
 
   void setStatus(String status) async {
@@ -63,37 +64,39 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
   }
 
   void onSearch() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  setState(() {
+    isLoading = true;
+    doctorList = []; // Clear the doctorList
+  });
+
+  String searchText = _search.text.trim().toLowerCase();
+  if (searchText.isEmpty) {
     setState(() {
-      isLoading = true;
+      onLoadUsers();
+      isLoading = false;
     });
-
-    String searchText = _search.text.trim().toLowerCase();
-    if (searchText.isEmpty) {
-      setState(() {
-        onLoadDoctors();
-        isLoading = false;
-      });
-      return;
-    }
-
-    await firestore
-        .collection('users')
-        .where("role", isEqualTo: "doctor")
-        .get()
-        .then((value) {
-      setState(() {
-        doctorList = value.docs
-            .where((doc) => doc['name'].toLowerCase().contains(searchText))
-            .map((doc) => doc.data())
-            .toList();
-        isLoading = false;
-      });
-    });
+    return;
   }
 
-  void onLoadDoctors() async {
+  await firestore
+      .collection('users')
+      .where("role", isEqualTo: "doctor")
+      .get()
+      .then((value) {
+    setState(() {
+      doctorList = value.docs
+          .where((doc) => doc['name'].toLowerCase().contains(searchText))
+          .map((doc) => doc.data())
+          .toList();
+      isLoading = false;
+    });
+  });
+}
+
+
+  void onLoadUsers() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     setState(() {
@@ -102,17 +105,25 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
 
     await firestore
         .collection('users')
-        .where("role", isEqualTo: "doctor")
+        .where("role", whereIn: ["doctor", "admin"])
         .get()
         .then((value) {
       if (value.docs.isNotEmpty) {
         setState(() {
-          doctorList = value.docs.map((doc) => doc.data()).toList();
+          doctorList = value.docs
+              .where((doc) => doc['role'] == 'doctor')
+              .map((doc) => doc.data())
+              .toList();
+          adminList = value.docs
+              .where((doc) => doc['role'] == 'admin')
+              .map((doc) => doc.data())
+              .toList();
           isLoading = false;
         });
       } else {
         setState(() {
           doctorList = [];
+          adminList = [];
           isLoading = false;
         });
       }
@@ -184,69 +195,169 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                     height: size.height / 60,
                   ),
 
+                  // Display doctor list
+                 
+
+                 if (adminList.isNotEmpty)
+                    Container(
+                      child: Column(
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: adminList.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> admin = adminList[index];
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    onTap: () {
+                                      String roomId = chatRoomId(
+                                        _auth.currentUser!.displayName!,
+                                        admin['name'],
+                                      );
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => ChatRoom(
+                                            chatRoomId: roomId,
+                                            userMap: admin,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    leading: Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 30,
+                                          backgroundImage: NetworkImage(
+                                            admin['imageURL'],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    title: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Chăm Sóc Khách Hàng',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            height: 1.5,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Thứ 2 -Thứ 7: 8h30 - 17h30',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            height: 1.2,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (index < adminList.length - 1)
+                                    Divider(
+                                      color: Colors.grey,
+                                      thickness: 1.0,
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                          Divider(
+                                      color: Colors.grey,
+                                      thickness: 5.0,
+                                    ),
+                        ],
+                      ),
+                    ),
+
                   if (doctorList.isNotEmpty)
                     Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: doctorList.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> doctor = doctorList[index];
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 5,
-                            ),
-                            child: ListTile(
-                              onTap: () {
-                                String roomId = chatRoomId(
-                                  _auth.currentUser!.displayName!,
-                                  doctor['name'],
-                                );
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ChatRoom(
-                                      chatRoomId: roomId,
-                                      userMap: doctor,
-                                    ),
-                                  ),
-                                );
-                              },
-                              leading: Stack(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Danh sách bác sĩ',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            width: 200.0,  
+                            child: Divider(
+                            color: const Color.fromARGB(255, 179, 35, 35),
+                            thickness: 3.0,
+                                ),
+                          ),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: doctorList.length,
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> doctor = doctorList[index];
+                              return Column(
                                 children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                      doctor['imageURL'],
-                                    ),
-                                  ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 12,
-                                      width: 12,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: getStatusDotColor(
-                                          doctor['status'] == 'online',
+                                  ListTile(
+                                    onTap: () {
+                                      String roomId = chatRoomId(
+                                        _auth.currentUser!.displayName!,
+                                        doctor['name'],
+                                      );
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => ChatRoom(
+                                            chatRoomId: roomId,
+                                            userMap: doctor,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    leading: Stack(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 30,
+                                          backgroundImage: NetworkImage(
+                                            doctor['imageURL'],
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: Container(
+                                            height: 12,
+                                            width: 12,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: getStatusDotColor(
+                                                doctor['status'] == 'online',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    title: Text(
+                                      doctor['name'],
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        height: 1.5,
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
+                                    trailing: const Icon(Icons.chat, color: Colors.black),
                                   ),
+                                  if (index < doctorList.length - 1)
+                                    Divider(
+                                      color: Colors.grey,
+                                      thickness: 1.0,
+                                      
+                                    ),
                                 ],
-                              ),
-                              title: Text(
-                                doctor['name'],
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  height: 1.5,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              trailing: const Icon(Icons.chat, color: Colors.black),
-                            ),
-                          );
-                        },
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                 ],

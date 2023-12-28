@@ -17,22 +17,134 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   List<bool> isLikedList = [];
   List<String> selectedFilterCategories = [];
   final List<String> categories = [
-    'Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'
+      "Tay mũi họng",
+      "Bệnh nhiệt đới",
+      "Nội thần kinh",
+      "Mắt",
+      "Nha khoa",
+      "Chấn thương chỉnh hình",
+      "Tim mạch",
+      "Tiêu hóa",
+      "Hô hấp",
+      "Huyết học",
+      "Nội tiết",
+
   ];
   late String currentUserId;
-  bool showUserQuestions = false; // Step 2: Add a variable to track button state
+  bool showUserQuestions = false;
+
   void toggleLikeStatus(Question question) {
-  FirebaseFirestore.instance.collection('questions').doc(question.id).update({
-    'isLiked': question.isLiked,
-  });
+    FirebaseFirestore.instance.collection('questions').doc(question.id).update({
+      'isLiked': question.isLiked,
+    });
+  }
+  Future<void> _deleteQuestion(String questionId) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('questions')
+        .doc(questionId)
+        .delete();
+  } catch (e) {
+    print('Error deleting question: $e');
+  }
 }
+
+Future<bool> _currentUserIsAdmin() async {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      String? userRole = userDoc['role'];
+
+      return userRole != null && userRole.toLowerCase() == 'admin';
+    } catch (e) {
+      print('Error getting user role: $e');
+    }
+  }
+
+  return false;
+}
+
+Widget _buildActionButton(Question question, int index) {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  if (user != null) {
+    return FutureBuilder<bool>(
+      future: _currentUserIsAdmin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data == true) {
+          return IconButton(
+            icon: const Icon(Icons.delete),
+            color: Colors.blue,
+            onPressed: () async {
+              bool confirmDelete =
+                  await _showDeleteConfirmationDialog(context);
+              if (confirmDelete) {
+                await _deleteQuestion(question.id);
+              }
+            },
+          );
+        } else {
+          bool isLiked =
+              isLikedList.length > index ? isLikedList[index] : false;
+          return IconButton(
+            icon: Icon(
+              isLiked ? Icons.favorite : Icons.favorite_border,
+              color: isLiked ? Colors.red : Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                isLikedList[index] = !isLikedList[index];
+                question.isLiked = isLikedList[index];
+                toggleLikeStatus(question);
+              });
+            },
+          );
+        }
+      },
+    );
+  }
+
+  return Container();
+}
+
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text('Are you sure you want to delete this question?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
-      title: Text(showUserQuestions ? 'Câu hỏi của bạn' : 'Hỏi đáp cộng đồng'),        centerTitle: true,
+        title: Text(showUserQuestions ? 'Câu hỏi của bạn' : 'Hỏi đáp cộng đồng'),
+        centerTitle: true,
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -62,23 +174,13 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               setState(() {
                 showUserQuestions = value;
                 User? user = FirebaseAuth.instance.currentUser;
-                String currentUserId = user?.uid ?? '';
-                print('showUserQuestions: $showUserQuestions'); // Add this line
+                currentUserId = user?.uid ?? '';
+                print('showUserQuestions: $showUserQuestions');
               });
             },
           ),
-          // IconButton(
-          //   icon: Icon(Icons.person),
-          //   onPressed: () {
-          //     setState(() {
-          //       // Toggle the button state
-          //       showUserQuestions = !showUserQuestions;
-          //     });
-          //   },
-          // ),
         ],
       ),
-      // bug
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('questions').snapshots(),
         builder: (context, snapshot) {
@@ -91,11 +193,11 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
           final List<Question> questions = [];
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           User? user = FirebaseAuth.instance.currentUser;
-          currentUserId = user?.uid ?? ''; // Use the null-aware operator and provide a default value
+          currentUserId = user?.uid ?? '';
 
           for (var document in documents) {
             final List<dynamic> categories = document['categories'];
-         
+
             final question = Question(
               id: document.id,
               gender: document['gender'],
@@ -104,7 +206,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               content: document['content'],
               categories: categories.cast<String>().toList(),
               answerCount: 0,
-              questionUserId:  document['questionUserId'], // Use currentUserId here
+              questionUserId:  document['questionUserId'],
             );
             questions.add(question);
             isLikedList.add(false);
@@ -121,7 +223,6 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
           return ListView.builder(
             itemCount: filteredQuestions.length,
             itemBuilder: (context, index) {
-              bool isLiked = isLikedList.length > index ? isLikedList[index] : false;
               return InkWell(
                 onTap: () {
                   Navigator.push(
@@ -182,28 +283,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                             color: Colors.blue,
                           ),
                           SizedBox(width: 10),
-                          IconButton(
-                            icon: Icon(
-                              isLiked ? Icons.favorite : Icons.favorite_border,
-                              color: isLiked ? Colors.red : Colors.grey,
-                            ),
-                            onPressed: () {
-                                 setState(() {
-                                isLikedList[index] = !isLikedList[index];
-                                filteredQuestions[index].isLiked = isLikedList[index];
-                                toggleLikeStatus(filteredQuestions[index]);
-                              });
-                            },
-
-                          ),
-                          const Divider(),
-                          Text(
-                            'Answers: ${filteredQuestions[index].answerCount}', // Display answer count
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.green,
-                            ),
-                          ),
+                          _buildActionButton(filteredQuestions[index], index),
                         ],
                       ),
                     ),
@@ -245,7 +325,11 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Chọn chuyên khoa thẩm mĩ'),
-          content: StatefulBuilder(
+          content: Container(
+          height: 300,
+          width: 400,
+            child: SingleChildScrollView(
+              child:StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -274,6 +358,8 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                 }).toList(),
               );
             },
+              ),
+            ),
           ),
           actions: <Widget>[
             TextButton(

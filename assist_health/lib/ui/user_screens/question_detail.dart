@@ -16,33 +16,35 @@ class QuestionDetailScreen extends StatefulWidget {
 class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   List<Map<String, dynamic>> answers = [];
   late User currentUser;
-  late String? currentUserRole; 
+  late String? currentUserRole;
+
   @override
   void initState() {
     super.initState();
     _loadAnswers();
-    _loadCurrentUserRole(); 
+    _loadCurrentUserRole();
     currentUserRole = '';
     currentUser = FirebaseAuth.instance.currentUser!;
   }
+
   void _loadCurrentUserRole() {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then((docSnapshot) {
-      if (docSnapshot.exists) {
-        setState(() {
-          currentUserRole = docSnapshot.data()?['role'] ?? '';
-        });
-      }
-    }).catchError((error) {
-      print('Failed to load user role: $error');
-    });
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((docSnapshot) {
+        if (docSnapshot.exists) {
+          setState(() {
+            currentUserRole = docSnapshot.data()?['role'] ?? '';
+          });
+        }
+      }).catchError((error) {
+        print('Failed to load user role: $error');
+      });
+    }
   }
-}
 
   void _loadAnswers() {
     FirebaseFirestore.instance
@@ -150,7 +152,6 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                         String imageUrl = userData['imageURL'];
 
                         // Check if the current user is the author of the question
-                        // bool isCurrentUserAuthor = currentUser.uid == userId;
                         bool isAnswererAuthor = widget.question.questionUserId == userId;
 
                         return Column(
@@ -172,7 +173,9 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                                 Text(
                                   isAnswererAuthor
                                       ? '${widget.question.gender}, ${widget.question.age} tuổi'
-                                      : '${userData['name']}', // Display 'You' for the author
+                                      :  currentUserRole == 'admin'
+                                            ? 'Quản trị viên' 
+                                            : '${userData['name']}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -185,6 +188,19 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                               'Answer: $answer',
                               style: const TextStyle(fontSize: 16),
                             ),
+                            if (currentUserRole == 'admin')
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      _showDeleteConfirmationDialog(answerData);
+                                    },
+                                    icon: Icon(Icons.delete),
+                                    color: Colors.red,
+                                  ),
+                                ],
+                              ),
                           ],
                         );
                       }
@@ -195,34 +211,82 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                 );
               },
             ),
-      if (widget.question.questionUserId == currentUser.uid||currentUserRole == "doctor")
-           Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showAnswerDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.pink, // Change the button color
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Adjust the padding
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Adjust the border radius
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            if (widget.question.questionUserId == currentUser.uid ||
+                currentUserRole == "doctor")
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showAnswerDialog(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.pink, // Change the button color
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    child: const Text('Thêm câu trả lời'),
                   ),
                 ),
-                child: const Text('Thêm câu trả lời'),
               ),
-            ),
-          ),
-
           ],
         ),
       ),
     );
+  }
+
+  void _showDeleteConfirmationDialog(Map<String, dynamic> answerData) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Xác nhận xóa câu trả lời'),
+          content: const Text('Bạn có chắc chắn muốn xóa câu trả lời này?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteAnswerFromFirebase(answerData);
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.red,
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              child: const Text('Xóa'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteAnswerFromFirebase(Map<String, dynamic> answerData) {
+    FirebaseFirestore.instance
+        .collection('questions')
+        .doc(widget.question.id)
+        .update({
+          'answers': FieldValue.arrayRemove([answerData])
+        })
+        .then((_) {
+      print('Answer deleted from Firestore');
+      _loadAnswers();
+    }).catchError((error) {
+      print('Failed to delete answer: $error');
+    });
   }
 
   void _showAnswerDialog(BuildContext context) {
