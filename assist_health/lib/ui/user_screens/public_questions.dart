@@ -270,6 +270,23 @@ Widget _buildActionButton(Question question, int index) {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: filteredQuestions[index].categories
+                                  .map((category) => Padding(
+                                        padding: const EdgeInsets.only(right: 8.0),
+                                        child: Chip(
+                                          label: Text(category),
+                                          backgroundColor: Themes.selectedClr,
+                                          labelStyle: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ))
+                                  .toList(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
