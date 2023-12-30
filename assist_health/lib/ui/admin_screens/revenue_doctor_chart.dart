@@ -169,6 +169,13 @@ class _DoctorRevenueChartScreenState extends State<DoctorRevenueChartScreen> {
                                       entry.value.toDouble(),
                                     ))
                                 .toList(),
+                                //custom
+                                isCurved: true,
+                                color: Colors.blue,
+                                barWidth: 4,
+                                belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
+                                dotData: FlDotData(show: true),
+                               
                           ),
                         ],
                       ),

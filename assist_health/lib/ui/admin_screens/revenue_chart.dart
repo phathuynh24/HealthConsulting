@@ -125,7 +125,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                           onPressed: () {
                             showDataDialog(monthlyRevenue);
                           },
-                          child: Text('Show Monthly Revenue'),
+                          child: Text('Monthly Revenue'),
                         ),
                         SizedBox(width: 16),
                         DropdownButton<int>(
@@ -164,6 +164,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                               sideTitles: SideTitles(
                                 showTitles: true,
                                 interval: 1,
+                                
                               ),
                             ),
                           ),
@@ -183,6 +184,12 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                                       entry.value.toDouble(),
                                     ))
                                 .toList(),
+                                isCurved: true,
+                                color: Colors.blue,
+                                barWidth: 4,
+                                belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
+                                dotData: FlDotData(show: true),
+                               
                           ),
                         ],
                       ),
