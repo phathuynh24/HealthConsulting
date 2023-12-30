@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:assist_health/others/theme.dart';
@@ -25,15 +27,15 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   TextEditingController _studytextController = TextEditingController();
   File? _selectedImage;
   List<String> _selectedSpecialties = [];
-  List<String> _specialties = [
+  final List<String> _specialties = [
     'Tai mũi họng',
     'Nội thần kinh',
     'Mắt',
     'Nha khoa',
     'Chấn thương chỉnh hình'
   ];
-  List<Experience> _experiences = [Experience()];
-  List<Education> _educations = [Education()];
+  final List<Experience> _experiences = [Experience()];
+  final List<Education> _educations = [Education()];
 
   @override
   void initState() {
@@ -117,7 +119,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Họ tên bác sĩ',
                   border: OutlineInputBorder(),
                 ),
@@ -134,12 +136,12 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                     _selectedSpecialties = values.cast<String>().toList();
                   });
                 },
-                title: Text('Chuyên khoa'),
+                title: const Text('Chuyên khoa'),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _emailController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Email',
                   border: OutlineInputBorder(),
                 ),
@@ -147,7 +149,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Mô tả',
                   border: OutlineInputBorder(),
                 ),
@@ -155,7 +157,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _workplaceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Nơi công tác',
                   border: OutlineInputBorder(),
                 ),
@@ -167,7 +169,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _experiencetextController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Kinh nghiệm làm việc',
                   border: OutlineInputBorder(),
                 ),
@@ -181,7 +183,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _studytextController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Học vấn',
                   border: OutlineInputBorder(),
                 ),
@@ -206,7 +208,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Kinh nghiệm làm việc'),
+        const Text('Kinh nghiệm làm việc'),
         const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -221,7 +223,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   });
                 },
                 items: _generateYearItems(),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Bắt đầu',
                   border: OutlineInputBorder(),
                 ),
@@ -239,7 +241,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   });
                 },
                 items: _generateYearItems(),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Kết thúc',
                   border: OutlineInputBorder(),
                 ),
@@ -253,7 +255,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
             Expanded(
               child: TextField(
                 controller: _experiences[index].workplaceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Nơi làm việc',
                   border: OutlineInputBorder(),
                 ),
@@ -263,7 +265,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               onPressed: () {
                 _addExperienceDescription(index);
               },
-              icon: Icon(Icons.send),
+              icon: const Icon(Icons.send),
             ),
           ],
         ),
@@ -275,7 +277,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Học vấn'),
+        const Text('Học vấn'),
         const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,7 +292,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   });
                 },
                 items: _generateYearItems(),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Bắt đầu',
                   border: OutlineInputBorder(),
                 ),
@@ -308,7 +310,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   });
                 },
                 items: _generateYearItems(),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Kết thúc',
                   border: OutlineInputBorder(),
                 ),
@@ -322,7 +324,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
             Expanded(
               child: TextField(
                 controller: _educations[index].schoolController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Trường học',
                   border: OutlineInputBorder(),
                 ),
@@ -332,7 +334,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               onPressed: () {
                 _addEducationDescription(index);
               },
-              icon: Icon(Icons.send),
+              icon: const Icon(Icons.send),
             ),
           ],
         ),
@@ -402,7 +404,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
   void _saveDataToFirestore() async {
     try {
-      String uid = Uuid().v4();
+      String uid = const Uuid().v4();
       String name = _nameController.text.trim();
       String email = _emailController.text.trim();
       String description = _descriptionController.text.trim();
@@ -441,7 +443,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
       // Create a new document in the 'users' collection with the generated UID
       DocumentReference doctorRef =
-          await firestore.collection('users').doc(userCredential.user!.uid);
+          firestore.collection('users').doc(userCredential.user!.uid);
       String? downloadURL;
       if (_selectedImage != null) {
         downloadURL = await _uploadImageToFirebase(_selectedImage!, uid);
@@ -465,10 +467,11 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
             .expand((descriptions) => descriptions)
             .toList(),
         'imageURL': downloadURL,
-        'status':'offline',
+        'status': 'offline',
       });
 
       _showSuccessSnackBar('Doctor information saved successfully!');
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
       print('Error saving data to Firestore: $e');

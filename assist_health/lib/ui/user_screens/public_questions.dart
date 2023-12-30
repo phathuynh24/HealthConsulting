@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,29 +12,36 @@ class PublicQuestionsScreen extends StatefulWidget {
   const PublicQuestionsScreen({Key? key}) : super(key: key);
 
   @override
-  _PublicQuestionsScreenState createState() => _PublicQuestionsScreenState();
+  State<PublicQuestionsScreen> createState() => _PublicQuestionsScreenState();
 }
 
 class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   List<bool> isLikedList = [];
   List<String> selectedFilterCategories = [];
   final List<String> categories = [
-    'Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'
+    'Health',
+    'Fitness',
+    'Nutrition',
+    'Mental Health',
+    'Other'
   ];
   late String currentUserId;
-  bool showUserQuestions = false; // Step 2: Add a variable to track button state
+  bool showUserQuestions =
+      false; // Step 2: Add a variable to track button state
   void toggleLikeStatus(Question question) {
-  FirebaseFirestore.instance.collection('questions').doc(question.id).update({
-    'isLiked': question.isLiked,
-  });
-}
+    FirebaseFirestore.instance.collection('questions').doc(question.id).update({
+      'isLiked': question.isLiked,
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
-      title: Text(showUserQuestions ? 'Câu hỏi của bạn' : 'Hỏi đáp cộng đồng'),        centerTitle: true,
+        title:
+            Text(showUserQuestions ? 'Câu hỏi của bạn' : 'Hỏi đáp cộng đồng'),
+        centerTitle: true,
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -91,11 +100,12 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
           final List<Question> questions = [];
           final List<DocumentSnapshot> documents = snapshot.data!.docs;
           User? user = FirebaseAuth.instance.currentUser;
-          currentUserId = user?.uid ?? ''; // Use the null-aware operator and provide a default value
+          currentUserId = user?.uid ??
+              ''; // Use the null-aware operator and provide a default value
 
           for (var document in documents) {
             final List<dynamic> categories = document['categories'];
-         
+
             final question = Question(
               id: document.id,
               gender: document['gender'],
@@ -104,7 +114,8 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
               content: document['content'],
               categories: categories.cast<String>().toList(),
               answerCount: 0,
-              questionUserId:  document['questionUserId'], // Use currentUserId here
+              questionUserId:
+                  document['questionUserId'], // Use currentUserId here
             );
             questions.add(question);
             isLikedList.add(false);
@@ -112,7 +123,8 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
           final filteredQuestions = questions
               .where((question) =>
                   (!showUserQuestions ||
-                      (showUserQuestions && question.questionUserId == currentUserId)) &&
+                      (showUserQuestions &&
+                          question.questionUserId == currentUserId)) &&
                   (selectedFilterCategories.isEmpty ||
                       question.categories.any((category) =>
                           selectedFilterCategories.contains(category))))
@@ -121,7 +133,8 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
           return ListView.builder(
             itemCount: filteredQuestions.length,
             itemBuilder: (context, index) {
-              bool isLiked = isLikedList.length > index ? isLikedList[index] : false;
+              bool isLiked =
+                  isLikedList.length > index ? isLikedList[index] : false;
               return InkWell(
                 onTap: () {
                   Navigator.push(
@@ -181,25 +194,25 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                             Icons.chat,
                             color: Colors.blue,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           IconButton(
                             icon: Icon(
                               isLiked ? Icons.favorite : Icons.favorite_border,
                               color: isLiked ? Colors.red : Colors.grey,
                             ),
                             onPressed: () {
-                                 setState(() {
+                              setState(() {
                                 isLikedList[index] = !isLikedList[index];
-                                filteredQuestions[index].isLiked = isLikedList[index];
+                                filteredQuestions[index].isLiked =
+                                    isLikedList[index];
                                 toggleLikeStatus(filteredQuestions[index]);
                               });
                             },
-
                           ),
                           const Divider(),
                           Text(
                             'Answers: ${filteredQuestions[index].answerCount}', // Display answer count
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               color: Colors.green,
                             ),

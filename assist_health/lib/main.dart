@@ -1,5 +1,4 @@
 import 'package:assist_health/firebase_options.dart';
-import 'package:assist_health/ui/user_screens/schedule.dart';
 import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +21,7 @@ void main() async {
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   if (initialNotification?.didNotificationLaunchApp == true) {
     // LocalNotifications.onClickNotification.stream.listen((event) {
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () {
       // print(event);
       // navigatorKey.currentState!.pushNamed('/another',
       //     arguments: initialNotification?.notificationResponse?.payload);
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      home: WelcomeScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }

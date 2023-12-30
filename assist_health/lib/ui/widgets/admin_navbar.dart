@@ -19,7 +19,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 2
     const AddDoctorScreen(),
     // Screen 3
-    DoctorProfileList(),
+    const DoctorProfileList(),
     // Screen 4
     Container(),
   ];

@@ -48,12 +48,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
               ),
               const SizedBox(height: 25),
               const Text(
-                "Phone Verification",
+                "Gửi mã xác thực",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Add your phone number. We'll send you a verification code",
+                "Vui lòng nhập số điện thoại, sau đó chúng tôi sẽ gửi mã xác thực cho bạn!",
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -75,7 +75,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: "Enter phone number",
+                  hintText: "0123456789",
                   hintStyle: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 15,
@@ -161,7 +161,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       );
                     },
                     child: const Text(
-                      "Send the code",
+                      "Gửi mã xác thực",
                       style: TextStyle(fontSize: 16),
                     )),
               )

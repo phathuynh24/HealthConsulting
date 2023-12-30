@@ -124,7 +124,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
             children: [
               Text(
                 DateFormat('dd/MM/yyyy').format(DateTime.now()),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Themes.buttonClr, // Set the color based on your theme
@@ -239,7 +239,7 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
                                                   vertical: 5,
                                                 ),
                                                 decoration: BoxDecoration(
-                                                  color: Color.fromARGB(
+                                                  color: const Color.fromARGB(
                                                       255, 255, 255, 255),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
@@ -283,6 +283,4 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
       ),
     );
   }
-
-  _bottomSheet() {}
 }

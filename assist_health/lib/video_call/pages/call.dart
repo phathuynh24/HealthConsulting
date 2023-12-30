@@ -38,6 +38,7 @@ class _CallPageState extends State<CallPage> {
   @override
   void initState() {
     super.initState();
+    appointmentSchedule = widget.appointmentSchedule;
     initialize();
   }
 
@@ -195,8 +196,9 @@ class _CallPageState extends State<CallPage> {
                                 ),
                               ),
                               onTap: () {
+                                appointmentSchedule!.isExamined = true;
                                 appointmentSchedule!
-                                    .updateAppointmentIsExaminated(true);
+                                    .updateAppointmentIsExaminated();
                                 Navigator.of(context)
                                     .popUntil((route) => route.isFirst);
                               }),

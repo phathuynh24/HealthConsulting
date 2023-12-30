@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:assist_health/others/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,8 @@ import 'package:assist_health/models/other/question.dart';
 class QuestionDetailScreen extends StatefulWidget {
   final Question question;
 
-  const QuestionDetailScreen({Key? key, required this.question}) : super(key: key);
+  const QuestionDetailScreen({Key? key, required this.question})
+      : super(key: key);
 
   @override
   State<QuestionDetailScreen> createState() => _QuestionDetailScreenState();
@@ -16,33 +19,34 @@ class QuestionDetailScreen extends StatefulWidget {
 class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   List<Map<String, dynamic>> answers = [];
   late User currentUser;
-  late String? currentUserRole; 
+  late String? currentUserRole;
   @override
   void initState() {
     super.initState();
     _loadAnswers();
-    _loadCurrentUserRole(); 
+    _loadCurrentUserRole();
     currentUserRole = '';
     currentUser = FirebaseAuth.instance.currentUser!;
   }
+
   void _loadCurrentUserRole() {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then((docSnapshot) {
-      if (docSnapshot.exists) {
-        setState(() {
-          currentUserRole = docSnapshot.data()?['role'] ?? '';
-        });
-      }
-    }).catchError((error) {
-      print('Failed to load user role: $error');
-    });
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((docSnapshot) {
+        if (docSnapshot.exists) {
+          setState(() {
+            currentUserRole = docSnapshot.data()?['role'] ?? '';
+          });
+        }
+      }).catchError((error) {
+        print('Failed to load user role: $error');
+      });
+    }
   }
-}
 
   void _loadAnswers() {
     FirebaseFirestore.instance
@@ -52,7 +56,8 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         .then((docSnapshot) {
       if (docSnapshot.exists) {
         setState(() {
-          answers = List<Map<String, dynamic>>.from(docSnapshot.data()?['answers'] ?? []);
+          answers = List<Map<String, dynamic>>.from(
+              docSnapshot.data()?['answers'] ?? []);
         });
       }
     }).catchError((error) {
@@ -68,7 +73,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         title: const Text('Câu hỏi'),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
@@ -139,19 +144,25 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   title: FutureBuilder<DocumentSnapshot>(
-                    future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
-                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(userId)
+                        .get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot> snapshot) {
                       if (snapshot.hasError) {
-                        return Text('Error loading user data');
+                        return const Text('Error loading user data');
                       }
 
                       if (snapshot.connectionState == ConnectionState.done) {
-                        Map<String, dynamic> userData = snapshot.data!.data() as Map<String, dynamic>;
+                        Map<String, dynamic> userData =
+                            snapshot.data!.data() as Map<String, dynamic>;
                         String imageUrl = userData['imageURL'];
 
                         // Check if the current user is the author of the question
                         // bool isCurrentUserAuthor = currentUser.uid == userId;
-                        bool isAnswererAuthor = widget.question.questionUserId == userId;
+                        bool isAnswererAuthor =
+                            widget.question.questionUserId == userId;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,14 +170,15 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                             Row(
                               children: [
                                 isAnswererAuthor
-                                    ? CircleAvatar(
+                                    ? const CircleAvatar(
                                         child: Icon(
                                           Icons.person,
                                           size: 30,
                                         ),
                                       )
                                     : CircleAvatar(
-                                        backgroundImage: NetworkImage(imageUrl) as ImageProvider<Object>,
+                                        backgroundImage: NetworkImage(imageUrl)
+                                            as ImageProvider<Object>,
                                       ),
                                 const SizedBox(width: 8),
                                 Text(
@@ -189,36 +201,38 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                         );
                       }
 
-                      return CircularProgressIndicator(); // While waiting for the data, show a loading indicator
+                      return const CircularProgressIndicator(); // While waiting for the data, show a loading indicator
                     },
                   ),
                 );
               },
             ),
-      if (widget.question.questionUserId == currentUser.uid||currentUserRole == "doctor")
-           Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  _showAnswerDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.pink, // Change the button color
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Adjust the padding
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Adjust the border radius
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+            if (widget.question.questionUserId == currentUser.uid ||
+                currentUserRole == "doctor")
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showAnswerDialog(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.pink, // Change the button color
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12), // Adjust the padding
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            20), // Adjust the border radius
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    child: const Text('Thêm câu trả lời'),
                   ),
                 ),
-                child: const Text('Thêm câu trả lời'),
               ),
-            ),
-          ),
-
           ],
         ),
       ),
@@ -268,14 +282,13 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         .collection('questions')
         .doc(widget.question.id)
         .update({
-          'answers': FieldValue.arrayUnion([
-            {
-              'answer': answer,
-              'userId': currentUserId,
-            }
-          ])
-        })
-        .then((_) {
+      'answers': FieldValue.arrayUnion([
+        {
+          'answer': answer,
+          'userId': currentUserId,
+        }
+      ])
+    }).then((_) {
       print('Answer saved to Firestore');
       _loadAnswers();
     }).catchError((error) {

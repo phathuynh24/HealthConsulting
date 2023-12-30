@@ -46,7 +46,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    _appointmentScheduleController!.close();
     super.dispose();
   }
 

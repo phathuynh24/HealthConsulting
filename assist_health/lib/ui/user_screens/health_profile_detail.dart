@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:io';
 import 'dart:ui';
@@ -583,7 +583,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
           .set({
         'data': FieldValue.arrayUnion([downloadURL]),
       }, SetOptions(merge: true));
-    } catch (error) {}
+    } catch (error) {
+      print(error);
+    }
   }
 
   Future<List<String>> getFileURLsFromStorage() async {

@@ -214,7 +214,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                               ),
                             ],
                           )
-                        : SizedBox(),
+                        : const SizedBox(),
                     const SizedBox(
                       width: 5,
                     ),
@@ -815,6 +815,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                                                     }),
                                                   );
                                                 }
+                                                return null;
                                               },
                                             ),
                                           )
@@ -979,7 +980,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                       textAlign: TextAlign.center,
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
             (!widget.isEdit)
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -1004,12 +1005,12 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                       ],
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
             (!widget.isEdit)
                 ? const SizedBox(
                     height: 8,
                   )
-                : SizedBox(),
+                : const SizedBox(),
             GestureDetector(
               onTap: () {
                 if (widget.isEdit) {

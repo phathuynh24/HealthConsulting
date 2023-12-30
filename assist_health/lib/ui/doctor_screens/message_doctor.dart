@@ -11,7 +11,8 @@ class MessageDoctorScreen extends StatefulWidget {
   State<MessageDoctorScreen> createState() => _MessageDoctorScreenState();
 }
 
-class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsBindingObserver {
+class _MessageDoctorScreenState extends State<MessageDoctorScreen>
+    with WidgetsBindingObserver {
   List<Map<String, dynamic>> userList = [];
   bool isLoading = false;
   Map<String, dynamic>? userMap;
@@ -56,10 +57,12 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsB
   }
 
   String chatRoomId(String user1, String user2) {
-    return user1[0].toLowerCase().codeUnits[0] > user2[0].toLowerCase().codeUnits[0]
+    return user1[0].toLowerCase().codeUnits[0] >
+            user2[0].toLowerCase().codeUnits[0]
         ? "$user1$user2"
         : "$user2$user1";
   }
+
   void toggleChattedUsers() {
     setState(() {
       showChattedUsers = !showChattedUsers;
@@ -72,54 +75,56 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsB
   }
 
   void filterChattedUsers() async {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  setState(() {
-    isLoading = true;
-  });
-
-  // Fetch the list of chat rooms for the current user
-  QuerySnapshot chatRoomsSnapshot = await firestore
-      .collection('chatroom')
-      .where('users', arrayContains: _auth.currentUser!.uid)
-      .get();
-
-  // Extract doctor IDs from the chat rooms
-  List<String> doctorIds = [];
-  for (QueryDocumentSnapshot room in chatRoomsSnapshot.docs) {
-    List<dynamic> users = room['users'];
-    doctorIds.addAll(users.where((id) => id != _auth.currentUser!.uid).whereType<String>());
-  }
-
-  doctorIds = doctorIds.toSet().toList();
-
-  if (doctorIds.isNotEmpty) {
-    // Fetch the details of doctors based on the filtered IDs
-    await firestore
-        .collection('users')
-        .where("role", isEqualTo: "user")
-        .where(FieldPath.documentId, whereIn: doctorIds)
-        .get()
-        .then((value) {
-      if (value.docs.isNotEmpty) {
-        setState(() {
-          userList = value.docs.map((doc) => doc.data()).toList();
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          userList = [];
-          isLoading = false;
-        });
-      }
-    });
-  } else {
     setState(() {
-      userList = [];
-      isLoading = false;
+      isLoading = true;
     });
+
+    // Fetch the list of chat rooms for the current user
+    QuerySnapshot chatRoomsSnapshot = await firestore
+        .collection('chatroom')
+        .where('users', arrayContains: _auth.currentUser!.uid)
+        .get();
+
+    // Extract doctor IDs from the chat rooms
+    List<String> doctorIds = [];
+    for (QueryDocumentSnapshot room in chatRoomsSnapshot.docs) {
+      List<dynamic> users = room['users'];
+      doctorIds.addAll(users
+          .where((id) => id != _auth.currentUser!.uid)
+          .whereType<String>());
+    }
+
+    doctorIds = doctorIds.toSet().toList();
+
+    if (doctorIds.isNotEmpty) {
+      // Fetch the details of doctors based on the filtered IDs
+      await firestore
+          .collection('users')
+          .where("role", isEqualTo: "user")
+          .where(FieldPath.documentId, whereIn: doctorIds)
+          .get()
+          .then((value) {
+        if (value.docs.isNotEmpty) {
+          setState(() {
+            userList = value.docs.map((doc) => doc.data()).toList();
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            userList = [];
+            isLoading = false;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        userList = [];
+        isLoading = false;
+      });
+    }
   }
-}
 
   void onSearch() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -251,11 +256,12 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsB
                     ),
                     onPressed: toggleChattedUsers,
                     child: Text(
-                      showChattedUsers ? "Hiển thị tất cả" : "Chỉ hiển thị đã chat",
-                      style: TextStyle(color: Colors.white),
+                      showChattedUsers
+                          ? "Hiển thị tất cả"
+                          : "Chỉ hiển thị đã chat",
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                  
                   if (userList.isNotEmpty)
                     Container(
                       child: ListView.builder(
@@ -322,7 +328,8 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> with WidgetsB
                               //     height: 1.5,
                               //   ),
                               // ),
-                              trailing: const Icon(Icons.chat, color: Colors.black),
+                              trailing:
+                                  const Icon(Icons.chat, color: Colors.black),
                             ),
                           );
                         },

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:assist_health/others/theme.dart';
@@ -11,24 +13,24 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 class UpdateDoctorScreen extends StatefulWidget {
   final String doctorId;
 
-  const UpdateDoctorScreen({Key? key, required this.doctorId})
-      : super(key: key);
+  const UpdateDoctorScreen({super.key, required this.doctorId});
 
   @override
-  _UpdateDoctorScreenState createState() => _UpdateDoctorScreenState();
+  State<UpdateDoctorScreen> createState() => _UpdateDoctorScreenState();
 }
 
 class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _workplaceController = TextEditingController();
-  TextEditingController _experiencetextController = TextEditingController();
-  TextEditingController _studytextController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _workplaceController = TextEditingController();
+  final TextEditingController _experiencetextController =
+      TextEditingController();
+  final TextEditingController _studytextController = TextEditingController();
   File? _selectedImage;
   String? _imageURL;
   List<String> _selectedSpecialties = [];
-  List<String> _specialties = [
+  final List<String> _specialties = [
     'Tai mũi họng',
     'Nội thần kinh',
     'Mắt',
@@ -100,6 +102,7 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
       });
 
       _showSuccessSnackBar('Doctor information updated successfully!');
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } catch (e) {
       print('Error updating data to Firestore: $e');

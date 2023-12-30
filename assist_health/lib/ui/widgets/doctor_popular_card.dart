@@ -42,14 +42,14 @@ class DoctorPopularCardWidget extends StatelessWidget {
                   (BuildContext context, Object exception,
                       StackTrace? stackTrace) {
                 return Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       FontAwesomeIcons.userDoctor,
                       size: 90,
@@ -102,7 +102,7 @@ class DoctorPopularCardWidget extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.black, fontSize: 11, height: 1.5),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 10,
                     ),
                     Icon(
@@ -140,10 +140,10 @@ class DoctorPopularCardWidget extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
               horizontal: 10,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
               color: Colors.lightBlueAccent.shade100.withOpacity(0.3),
               borderRadius: BorderRadius.circular(5),
@@ -159,28 +159,28 @@ class DoctorPopularCardWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Container(
-            margin: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
               horizontal: 10,
             ),
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
               borderRadius: BorderRadius.circular(3),
             ),
-            child: Text(
+            child: const Text(
               'Tư vấn trực tuyến',
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,

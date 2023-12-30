@@ -94,11 +94,11 @@ Stream<List<DoctorInfo>> getInfoDoctors() {
       .map((QuerySnapshot querySnapshot) {
     final List<DoctorInfo> doctorInfos = [];
 
-    querySnapshot.docs.forEach((doctorDoc) {
+    for (var doctorDoc in querySnapshot.docs) {
       final doctorData = doctorDoc.data() as Map<String, dynamic>?;
       final DoctorInfo doctorInfo = DoctorInfo.fromJson(doctorData!);
       doctorInfos.add(doctorInfo);
-    });
+    }
 
     return doctorInfos;
   });
@@ -212,7 +212,7 @@ Future<DoctorSchedule> getSchedulesDoctor(
 }
 
 Stream<List<UserProfile>> getProfileUsers(String uid) async* {
-  List<UserProfile> doctorProfiles = [];
+  List<UserProfile> userProfiles = [];
 
   final docSnapshot = await _firestore
       .collection('users')
@@ -230,9 +230,27 @@ Stream<List<UserProfile>> getProfileUsers(String uid) async* {
     }
   }).whereType<UserProfile>();
 
-  doctorProfiles.addAll(listOfProfiles);
+  userProfiles.addAll(listOfProfiles);
 
-  yield doctorProfiles.reversed.toList();
+  yield userProfiles.reversed.toList();
+}
+
+Stream<UserProfile> getMainProfileUsers(String uid) async* {
+  UserProfile userProfile = UserProfile('', '', '', '', '', '', '', '');
+
+  final docSnapshot = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .collection('health_profiles')
+      .doc('main_profile')
+      .get();
+
+  if (docSnapshot.exists) {
+    final data = docSnapshot.data();
+    userProfile = UserProfile.fromJson(data!);
+  }
+
+  yield userProfile;
 }
 
 Future<List<UserHeight>> getHeightDataUser(String uid, String idDoc) async {

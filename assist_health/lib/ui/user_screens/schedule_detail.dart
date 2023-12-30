@@ -1790,6 +1790,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   Future<void> onJoin() async {
     await _handleCameraAndMic(Permission.camera);
     await _handleCameraAndMic(Permission.microphone);
+    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(

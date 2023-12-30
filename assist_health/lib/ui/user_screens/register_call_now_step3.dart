@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
@@ -11,23 +9,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:open_file/open_file.dart';
 
 // ignore: must_be_immutable
-class RegisterCallStep4 extends StatefulWidget {
+class RegisterCallNowStep3 extends StatefulWidget {
   AppointmentSchedule appointmentSchedule;
-  RegisterCallStep4({required this.appointmentSchedule, super.key});
+  RegisterCallNowStep3({super.key, required this.appointmentSchedule});
 
   @override
-  State<RegisterCallStep4> createState() => _RegisterCallStep4();
+  State<RegisterCallNowStep3> createState() => _RegisterCallNowStep3State();
 }
 
-class _RegisterCallStep4 extends State<RegisterCallStep4> {
-  bool _isVisibleInformation = true;
-  bool _isVisibleReasonForExamination = true;
-  bool _isVisiblePayment = true;
-
+class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
   AppointmentSchedule? _appointmentSchedule;
+  bool _isVisibleInformation = true;
+  bool _isVisiblePayment = true;
 
   @override
   void initState() {
@@ -682,243 +677,6 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                     height: 20,
                                   ),
 
-                                  // Lý do khám
-                                  if (_isNotEmptyReasonForExamination())
-                                    Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              _isVisibleReasonForExamination =
-                                                  !_isVisibleReasonForExamination;
-                                            });
-                                          },
-                                          child: Row(children: [
-                                            HalfCircle(
-                                                height: 20,
-                                                weight: 10,
-                                                color: Colors.blueAccent
-                                                    .withOpacity(0.1),
-                                                isLeft: true),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            const Text(
-                                              'LÝ DO KHÁM',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            const SizedBox(
-                                              width: 6,
-                                            ),
-                                            MySeparator(
-                                                color: Colors.grey.shade400),
-                                            Icon(
-                                              (_isVisibleReasonForExamination)
-                                                  ? Icons
-                                                      .keyboard_arrow_down_rounded
-                                                  : Icons
-                                                      .keyboard_arrow_up_rounded,
-                                              size: 27,
-                                              color: Colors.grey.shade400,
-                                            ),
-                                            const SizedBox(
-                                              width: 4,
-                                            ),
-                                            HalfCircle(
-                                                height: 20,
-                                                weight: 10,
-                                                color: Colors.blueAccent
-                                                    .withOpacity(0.1),
-                                                isLeft: false),
-                                          ]),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Visibility(
-                                          visible:
-                                              _isVisibleReasonForExamination,
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'Lý do khám, triệu chứng',
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    _appointmentSchedule!
-                                                                .reasonForExamination! ==
-                                                            ''
-                                                        ? 'Trống'
-                                                        : _appointmentSchedule!
-                                                            .reasonForExamination!,
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors
-                                                            .blue.shade300,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 16,
-                                                  ),
-                                                  const Text(
-                                                    'Hình ảnh, toa thuốc',
-                                                    style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                  (_appointmentSchedule!
-                                                          .listOfHealthInformationFiles!
-                                                          .isNotEmpty)
-                                                      ? Container(
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            vertical: 10,
-                                                          ),
-                                                          child:
-                                                              GridView.builder(
-                                                            padding:
-                                                                EdgeInsets.zero,
-                                                            scrollDirection:
-                                                                Axis.vertical,
-                                                            shrinkWrap: true,
-                                                            physics:
-                                                                const NeverScrollableScrollPhysics(),
-                                                            itemCount:
-                                                                _appointmentSchedule!
-                                                                    .listOfHealthInformationFiles!
-                                                                    .length,
-                                                            gridDelegate:
-                                                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                                              crossAxisCount: 4,
-                                                              mainAxisSpacing:
-                                                                  6,
-                                                              crossAxisSpacing:
-                                                                  6,
-                                                              childAspectRatio:
-                                                                  1,
-                                                            ),
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              if (index !=
-                                                                  _appointmentSchedule!
-                                                                      .listOfHealthInformationFiles!
-                                                                      .length) {
-                                                                File file =
-                                                                    _appointmentSchedule!
-                                                                            .listOfHealthInformationFiles![
-                                                                        index];
-                                                                String
-                                                                    extension =
-                                                                    file.path
-                                                                        .split(
-                                                                            '.')
-                                                                        .last
-                                                                        .toLowerCase();
-
-                                                                return GestureDetector(
-                                                                  onTap: () {
-                                                                    OpenFile.open(
-                                                                        file.path);
-                                                                  },
-                                                                  child: LayoutBuilder(builder: (BuildContext
-                                                                          context,
-                                                                      BoxConstraints
-                                                                          constraints) {
-                                                                    return Center(
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            constraints.maxWidth -
-                                                                                10,
-                                                                        width: constraints.maxHeight -
-                                                                            10,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(6),
-                                                                          color:
-                                                                              Colors.grey,
-                                                                        ),
-                                                                        alignment:
-                                                                            Alignment.center,
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            if (extension ==
-                                                                                'pdf')
-                                                                              const Icon(Icons.picture_as_pdf, size: 50),
-                                                                            if (extension == 'doc' ||
-                                                                                extension == 'docx')
-                                                                              const Icon(Icons.description, size: 50),
-                                                                            if (extension ==
-                                                                                'mp4')
-                                                                              const Icon(Icons.play_circle_filled, size: 50),
-                                                                            if (extension == 'png' ||
-                                                                                extension == 'jpg' ||
-                                                                                extension == 'jpeg')
-                                                                              SizedBox(
-                                                                                height: constraints.maxWidth - 10,
-                                                                                width: constraints.maxHeight - 10,
-                                                                                child: ClipRRect(
-                                                                                  borderRadius: BorderRadius.circular(6),
-                                                                                  child: Image.file(
-                                                                                    file,
-                                                                                    fit: BoxFit.cover,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  }),
-                                                                );
-                                                              }
-                                                              return null;
-                                                            },
-                                                          ),
-                                                        )
-                                                      : Container(
-                                                          margin:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                            top: 6,
-                                                          ),
-                                                          child: const Text(
-                                                            'Trống',
-                                                            style: TextStyle(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400),
-                                                          ),
-                                                        ),
-                                                  const SizedBox(height: 20),
-                                                ]),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  const SizedBox(height: 15),
                                   // Thông tin thanh toán
                                   GestureDetector(
                                     onTap: () {
@@ -1524,13 +1282,5 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
         });
       },
     );
-  }
-
-  _isNotEmptyReasonForExamination() {
-    if (_appointmentSchedule!.reasonForExamination!.isNotEmpty ||
-        _appointmentSchedule!.listOfHealthInformationFiles!.isNotEmpty) {
-      return true;
-    }
-    return false;
   }
 }

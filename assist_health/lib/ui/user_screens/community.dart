@@ -18,7 +18,13 @@ class _CommunityScreenState extends State<CommunityScreen> {
   String gender = 'Nam';
 
   final List<String> selectedCategories = [];
-  final List<String> categories = ['Health', 'Fitness', 'Nutrition', 'Mental Health', 'Other'];
+  final List<String> categories = [
+    'Health',
+    'Fitness',
+    'Nutrition',
+    'Mental Health',
+    'Other'
+  ];
 
   final List<Question> questions = [];
   final TextEditingController titleController = TextEditingController();
@@ -258,7 +264,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
             const SizedBox(
               height: 30,
             ),
-            
             ActionChip(
               onPressed: () async {
                 // Get the current user
@@ -277,21 +282,25 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     content: contentController.text,
                     categories: selectedCategories,
                     questionUserId: currentUserId, // Add this line
-
                   );
 
-                  await FirebaseFirestore.instance.collection('questions').doc(id).set({
+                  await FirebaseFirestore.instance
+                      .collection('questions')
+                      .doc(id)
+                      .set({
                     'gender': question.gender,
                     'age': question.age,
                     'title': question.title,
                     'content': question.content,
                     'categories': FieldValue.arrayUnion(question.categories),
-                    'questionUserId':currentUserId,
+                    'questionUserId': currentUserId,
                   });
 
+                  // ignore: use_build_context_synchronously
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const PublicQuestionsScreen()),
+                    MaterialPageRoute(
+                        builder: (_) => const PublicQuestionsScreen()),
                   );
 
                   setState(() {

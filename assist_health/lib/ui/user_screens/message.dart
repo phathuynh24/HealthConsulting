@@ -1,4 +1,3 @@
-import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/chatroom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +11,8 @@ class MessageScreen extends StatefulWidget {
   State<MessageScreen> createState() => _MessageScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserver {
+class _MessageScreenState extends State<MessageScreen>
+    with WidgetsBindingObserver {
   List<Map<String, dynamic>> doctorList = [];
   bool isLoading = false;
   Map<String, dynamic>? userMap;
@@ -57,7 +57,8 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
   }
 
   String chatRoomId(String user1, String user2) {
-    return user1[0].toLowerCase().codeUnits[0] > user2[0].toLowerCase().codeUnits[0]
+    return user1[0].toLowerCase().codeUnits[0] >
+            user2[0].toLowerCase().codeUnits[0]
         ? "$user1$user2"
         : "$user2$user1";
   }
@@ -183,71 +184,69 @@ class _MessageScreenState extends State<MessageScreen> with WidgetsBindingObserv
                   SizedBox(
                     height: size.height / 60,
                   ),
-
                   if (doctorList.isNotEmpty)
-                    Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: doctorList.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> doctor = doctorList[index];
-                          return Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 5,
-                            ),
-                            child: ListTile(
-                              onTap: () {
-                                String roomId = chatRoomId(
-                                  _auth.currentUser!.displayName!,
-                                  doctor['name'],
-                                );
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ChatRoom(
-                                      chatRoomId: roomId,
-                                      userMap: doctor,
-                                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: doctorList.length,
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> doctor = doctorList[index];
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 5,
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              String roomId = chatRoomId(
+                                _auth.currentUser!.displayName!,
+                                doctor['name'],
+                              );
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ChatRoom(
+                                    chatRoomId: roomId,
+                                    userMap: doctor,
                                   ),
-                                );
-                              },
-                              leading: Stack(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: NetworkImage(
-                                      doctor['imageURL'],
-                                    ),
+                                ),
+                              );
+                            },
+                            leading: Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: NetworkImage(
+                                    doctor['imageURL'],
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 12,
-                                      width: 12,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: getStatusDotColor(
-                                          doctor['status'] == 'online',
-                                        ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    height: 12,
+                                    width: 12,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: getStatusDotColor(
+                                        doctor['status'] == 'online',
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              title: Text(
-                                doctor['name'],
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  height: 1.5,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                              trailing: const Icon(Icons.chat, color: Colors.black),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                            title: Text(
+                              doctor['name'],
+                              style: const TextStyle(
+                                color: Colors.black,
+                                height: 1.5,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing:
+                                const Icon(Icons.chat, color: Colors.black),
+                          ),
+                        );
+                      },
                     ),
                 ],
               ),

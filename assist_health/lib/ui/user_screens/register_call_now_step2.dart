@@ -1,108 +1,33 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously
+// ignore_for_file: avoid_print
 
 import 'dart:async';
-import 'dart:io';
-import 'dart:math';
 
-import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
-import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
-import 'package:assist_health/ui/user_screens/register_call_step4.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
-class RegisterCallStep3 extends StatefulWidget {
-  DoctorInfo doctorInfo;
-  UserProfile userProfile;
-  String reasonForExamination;
-  List<File> listOfHealthInformationFiles;
-  DateTime selectedDate;
-  String time;
-  bool isMorning;
-
-  RegisterCallStep3(
-      {required this.doctorInfo,
-      required this.userProfile,
-      required this.reasonForExamination,
-      required this.listOfHealthInformationFiles,
-      required this.selectedDate,
-      required this.time,
-      required this.isMorning,
-      super.key});
+class RegisterCallNowStep2 extends StatefulWidget {
+  AppointmentSchedule appointmentSchedule;
+  RegisterCallNowStep2({super.key, required this.appointmentSchedule});
 
   @override
-  State<RegisterCallStep3> createState() => _RegisterCallStep3();
+  State<RegisterCallNowStep2> createState() => _RegisterCallNowStep2State();
 }
 
-class _RegisterCallStep3 extends State<RegisterCallStep3> {
-  int _secondsRemaining = 3600;
-
-  DoctorInfo? _doctorInfo;
-  UserProfile? _userProfile;
-  String? _reasonForExamination;
-  List<File>? _listOfHealthInformationFiles;
-
-  DateTime? _selectedDate;
-  String? _time;
-  bool? _isMorning;
-
-  String? _transferContent;
-
+class _RegisterCallNowStep2State extends State<RegisterCallNowStep2> {
+  AppointmentSchedule? appointmentSchedule;
   bool _isSaving = false;
-
-  String? _linkQRCode;
-
-  String? _appointmentCode;
-
-  DateTime? _paymentStartTime;
+  int _secondsRemaining = 3600;
 
   @override
   void initState() {
     super.initState();
-
-    _doctorInfo = widget.doctorInfo;
-    _userProfile = widget.userProfile;
-    _reasonForExamination = widget.reasonForExamination;
-    _listOfHealthInformationFiles = widget.listOfHealthInformationFiles;
-
-    _selectedDate = widget.selectedDate;
-    _time = widget.time;
-    _isMorning = widget.isMorning;
-
-    _transferContent = _generateTransferContent();
-
-    _linkQRCode =
-        'https://img.vietqr.io/image/sacombank-070119955066-compact.jpg?amount=${_doctorInfo!.serviceFee * 1.0083}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
-
-    _appointmentCode = _generateAppointmentCode();
-
-    _paymentStartTime = DateTime.now();
-
+    appointmentSchedule = widget.appointmentSchedule;
     startTimer();
-  }
-
-  void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_secondsRemaining > 0) {
-          _secondsRemaining--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
-  }
-
-  String formatTime(int seconds) {
-    int hours = seconds ~/ 3600;
-    int minutes = (seconds % 3600) ~/ 60;
-    int remainingSeconds = seconds % 60;
-    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -122,154 +47,6 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                   colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
-                ),
-              ),
-            ),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(45),
-              child: Container(
-                width: double.infinity,
-                height: 45,
-                color: Colors.white,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  color: Colors.blueAccent.withOpacity(0.1),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                          child: const Text(
-                            '1',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Chọn lịch tư vấn',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                          child: const Text(
-                            '2',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Xác nhận',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                          child: const Text(
-                            '3',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Thanh toán',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blueGrey,
-                          ),
-                          child: const Text(
-                            '4',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Text(
-                          'Nhận lịch hẹn',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.blueGrey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -389,7 +166,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                 // Xử lý sự kiện sao chép số tài khoản
                                 final data = ClipboardData(
                                     text:
-                                        '${_doctorInfo!.serviceFee * 1.0083}');
+                                        '${appointmentSchedule!.doctorInfo!.serviceFee * 1.0083}');
                                 Clipboard.setData(data);
                                 showToastMessage(
                                     context, 'Số tiền đã được sao chép');
@@ -398,7 +175,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                    '${NumberFormat("#,##0", "en_US").format(int.parse((appointmentSchedule!.doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
                                     style: const TextStyle(
                                       color: Themes.gradientDeepClr,
                                       fontWeight: FontWeight.w500,
@@ -434,8 +211,9 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                             child: GestureDetector(
                               onTap: () {
                                 // Xử lý sự kiện sao chép nội dung chuyển khoản
-                                final data =
-                                    ClipboardData(text: _transferContent!);
+                                final data = ClipboardData(
+                                    text:
+                                        appointmentSchedule!.transferContent!);
                                 Clipboard.setData(data);
                                 showToastMessage(context,
                                     'Nội dung chuyển khoản đã được sao chép');
@@ -444,7 +222,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    _transferContent!,
+                                    appointmentSchedule!.transferContent!,
                                     style: const TextStyle(
                                       color: Themes.gradientDeepClr,
                                       fontWeight: FontWeight.w500,
@@ -504,7 +282,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                         thickness: 0.3,
                       ),
                       Image.network(
-                        _linkQRCode!,
+                        appointmentSchedule!.linkQRCode!,
                         errorBuilder: (BuildContext context, Object exception,
                             StackTrace? stackTrace) {
                           return Container(
@@ -699,69 +477,23 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     );
   }
 
-  String _generateTransferContent() {
-    String characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    Random random = Random();
-    String randomString = '';
-
-    for (int i = 0; i < 12; i++) {
-      int randomIndex = random.nextInt(characters.length);
-      randomString += characters[randomIndex];
-    }
-
-    return randomString;
-  }
-
-  String _generateAppointmentCode() {
-    // Sinh số ngẫu nhiên gồm 8 chữ số
-    Random random = Random();
-    String randomDigits =
-        List.generate(8, (_) => random.nextInt(10).toString()).join();
-
-    // Ghép nó với "MDK"
-    String appointmentCode = 'MDK$randomDigits';
-
-    return appointmentCode;
-  }
-
   _saveExaminationForm() async {
-    updateIsSaving(true); // Mở ProgressDialog
-
-    AppointmentSchedule appointmentSchedule = AppointmentSchedule(
-      doctorInfo: _doctorInfo,
-      userProfile: _userProfile,
-      idDocUser: FirebaseAuth.instance.currentUser!.uid,
-      reasonForExamination: _reasonForExamination,
-      listOfHealthInformationFiles: _listOfHealthInformationFiles,
-      selectedDate: _selectedDate,
-      time: _time,
-      isMorning: _isMorning,
-      transferContent: _transferContent,
-      appointmentCode: _appointmentCode,
-      linkQRCode: _linkQRCode,
-      receivedAppointmentTime: getFormattedDateTime(),
-      paymentStartTime: _paymentStartTime,
-      status: 'Chờ duyệt',
-      paymentStatus: 'Chờ xác nhận',
-    );
-
     try {
-      await appointmentSchedule.saveAppointmentToFirestore().whenComplete(() {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RegisterCallStep4(
-              appointmentSchedule: appointmentSchedule,
-            ),
-          ),
-          (Route<dynamic> route) => false,
-        );
+      await appointmentSchedule!.saveAppointmentToFirestore().whenComplete(() {
+        // Navigator.pushAndRemoveUntil(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => RegisterCallStep4(
+        //       appointmentSchedule: appointmentSchedule,
+        //     ),
+        //   ),
+        //   (Route<dynamic> route) => false,
+        // );
       });
       print('Dữ liệu đã được lưu thành công!');
     } catch (e) {
       print('Lỗi khi lưu dữ liệu: $e');
     }
-    updateIsSaving(false); // Ẩn ProgressDialog
   }
 
   void updateIsSaving(bool value) {
@@ -770,12 +502,22 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     });
   }
 
-  String getFormattedDateTime() {
-    DateTime now = DateTime.now();
-    String formattedTime = DateFormat('HH:mm:ss').format(now);
-    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
-    String formattedDateTime = '$formattedTime - $formattedDate';
+  String formatTime(int seconds) {
+    int hours = seconds ~/ 3600;
+    int minutes = (seconds % 3600) ~/ 60;
+    int remainingSeconds = seconds % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
 
-    return formattedDateTime;
+  void startTimer() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 }

@@ -2,6 +2,7 @@ import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/doctor_detail.dart';
+import 'package:assist_health/ui/user_screens/register_call_now_step1.dart';
 import 'package:assist_health/ui/user_screens/register_call_step1.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
@@ -524,6 +525,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                           color: Colors.black,
                                           fontSize: 14,
                                           height: 1.5,
+                                          fontWeight: FontWeight.w500,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
@@ -580,19 +582,17 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Expanded(
-                            child: InkWell(
+                            child: GestureDetector(
                               onTap: () {
-                                // isOnline
-                                //     ? Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(
-                                //             builder: (context) =>
-                                //                 RegisterCallStep2(
-                                //                   userProfile: ,
-                                //                     doctorInfo:
-                                //                         snapshot.data![index])))
-                                //     :
-                                showNotificationDialog(context);
+                                isOnline
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                RegisterCallNowStep1(
+                                                  doctorInfo: doctor,
+                                                )))
+                                    : showNotificationDialog(context);
                               },
                               child: Container(
                                 height: 50,

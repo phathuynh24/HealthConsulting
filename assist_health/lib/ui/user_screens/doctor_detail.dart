@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
@@ -79,7 +81,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
 
     _initialSelectedDate = _isNotEmptySlot()
         ? DateTime.now()
-        : DateTime.now().add(Duration(days: 1));
+        : DateTime.now().add(const Duration(days: 1));
 
     _selectedDate = _initialSelectedDate;
 
@@ -201,7 +203,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                                   (BuildContext context,
                                                       Object exception,
                                                       StackTrace? stackTrace) {
-                                              return Center(
+                                              return const Center(
                                                 child: Icon(
                                                   FontAwesomeIcons.userDoctor,
                                                   size: 60,
@@ -248,7 +250,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               children: [
                                 Text(
                                   _doctorInfo!.careerTitiles,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
                                     height: 1.5,
@@ -257,7 +259,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 ),
                                 Text(
                                   _doctorInfo!.name,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.black87,
                                     fontSize: 16,
                                     height: 1.5,
@@ -267,7 +269,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 ),
                                 Text(
                                   '${DateTime.now().year - _doctorInfo!.graduationYear} năm kinh nghiệm',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
                                     height: 1.5,
@@ -279,7 +281,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 6,
                       ),
                       Row(
@@ -507,7 +509,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 5,
                             ),
                             Column(
@@ -892,16 +894,16 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                           child: Center(
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Tư vấn trực tuyến',
                                   style: TextStyle(
                                     fontSize: 15,
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 Text(
                                   '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -1063,7 +1065,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                           ),
                           child: Text(
                             _doctorInfo!.description,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                               height: 1.5,
                             ),
@@ -1287,7 +1289,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                   ),
                                   Text(
                                     _doctorInfo!.workplace,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
                                   ),
@@ -1954,7 +1956,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
         } else {
           _initialSelectedDate = DateTime.now();
           if (_isNotEmptySlot()) {
-            _initialSelectedDate = DateTime.now().add(Duration(days: 1));
+            _initialSelectedDate = DateTime.now().add(const Duration(days: 1));
           }
         }
 

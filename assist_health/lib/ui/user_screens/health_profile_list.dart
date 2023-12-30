@@ -35,6 +35,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
 
   @override
   void dispose() {
+    _userStreamController.close();
     super.dispose();
   }
 
@@ -67,6 +68,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
               );
 
               if (isAdded != null && isAdded == true) {
+                _userStreamController.addStream(getProfileUsers(_uid));
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('Lưu hồ sơ thành công!'),
@@ -92,7 +94,7 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: const CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   List<UserProfile> userProfiles = snapshot.data!;
@@ -124,6 +126,8 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
                                     builder: (context) =>
                                         HealthProfileDetailScreen(
                                             profile: profile)));
+                            _userStreamController
+                                .addStream(getProfileUsers(_uid));
                           },
                           child: Row(
                             children: [

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/other/feedback_doctor.dart';
 import 'package:assist_health/others/methods.dart';
@@ -98,7 +100,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                                               (BuildContext context,
                                                   Object exception,
                                                   StackTrace? stackTrace) {
-                                          return Center(
+                                          return const Center(
                                             child: Icon(
                                               FontAwesomeIcons.userDoctor,
                                               size: 60,
@@ -146,7 +148,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                           children: [
                             Text(
                               _appointmentSchedule!.doctorInfo!.careerTitiles,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 15,
                                 height: 1.5,
@@ -155,7 +157,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                             ),
                             Text(
                               _appointmentSchedule!.doctorInfo!.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black87,
                                 fontSize: 16,
                                 height: 1.5,
@@ -165,7 +167,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                             ),
                             Text(
                               '${DateTime.now().year - _appointmentSchedule!.doctorInfo!.graduationYear} năm kinh nghiệm',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 15,
                                 height: 1.5,
@@ -177,7 +179,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 6,
                   ),
                   Row(
@@ -227,7 +229,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
                 height: 5,
                 child: MySeparator(
                   color: Colors.grey,
@@ -236,8 +238,8 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
               height: 15,
             ),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              padding: EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.amber.shade100.withOpacity(0.7),
@@ -246,7 +248,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                Text(
+                const Text(
                   'Vui lòng đánh giá chất lượng dịch vụ',
                   style: TextStyle(fontSize: 16),
                 ),
@@ -260,8 +262,8 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                   allowHalfRating: true,
                   itemCount: 5,
                   itemSize: 50,
-                  itemPadding: EdgeInsets.symmetric(horizontal: 3.0),
-                  itemBuilder: (context, _) => Icon(
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 3.0),
+                  itemBuilder: (context, _) => const Icon(
                     Icons.star,
                     color: Colors.amber,
                   ),
@@ -270,15 +272,15 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                   },
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(
+                  margin: const EdgeInsets.symmetric(
                     vertical: 10,
                   ),
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   child: TextField(
                     controller: _feedbackController,
                     maxLines: 5,
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.grey.shade100.withOpacity(0.7),
                         hintText:
@@ -304,7 +306,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
             vertical: 8,
             horizontal: 15,
           ),
-          margin: EdgeInsets.symmetric(
+          margin: const EdgeInsets.symmetric(
             vertical: 20,
             horizontal: 40,
           ),
@@ -312,7 +314,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
             borderRadius: BorderRadius.circular(10),
             color: Themes.gradientDeepClr,
           ),
-          child: Center(
+          child: const Center(
             child: Text(
               'Gửi đánh giá',
               style: TextStyle(
@@ -350,6 +352,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
         'idUser': _appointmentSchedule!.idDocUser!,
         'idDoc': _feedback!.idDoc,
       });
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pop(_feedback!.idDoc);
 
       print('Feedback saved successfully!');

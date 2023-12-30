@@ -1,13 +1,14 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/ui/user_screens/doctor_chat.dart';
 import 'package:assist_health/ui/user_screens/doctor_detail.dart';
 import 'package:assist_health/ui/user_screens/doctor_list.dart';
 import 'package:assist_health/ui/user_screens/health_profile_list.dart';
-import 'package:assist_health/ui/user_screens/message.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
-import 'package:assist_health/ui/widgets/appbar_home.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -95,7 +96,6 @@ class _MyHomeScreen extends State<HomeScreen> {
   @override
   void dispose() {
     setOffline();
-    _doctorStreamController.close();
     super.dispose();
   }
 
@@ -281,7 +281,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                     ),
                     child: Row(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 10,
                         ),
                         Icon(
@@ -289,11 +289,11 @@ class _MyHomeScreen extends State<HomeScreen> {
                           color: Colors.blueGrey.shade300,
                           size: 23,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 4,
                         ),
                         Text(
-                          'Tên bác sĩ, chuyên khoa',
+                          'Tên bác sĩ, chuyên khoa,...',
                           style: TextStyle(
                               color: Colors.blueGrey.shade400,
                               fontSize: 15,
@@ -461,7 +461,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (_) =>
-                                              const MessageScreen()),
+                                              const DoctorChatScreen()),
                                     );
                                   }),
                                   itemDashboard(
