@@ -6,6 +6,7 @@ import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
@@ -30,12 +31,18 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
   File? _selectedImage;
   String? _imageURL;
   List<String> _selectedSpecialties = [];
-  final List<String> _specialties = [
-    'Tai mũi họng',
-    'Nội thần kinh',
-    'Mắt',
-    'Nha khoa',
-    'Chấn thương chỉnh hình'
+  List<String> _specialties = [
+    "Tay mũi họng",
+    "Bệnh nhiệt đới",
+    "Nội thần kinh",
+    "Mắt",
+    "Nha khoa",
+    "Chấn thương chỉnh hình",
+    "Tim mạch",
+    "Tiêu hóa",
+    "Hô hấp",
+    "Huyết học",
+    "Nội tiết",
   ];
   @override
   void initState() {
@@ -201,8 +208,10 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
                   labelText: 'Họ tên bác sĩ',
                   border: OutlineInputBorder(),
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+                ],
               ),
-
               const SizedBox(height: 16),
               MultiSelectDialogField(
                 items: _specialties

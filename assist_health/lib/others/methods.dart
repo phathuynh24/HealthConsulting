@@ -417,6 +417,42 @@ Stream<List<AppointmentSchedule>> getAppointmentSchdedules() {
   });
 }
 
+Stream<List<AppointmentSchedule>> getAllAppointmentSchdedules() {
+  return _firestore
+      .collection('appointment_schedule')
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<AppointmentSchedule> appointmentSchedules = [];
+
+    for (var appointmentScheduleDoc in querySnapshot.docs) {
+      final appointmentScheduleData =
+          appointmentScheduleDoc.data() as Map<String, dynamic>?;
+      final AppointmentSchedule appointmentSchedule =
+          AppointmentSchedule.fromJson(appointmentScheduleData!);
+      appointmentSchedules.add(appointmentSchedule);
+    }
+
+    return appointmentSchedules;
+  });
+}
+Stream<List<AppointmentSchedule>> getAppointmentSchedulesByDoctor(String doctorId) {
+    return _firestore
+      .collection('appointment_schedule')
+      // .where('doctorid', isEqualTo: doctorId)
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<AppointmentSchedule> appointmentSchedules = [];
+
+    for (var appointmentScheduleDoc in querySnapshot.docs) {
+      final appointmentScheduleData = appointmentScheduleDoc.data() as Map<String, dynamic>?;
+      final AppointmentSchedule appointmentSchedule = AppointmentSchedule.fromJson(appointmentScheduleData!);
+      appointmentSchedules.add(appointmentSchedule);
+    }
+
+    return appointmentSchedules;
+  });
+  }
+
 showToastMessage(BuildContext context, String message) {
   showToast(message,
       context: context,

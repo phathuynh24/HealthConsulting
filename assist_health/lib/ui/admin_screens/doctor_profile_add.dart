@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
@@ -27,12 +28,18 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   TextEditingController _studytextController = TextEditingController();
   File? _selectedImage;
   List<String> _selectedSpecialties = [];
-  final List<String> _specialties = [
-    'Tai mũi họng',
-    'Nội thần kinh',
-    'Mắt',
-    'Nha khoa',
-    'Chấn thương chỉnh hình'
+  List<String> _specialties = [
+    "Tay mũi họng",
+    "Bệnh nhiệt đới",
+    "Nội thần kinh",
+    "Mắt",
+    "Nha khoa",
+    "Chấn thương chỉnh hình",
+    "Tim mạch",
+    "Tiêu hóa",
+    "Hô hấp",
+    "Huyết học",
+    "Nội tiết",
   ];
   final List<Experience> _experiences = [Experience()];
   final List<Education> _educations = [Education()];
@@ -123,6 +130,9 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   labelText: 'Họ tên bác sĩ',
                   border: OutlineInputBorder(),
                 ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z ]')),
+                ],
               ),
               const SizedBox(height: 16),
               MultiSelectDialogField(
@@ -136,7 +146,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                     _selectedSpecialties = values.cast<String>().toList();
                   });
                 },
-                title: const Text('Chuyên khoa'),
+                title: Text('Chuyên khoa'),
+                dialogHeight: 300,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -417,6 +428,23 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
           workplace.isEmpty ||
           _selectedImage == null) {
         _showErrorSnackBar('Please fill in all fields and select an image.');
+        return;
+      }
+      if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$')
+          .hasMatch(email)) {
+        _showErrorSnackBar('Please enter a valid email address.');
+        return;
+      }
+      if (_experiences.any((experience) =>
+          experience.startYear.compareTo(experience.endYear) > 0)) {
+        _showErrorSnackBar(
+            'Start year must be before end year for experiences.');
+        return;
+      }
+      if (_educations.any((education) =>
+          education.startYear.compareTo(education.endYear) > 0)) {
+        _showErrorSnackBar(
+            'Start year must be before end year for educations.');
         return;
       }
 

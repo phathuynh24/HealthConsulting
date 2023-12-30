@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "assist_health",
+            "cwd": "assist_health",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "assist_health (profile mode)",
+            "cwd": "assist_health",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "assist_health (release mode)",
+            "cwd": "assist_health",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

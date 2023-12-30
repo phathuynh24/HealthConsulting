@@ -19,16 +19,44 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   final List<String> selectedCategories = [];
   final List<String> categories = [
-    'Health',
-    'Fitness',
-    'Nutrition',
-    'Mental Health',
-    'Other'
+    "Tay mũi họng",
+    "Bệnh nhiệt đới",
+    "Nội thần kinh",
+    "Mắt",
+    "Nha khoa",
+    "Chấn thương chỉnh hình",
+    "Tim mạch",
+    "Tiêu hóa",
+    "Hô hấp",
+    "Huyết học",
+    "Nội tiết",
   ];
 
   final List<Question> questions = [];
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  // Validation function to check if all required fields are filled
+  bool _validateFields() {
+    if (titleController.text.isEmpty || contentController.text.isEmpty) {
+      _showSnackBar('Please fill in both title and content fields.');
+      return false;
+    }
+    if (selectedCategories.isEmpty) {
+      _showSnackBar('Please choose at least one category.');
+      return false;
+    }
+    // Additional validation checks can be added if needed
+    return true;
+  }
 
   Future<void> _showCategoryDialog() async {
     List<String> selectedCategoriesCopy = List.from(selectedCategories);
@@ -37,36 +65,43 @@ class _CommunityScreenState extends State<CommunityScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Chọn chuyên khoa thẩm mĩ'),
-          content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: categories.map((category) {
-                  final isSelected = selectedCategoriesCopy.contains(category);
-                  return CheckboxListTile(
-                    title: Row(
-                      children: [
-                        Text(category),
-                        if (isSelected) const Icon(Icons.check),
-                      ],
-                    ),
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value != null) {
-                          if (value) {
-                            selectedCategoriesCopy.add(category);
-                          } else {
-                            selectedCategoriesCopy.remove(category);
-                          }
-                        }
-                      });
-                    },
+          title: const Text('Chọn chủ đề'),
+          content: Container(
+            height: 300,
+            width: 400, // Set the height as per your requirement
+            child: SingleChildScrollView(
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: categories.map((category) {
+                      final isSelected =
+                          selectedCategoriesCopy.contains(category);
+                      return CheckboxListTile(
+                        title: Row(
+                          children: [
+                            Text(category),
+                            // if (isSelected) const Icon(Icons.check),
+                          ],
+                        ),
+                        value: isSelected,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            if (value != null) {
+                              if (value) {
+                                selectedCategoriesCopy.add(category);
+                              } else {
+                                selectedCategoriesCopy.remove(category);
+                              }
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
                   );
-                }).toList(),
-              );
-            },
+                },
+              ),
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -167,7 +202,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Chuyên khoa:',
+                    'Chủ đề:',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,
@@ -192,7 +227,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   const SizedBox(height: 5),
                   ElevatedButton(
                     onPressed: _showCategoryDialog,
-                    child: const Text('Chọn chuyên khoa'),
+                    child: const Text(
+                      'Chọn chủ đề',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
@@ -266,6 +304,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
             ),
             ActionChip(
               onPressed: () async {
+                if (!_validateFields()) {
+                  return;
+                }
                 // Get the current user
                 User? user = FirebaseAuth.instance.currentUser;
 
@@ -281,7 +322,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     title: titleController.text,
                     content: contentController.text,
                     categories: selectedCategories,
-                    questionUserId: currentUserId, // Add this line
+                    questionUserId: currentUserId,
                   );
 
                   await FirebaseFirestore.instance
