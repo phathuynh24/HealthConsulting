@@ -2,26 +2,27 @@ import 'dart:async';
 
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/others/methods.dart';
-import 'package:assist_health/ui/admin_screens/doctor_list_revenue.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class RevenueChartScreen extends StatefulWidget {
-  const RevenueChartScreen({Key? key}) : super(key: key);
+class DoctorRevenueChartScreen extends StatefulWidget {
+  final String doctorId;
+
+  const DoctorRevenueChartScreen({Key? key, required this.doctorId}) : super(key: key);
 
   @override
-  State<RevenueChartScreen> createState() => _RevenueChartScreenState();
+  State<DoctorRevenueChartScreen> createState() => _DoctorRevenueChartScreenState();
 }
 
-class _RevenueChartScreenState extends State<RevenueChartScreen> {
+class _DoctorRevenueChartScreenState extends State<DoctorRevenueChartScreen> {
   StreamController<List<AppointmentSchedule>>? _appointmentScheduleController =
       StreamController<List<AppointmentSchedule>>.broadcast();
   int _selectedYear = DateTime.now().year;
-
+  
   @override
   void initState() {
     super.initState();
-    _appointmentScheduleController!.addStream(getAllAppointmentSchdedules());
+    _appointmentScheduleController!.addStream(getAppointmentSchedulesByDoctor(widget.doctorId));
   }
 
   void showDataDialog(Map<String, double> monthlyRevenue) {
@@ -43,17 +44,6 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
               },
               child: Text('OK'),
             ),
-                      ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DoctorListRevenue()),
-              );
-            },
-            child: Text('Go to Doctor List'),
-          ),
-
-
           ],
         );
       },
@@ -80,7 +70,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Revenue Chart'),
+        title: Text('Doctor Revenue Chart'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -90,32 +80,28 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               }
-
               if (snapshot.hasData) {
                 List<AppointmentSchedule> appointmentSchedules = snapshot.data!;
-
                 if (appointmentSchedules.isEmpty) {
                   return const SizedBox(
                     height: 600,
                     child: Center(child: Text('No appointments available')),
                   );
                 }
-
                 Map<String, double> monthlyRevenue = {};
                 for (AppointmentSchedule appointment in appointmentSchedules) {
                   DateTime? paymentTime = appointment.paymentStartTime;
                   String monthYear = '${paymentTime?.month}/${paymentTime?.year}';
                   DateTime dateTime = _getDateTime(monthYear);
-                  if (dateTime.year == _selectedYear) {
+                  if (dateTime.year == _selectedYear && appointment.doctorInfo?.uid==widget.doctorId) {
                     num serviceFee = appointment.doctorInfo?.serviceFee ?? 0.0;
                     monthlyRevenue[monthYear] = (monthlyRevenue[monthYear] ?? 0.0) + serviceFee;
                   }
                 }
-                //Sắp xếp lại tháng
+                // Sắp xếp lại tháng
                 monthlyRevenue = Map.fromEntries(monthlyRevenue.entries.toList()
-                ..sort((a, b) => _getDateTime(a.key).compareTo(_getDateTime(b.key))));
-                print('Monthly Revenue: $monthlyRevenue');
-
+                  ..sort((a, b) => _getDateTime(a.key).compareTo(_getDateTime(b.key))));
+                print('Monthly Revenue: $monthlyRevenue');             
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -131,7 +117,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                         DropdownButton<int>(
                           value: _selectedYear,
                           items: List.generate(10, (index) {
-                            int year = DateTime.now().year - index + 2;
+                            int year = DateTime.now().year - index + 2 ;
                             return DropdownMenuItem<int>(
                               value: year,
                               child: Text(year.toString()),
@@ -149,7 +135,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                     Container(
                       width: 400,
                       height: 600,
-                      child: LineChart(
+                     child: LineChart(
                         LineChartData(
                           minX: 1,
                           maxX: 12,
@@ -198,7 +184,6 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
       ),
     );
   }
-
   @override
   void dispose() {
     _appointmentScheduleController?.close();
