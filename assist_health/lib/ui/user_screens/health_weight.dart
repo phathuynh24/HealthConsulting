@@ -65,7 +65,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,95 +76,119 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
                       fontSize: 18,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       _showBottomSheet(context, -1);
                     },
-                    icon: const Icon(Icons.add),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 5),
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Themes.gradientDeepClr,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
+          Divider(
+            thickness: 0.9,
+            color: Colors.grey.shade200,
+            height: 0,
+          ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _weightDataList.length,
-              itemBuilder: (context, index) {
-                final weightData = _weightDataList[index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                  ),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
+            child: Container(
+              color: Colors.grey.shade100,
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: _weightDataList.length,
+                itemBuilder: (context, index) {
+                  final weightData = _weightDataList[index];
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: ListTile(
-                    title: Container(
-                      margin: const EdgeInsets.only(
-                        bottom: 8,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.amber,
-                            ),
-                            child: Text(
-                              '${weightData.weight} kg',
-                              style: const TextStyle(
-                                  color: Themes.textClr,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            weightData.date,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(
-                      calculateBirthdayToSelectedDate(
-                          widget.userProfile.doB, weightData.date),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    trailing: PopupMenuButton(
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Text('Sửa'),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text('Xóa'),
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 2),
                         ),
                       ],
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _handleUpdate(index);
-                        } else if (value == 'delete') {
-                          _handleDelete(index);
-                        }
-                      },
                     ),
-                  ),
-                );
-              },
+                    child: ListTile(
+                      title: Container(
+                        margin: const EdgeInsets.only(
+                          bottom: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.amber,
+                              ),
+                              child: Text(
+                                '${weightData.weight} kg',
+                                style: const TextStyle(
+                                    color: Themes.textClr,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              weightData.date,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      subtitle: Text(
+                        calculateBirthdayToSelectedDate(
+                            widget.userProfile.doB, weightData.date),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      trailing: PopupMenuButton(
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Text('Sửa'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Xóa'),
+                          ),
+                        ],
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _handleUpdate(index);
+                          } else if (value == 'delete') {
+                            _handleDelete(index);
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -199,7 +223,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
                   'Tăng trưởng cân nặng',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Themes.primaryColor,
+                    color: Themes.gradientDeepClr,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -268,7 +292,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
                                     child: Icon(
                                       Icons.calendar_month_sharp,
                                       size: 40,
-                                      color: Themes.iconClr,
+                                      color: Themes.gradientDeepClr,
                                     ),
                                   ),
                                 ),
@@ -332,7 +356,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
                   height: 20,
                 ),
                 Material(
-                  color: Themes.buttonClr,
+                  color: Themes.gradientDeepClr,
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
                     onTap: () {
@@ -419,6 +443,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã lưu thông tin.'),
+          backgroundColor: Colors.green,
         ),
       );
     }
@@ -444,6 +469,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã xóa thành công.'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (error) {
@@ -452,6 +478,7 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã xảy ra lỗi khi xóa.'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -483,12 +510,18 @@ class _HealthWeightScreenState extends State<HealthWeightScreen> {
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dữ liệu đã được cập nhật thành công.')),
+        const SnackBar(
+          content: Text('Dữ liệu đã được cập nhật thành công.'),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã xảy ra lỗi khi cập nhật dữ liệu.')),
+        const SnackBar(
+          content: Text('Đã xảy ra lỗi khi cập nhật dữ liệu.'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

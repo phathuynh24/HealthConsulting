@@ -40,6 +40,7 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
         appBar: AppBar(
+          foregroundColor: Colors.white,
           toolbarHeight: 50,
           title: const Text('Nhận lịch hẹn'),
           titleTextStyle: const TextStyle(fontSize: 16),

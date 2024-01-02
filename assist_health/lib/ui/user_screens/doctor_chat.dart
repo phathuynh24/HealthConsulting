@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/chatroom_new.dart';
 import 'package:assist_health/ui/user_screens/doctor_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,11 +27,16 @@ class _DoctorChatState extends State<DoctorChatScreen> {
   UserProfile? _userProfile;
   String? _uid;
   String? _idDoc;
+
+  final StreamController<List<DoctorInfo>> _doctorStreamController =
+      StreamController<List<DoctorInfo>>.broadcast();
+
   @override
   void initState() {
     super.initState();
     _uid = _auth.currentUser!.uid;
     _idDoc = 'main_profile';
+    _doctorStreamController.addStream(getInfoDoctors());
   }
 
   @override
@@ -41,6 +49,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         toolbarHeight: 50,
         centerTitle: true,
         title: const Text('Chat với bác sĩ'),
@@ -57,7 +66,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
         ),
       ),
       body: StreamBuilder<List<DoctorInfo>>(
-        stream: getInfoDoctors(),
+        stream: _doctorStreamController.stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Đã xảy ra lỗi: ${snapshot.error}');
@@ -305,7 +314,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                           Expanded(
                             child: InkWell(
                               onTap: () {
-                                _showProfileListBottomSheet(context);
+                                _showProfileListBottomSheet(context, doctor);
                               },
                               child: Container(
                                 height: 50,
@@ -351,7 +360,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
         .map((snapshot) => snapshot.docs);
   }
 
-  void _showProfileListBottomSheet(BuildContext context) {
+  void _showProfileListBottomSheet(BuildContext context, DoctorInfo doctor) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -385,7 +394,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                       ),
                     ),
                     Container(
-                      height: 580,
+                      height: 585,
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
                       ),
@@ -460,8 +469,8 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                                               children: [
                                                 GestureDetector(
                                                   onTap: () {
-                                                    // _showDetailProfileBottomSheet(
-                                                    //     context, userProfile);
+                                                    _showDetailProfileBottomSheet(
+                                                        context, _userProfile!);
                                                   },
                                                   child: Container(
                                                     width: 90,
@@ -727,24 +736,8 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                                     Expanded(
                                       child: GestureDetector(
                                         onTap: () {
-                                          // Navigator.of(context)
-                                          //     .push(
-                                          //   MaterialPageRoute(
-                                          //     builder: (context) =>
-                                          //         AddOrEditProfileScreen(
-                                          //       isEdit: false,
-                                          //     ),
-                                          //   ),
-                                          // )
-                                          //     .whenComplete(() {
-                                          //   UserProfile addedProfile =
-                                          //       UserProfile.fromJson(profiles[1]
-                                          //               .data()
-                                          //           as Map<String, dynamic>);
-                                          // _updateSelectedProfile(
-                                          //     addedProfile);
-                                          //Navigator.of(context).pop();
-                                          //});
+                                          Navigator.of(context).pop();
+                                          goToChatRoom(doctor);
                                         },
                                         child: Container(
                                           width: double.infinity,
@@ -760,7 +753,7 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                                           ),
                                           child: const Center(
                                             child: Text(
-                                              'Tạo hồ sơ mới',
+                                              'Tiếp tục',
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w500),
@@ -805,10 +798,407 @@ class _DoctorChatState extends State<DoctorChatScreen> {
     );
   }
 
+  void goToChatRoom(DoctorInfo doctor) async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('chatroom')
+          .where('idProfile', isEqualTo: _userProfile!.idDoc)
+          .where('idDoctor', isEqualTo: doctor.uid)
+          .where('idUser', isEqualTo: _uid)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Tài liệu đã tồn tại, lấy ID của tài liệu đầu tiên
+        String chatRoomId = querySnapshot.docs[0].id;
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomNew(
+              chatRoomId: chatRoomId,
+              userProfile: _userProfile!,
+              doctorInfo: doctor,
+            ),
+          ),
+        );
+      } else {
+        // Tài liệu không tồn tại, tạo tài liệu mới
+        var docRef =
+            await FirebaseFirestore.instance.collection('chatroom').add({
+          'idProfile': _userProfile!.idDoc,
+          'idDoctor': doctor.uid,
+          'idUser': _uid,
+        });
+
+        String chatRoomId = docRef.id;
+
+        await docRef.update({'idDoc': chatRoomId});
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomNew(
+              chatRoomId: chatRoomId,
+              userProfile: _userProfile!,
+              doctorInfo: doctor,
+            ),
+          ),
+        );
+      }
+
+      print('Chatroom created successfully');
+    } catch (e) {
+      print('Error creating or accessing chatroom: $e');
+    }
+  }
+
   _updateSelectedProfile(UserProfile selectedProfile) {
     setState(() {
       _userProfile = selectedProfile;
       _idDoc = selectedProfile.idDoc;
     });
+  }
+
+  void _showDetailProfileBottomSheet(
+      BuildContext context, UserProfile userProfile) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return Container(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  height: 5,
+                  width: 50,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2.5),
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                Container(
+                  height: 600,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
+                  ),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'Chi tiết hồ sơ',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            margin: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 1,
+                                )),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Mã bệnh nhân:',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      userProfile.idProfile,
+                                      style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Họ và tên:',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      userProfile.name,
+                                      style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Giới tính:',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      userProfile.gender,
+                                      style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Ngày sinh:',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      userProfile.doB,
+                                      style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Điện thoại:',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      userProfile.phone,
+                                      style: const TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Row(
+                                  children: [
+                                    Text(
+                                      'Mã bảo hiểm y tế',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Chưa cập nhật',
+                                      style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Row(
+                                  children: [
+                                    Text(
+                                      'Địa chỉ',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Chưa cập nhật',
+                                      style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Row(
+                                  children: [
+                                    Text(
+                                      'Dân tộc',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Chưa cập nhật',
+                                      style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Row(
+                                  children: [
+                                    Text(
+                                      'Nghề nghiệp',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Chưa cập nhật',
+                                      style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                const Row(
+                                  children: [
+                                    Text(
+                                      'Email',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Text(
+                                      'Chưa cập nhật',
+                                      style: TextStyle(
+                                          color: Colors.black45,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    margin: const EdgeInsets.only(
+                                      left: 20,
+                                      right: 20,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'Đóng',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 15,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Icon(
+                            Icons.close,
+                            size: 24,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
   }
 }

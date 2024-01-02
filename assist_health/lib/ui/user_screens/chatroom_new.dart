@@ -1,4 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
+import 'package:assist_health/models/doctor/doctor_info.dart';
+import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,17 +11,22 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-class ChatRoom extends StatefulWidget {
-  final Map<String, dynamic> userMap;
+class ChatRoomNew extends StatefulWidget {
   final String chatRoomId;
+  final UserProfile userProfile;
+  final DoctorInfo doctorInfo;
 
-  const ChatRoom({super.key, required this.chatRoomId, required this.userMap});
+  const ChatRoomNew(
+      {super.key,
+      required this.chatRoomId,
+      required this.userProfile,
+      required this.doctorInfo});
 
   @override
-  State<ChatRoom> createState() => _ChatRoomState();
+  State<ChatRoomNew> createState() => _ChatRoomNewState();
 }
 
-class _ChatRoomState extends State<ChatRoom> {
+class _ChatRoomNewState extends State<ChatRoomNew> {
   final TextEditingController _message = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -120,12 +129,12 @@ class _ChatRoomState extends State<ChatRoom> {
         title: StreamBuilder<DocumentSnapshot>(
           stream: _firestore
               .collection("users")
-              .doc(widget.userMap['uid'])
+              .doc(widget.doctorInfo.uid)
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               var userData = snapshot.data!.data() as Map<String, dynamic>;
-              String name = widget.userMap['name'];
+              String name = widget.doctorInfo.name;
               if (userData['role'] == 'admin') {
                 name = 'Chăm Sóc Khách Hàng';
               }
@@ -134,11 +143,11 @@ class _ChatRoomState extends State<ChatRoom> {
                 children: [
                   Text(
                     (name != 'Chăm Sóc Khách Hàng') ? 'Bác sĩ $name' : name,
-                    style: const TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 16, height: 1.7),
                   ),
                   Text(
-                    userData['status'],
-                    style: const TextStyle(fontSize: 14),
+                    'Bệnh nhân: ${widget.userProfile.name}',
+                    style: const TextStyle(fontSize: 12),
                   ),
                 ],
               );
@@ -151,7 +160,7 @@ class _ChatRoomState extends State<ChatRoom> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).viewInsets.bottom > 0
                   ? size.height -
                       MediaQuery.of(context).viewInsets.bottom -
@@ -241,7 +250,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 borderRadius: BorderRadius.circular(15),
                 color: isSentByMe
                     ? Colors.blue
-                    : Color.fromARGB(
+                    : const Color.fromARGB(
                         255, 231, 223, 223), // Customize the colors here
               ),
               child: Text(

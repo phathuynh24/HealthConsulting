@@ -10,6 +10,7 @@ import 'package:assist_health/ui/user_screens/doctor_list.dart';
 import 'package:assist_health/ui/user_screens/health_profile_list.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
+import 'package:assist_health/ui/widgets/health_metrics_topnavbar.dart';
 import 'package:assist_health/video_call/pages/local_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
@@ -59,7 +60,6 @@ class _MyHomeScreen extends State<HomeScreen> {
     "Hô hấp",
     "Huyết học",
     "Nội tiết",
-
   ];
 
   List imgs = [
@@ -157,6 +157,7 @@ class _MyHomeScreen extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          foregroundColor: Colors.white,
           toolbarHeight: 105,
           elevation: 0,
           centerTitle: true,
@@ -441,12 +442,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 mainAxisSpacing: 0,
                                 children: [
                                   itemDashboard(
-                                      'Đặt khám bác sĩ',
-                                      FontAwesomeIcons.userDoctor,
-                                      const Color(0xFFFFDF3F),
-                                      const Color(0xFFFA7516),
-                                      () {}),
-                                  itemDashboard(
                                       'Gọi video với bác sĩ',
                                       FontAwesomeIcons.mobile,
                                       const Color(0xFFD58EEE),
@@ -480,6 +475,17 @@ class _MyHomeScreen extends State<HomeScreen> {
                                       MaterialPageRoute(
                                           builder: (_) =>
                                               const PublicQuestionsScreen()),
+                                    );
+                                  }),
+                                  itemDashboard(
+                                      'Chỉ số sứ khỏe',
+                                      FontAwesomeIcons.chartColumn,
+                                      const Color(0xFFFFDF3F),
+                                      const Color(0xFFFA7516), () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const HealthMetricsTopNavBar()),
                                     );
                                   }),
                                   itemDashboard(
@@ -595,7 +601,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                         builder: (_, snapshot) {
                           if (snapshot.hasError) {
                             return SizedBox(
-                              height: 270,
+                              height: 280,
                               width: double.infinity,
                               child: Center(
                                 child: Text('Đã xảy ra lỗi: ${snapshot.error}'),
@@ -606,7 +612,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const SizedBox(
-                              height: 270,
+                              height: 280,
                               width: double.infinity,
                               child: Center(
                                 child: SizedBox(
@@ -619,7 +625,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                           }
 
                           return SizedBox(
-                            height: 280,
+                            height: 290,
                             child: ListView.builder(
                               itemCount: snapshot.data!.length,
                               shrinkWrap: true,

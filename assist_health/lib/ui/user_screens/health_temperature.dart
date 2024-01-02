@@ -7,6 +7,7 @@ import 'package:assist_health/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
@@ -35,6 +36,8 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
 
   DateTime? _selectedDate;
   bool _temperatureError = false;
+
+  List<bool> _isShowList = [];
 
   @override
   void initState() {
@@ -66,7 +69,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -77,94 +80,201 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
                       fontSize: 18,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       _showBottomSheet(context, -1);
                     },
-                    icon: const Icon(Icons.add),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 5),
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Themes.gradientDeepClr,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
+          Divider(
+            thickness: 0.9,
+            color: Colors.grey.shade200,
+            height: 0,
+          ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _temperatureDataList.length,
-              itemBuilder: (context, index) {
-                final temperatureData = _temperatureDataList[index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                  ),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
+            child: Container(
+              color: Colors.grey.shade100,
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: _temperatureDataList.length,
+                itemBuilder: (context, index) {
+                  final temperatureData = _temperatureDataList[index];
+                  _isShowList.add(false);
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: ListTile(
-                    title: Container(
-                      margin: const EdgeInsets.only(
-                        bottom: 8,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.amber,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(top: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            title: Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 8,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.amber,
+                                    ),
+                                    child: Text(
+                                      '${temperatureData.temperature} °C',
+                                      style: const TextStyle(
+                                          color: Themes.textClr,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    temperatureData.date,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Text(
-                              '${temperatureData.temperature} °C',
-                              style: const TextStyle(
-                                  color: Themes.textClr,
-                                  fontWeight: FontWeight.w600),
+                            subtitle: Text(
+                              'Đo lúc ${temperatureData.time}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            trailing: PopupMenuButton(
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Sửa'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Xóa'),
+                                ),
+                              ],
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _handleUpdate(index);
+                                } else if (value == 'delete') {
+                                  _handleDelete(index);
+                                }
+                              },
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            temperatureData.date,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(
-                      'Đo lúc ${temperatureData.time}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    trailing: PopupMenuButton(
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Text('Sửa'),
                         ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text('Xóa'),
+                        Visibility(
+                          visible: _isShowList[index],
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 14, right: 14, top: 15),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: _getTemperatureColor(double.tryParse(
+                                  temperatureData.temperature)!),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    _getBodyTemperatureStatus(double.tryParse(
+                                        temperatureData.temperature)!),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(
+                                    _getAdviseBodyTemperatureStatus(
+                                        double.tryParse(
+                                            temperatureData.temperature)!),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isShowList[index] = !_isShowList[index];
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(bottom: 8, top: 8),
+                                child: Text(
+                                  'Xem chi tiết',
+                                  style: TextStyle(
+                                    color:
+                                        Themes.gradientDeepClr.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Icon(
+                                (_isShowList[index])
+                                    ? FontAwesomeIcons.angleDown
+                                    : FontAwesomeIcons.angleUp,
+                                size: 14,
+                                color: Themes.gradientDeepClr.withOpacity(0.7),
+                              )
+                            ],
+                          ),
                         ),
                       ],
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _handleUpdate(index);
-                        } else if (value == 'delete') {
-                          _handleDelete(index);
-                        }
-                      },
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -200,7 +310,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
                   'Theo dỏi nhiệt độ',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Themes.primaryColor,
+                    color: Themes.gradientDeepClr,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -269,7 +379,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
                                     child: Icon(
                                       Icons.calendar_month_sharp,
                                       size: 40,
-                                      color: Themes.iconClr,
+                                      color: Themes.gradientDeepClr,
                                     ),
                                   ),
                                 ),
@@ -391,7 +501,7 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
                   height: 20,
                 ),
                 Material(
-                  color: Themes.buttonClr,
+                  color: Themes.gradientDeepClr,
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
                     onTap: () {
@@ -603,5 +713,56 @@ class _HealthTemperatureScreenState extends State<HealthTemperatureScreen> {
         );
       },
     );
+  }
+
+  String _getBodyTemperatureStatus(double temperature) {
+    if (temperature < 35.0) {
+      return 'Hạ thân nhiệt'; // Hạ thân nhiệt
+    } else if (temperature >= 35.0 && temperature < 37.5) {
+      return 'Bình thường'; // Bình thường
+    } else if (temperature >= 37.5 && temperature < 38.0) {
+      return 'Sốt nhẹ'; // Sốt nhẹ
+    } else if (temperature >= 38.0 && temperature < 39.0) {
+      return 'Sốt'; // Sốt
+    } else if (temperature >= 39.0 && temperature < 41.0) {
+      return 'Sốt cao'; // Sốt cao
+    } else {
+      return 'Siêu sốt'; // Siêu sốt
+    }
+  }
+
+  String _getAdviseBodyTemperatureStatus(double temperature) {
+    switch (temperature) {
+      case < 35.0:
+        return 'Bạn nên tăng cường giữ ấm cơ thể, mặc áo ấm và uống nước ấm.';
+      case >= 35.0 && < 37.5:
+        return 'Mức nhiệt độ cơ thể bình thường. Hãy tiếp tục duy trì lối sống lành mạnh và chế độ ăn uống cân đối.';
+      case >= 37.5 && < 38.0:
+        return 'Bạn nên nghỉ ngơi, uống đủ nước và kiểm tra sức khỏe thường xuyên. Nếu triệu chứng kéo dài, hãy tham khảo ý kiến của bác sĩ.';
+      case >= 38.0 && < 39.0:
+        return 'Bạn nên nghỉ ngơi, uống đủ nước và sử dụng thuốc hạ sốt theo hướng dẫn. Nếu triệu chứng trở nên nghiêm trọng hoặc kéo dài, hãy tham khảo ý kiến của bác sĩ.';
+      case >= 39.0 && < 41.0:
+        return 'Bạn nên nghỉ ngơi, uống đủ nước, sử dụng thuốc hạ sốt và liên hệ ngay với bác sĩ để được tư vấn và điều trị.';
+      case >= 41.0:
+        return 'Đây là một trạng thái nguy hiểm. Hãy liên hệ ngay với bác sĩ hoặc đội cấp cứu để nhận được sự chăm sóc y tế khẩn cấp.';
+      default:
+        return 'Hãy tham khảo ý kiến của bác sĩ để đánh giá và điều trị tình trạng nhiệt độ cơ thể của bạn.';
+    }
+  }
+
+  Color _getTemperatureColor(double temperature) {
+    if (temperature < 35.0) {
+      return const Color(0xFF0000FF); // Màu xanh dương
+    } else if (temperature >= 35.0 && temperature < 37.5) {
+      return const Color(0xFF00FF00); // Màu xanh lá cây
+    } else if (temperature >= 37.5 && temperature < 38.0) {
+      return const Color(0xFFFFA500); // Màu cam
+    } else if (temperature >= 38.0 && temperature < 39.0) {
+      return const Color(0xFFE00000); // Màu đỏ
+    } else if (temperature >= 39.0 && temperature < 41.0) {
+      return const Color(0xFF8B0000); // Màu đỏ đậm
+    } else {
+      return const Color(0xFF800080); // Màu tím
+    }
   }
 }

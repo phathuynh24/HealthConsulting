@@ -2,6 +2,7 @@
 
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/otp.dart';
 import 'package:assist_health/ui/widgets/admin_navbar.dart';
 import 'package:assist_health/ui/widgets/doctor_navbar.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
@@ -143,7 +144,7 @@ class WelcomeScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const PhoneScreen(),
+                            builder: (_) => const OtpVerificationScreen(),
                           ));
                     },
                     child: Container(

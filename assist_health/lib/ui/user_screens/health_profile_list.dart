@@ -43,7 +43,11 @@ class _HealthProfileListScreenState extends State<HealthProfileListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hồ sơ sức khỏe'),
+        foregroundColor: Colors.white,
+        title: const Text(
+          'Hồ sơ sức khỏe',
+          style: TextStyle(fontSize: 20),
+        ),
         elevation: 0,
         centerTitle: true,
         flexibleSpace: Container(

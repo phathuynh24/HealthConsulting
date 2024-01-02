@@ -44,6 +44,7 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: const Text('Đánh giá bác sĩ'),
         elevation: 0,
         centerTitle: true,

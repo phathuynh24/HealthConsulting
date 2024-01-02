@@ -75,12 +75,13 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   });
                 },
                 decoration: InputDecoration(
-                  hintText: "0123456789",
+                  hintText: "Nhập số điện thoại...",
                   hintStyle: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 15,
                     color: Colors.grey.shade600,
                   ),
+                  contentPadding: EdgeInsets.all(10),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(color: Colors.black12),
@@ -90,7 +91,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     borderSide: const BorderSide(color: Colors.black12),
                   ),
                   prefixIcon: Container(
-                    padding: const EdgeInsets.fromLTRB(8, 13, 8, 15),
+                    padding: const EdgeInsets.fromLTRB(8, 13, 8, 11),
                     child: InkWell(
                       onTap: () {
                         showCountryPicker(
@@ -107,7 +108,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       child: Text(
                         "${selectedCountry.flagEmoji} +${selectedCountry.phoneCode}",
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 17,
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
@@ -125,14 +126,14 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           ),
                           child: const Icon(
                             Icons.done,
-                            color: Themes.iconClr,
+                            color: Colors.white,
                             size: 20,
                           ),
                         )
                       : null,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 height: 45,
@@ -162,7 +163,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     },
                     child: const Text(
                       "Gửi mã xác thực",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     )),
               )
             ],

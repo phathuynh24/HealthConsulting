@@ -435,8 +435,10 @@ Stream<List<AppointmentSchedule>> getAllAppointmentSchdedules() {
     return appointmentSchedules;
   });
 }
-Stream<List<AppointmentSchedule>> getAppointmentSchedulesByDoctor(String doctorId) {
-    return _firestore
+
+Stream<List<AppointmentSchedule>> getAppointmentSchedulesByDoctor(
+    String doctorId) {
+  return _firestore
       .collection('appointment_schedule')
       // .where('doctorid', isEqualTo: doctorId)
       .snapshots()
@@ -444,14 +446,16 @@ Stream<List<AppointmentSchedule>> getAppointmentSchedulesByDoctor(String doctorI
     final List<AppointmentSchedule> appointmentSchedules = [];
 
     for (var appointmentScheduleDoc in querySnapshot.docs) {
-      final appointmentScheduleData = appointmentScheduleDoc.data() as Map<String, dynamic>?;
-      final AppointmentSchedule appointmentSchedule = AppointmentSchedule.fromJson(appointmentScheduleData!);
+      final appointmentScheduleData =
+          appointmentScheduleDoc.data() as Map<String, dynamic>?;
+      final AppointmentSchedule appointmentSchedule =
+          AppointmentSchedule.fromJson(appointmentScheduleData!);
       appointmentSchedules.add(appointmentSchedule);
     }
 
     return appointmentSchedules;
   });
-  }
+}
 
 showToastMessage(BuildContext context, String message) {
   showToast(message,

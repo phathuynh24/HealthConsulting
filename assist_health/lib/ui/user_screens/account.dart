@@ -65,7 +65,11 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Scaffold(
         backgroundColor: Colors.blueAccent.withOpacity(0.1),
         appBar: AppBar(
-          title: const Text('Tài khoản'),
+          foregroundColor: Colors.white,
+          title: const Text(
+            'Tài khoản',
+            style: TextStyle(fontSize: 20),
+          ),
           elevation: 0,
           centerTitle: true,
           automaticallyImplyLeading: false,
@@ -193,10 +197,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -230,10 +235,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -246,9 +252,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                HealthMetricsTopNavBar(
-                                                  userProfile: userProfile!,
-                                                )));
+                                                const HealthMetricsTopNavBar()));
                                   },
                                   leading: const Icon(
                                     Icons.add_chart,
@@ -305,10 +309,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -331,10 +336,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -357,10 +363,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -383,10 +390,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,
@@ -413,10 +421,11 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                 ),
                               ),
-                              const Divider(
+                              Divider(
                                 height: 10,
                                 indent: 15,
                                 endIndent: 15,
+                                color: Colors.grey.shade100,
                               ),
                               Container(
                                 height: 50,

@@ -71,6 +71,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
     return Scaffold(
       backgroundColor: const Color(0xFFE8EEFA),
       appBar: AppBar(
+        foregroundColor: Colors.white,
         toolbarHeight: 50,
         centerTitle: true,
         title: const Text('Gọi video ngay'),
@@ -208,7 +209,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
               ),
               Container(
                 width: double.infinity,
-                height: 180,
+                height: 195,
                 margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
                 decoration: BoxDecoration(
                     color: Colors.blueGrey.withOpacity(0.1),
@@ -545,7 +546,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
         ),
       ),
       bottomNavigationBar: Container(
-        height: 100,
+        height: 105,
         padding: const EdgeInsets.symmetric(
           vertical: 8,
           horizontal: 10,

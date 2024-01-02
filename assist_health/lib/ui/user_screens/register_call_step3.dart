@@ -112,6 +112,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
         Scaffold(
           backgroundColor: Themes.backgroundClr,
           appBar: AppBar(
+            foregroundColor: Colors.white,
             toolbarHeight: 50,
             title: const Text('Thanh toán bằng QR Code'),
             titleTextStyle: const TextStyle(fontSize: 16),
@@ -532,7 +533,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
             ),
           ),
           bottomNavigationBar: Container(
-            height: 100,
+            height: 110,
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 10,

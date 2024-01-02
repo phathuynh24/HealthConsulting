@@ -63,6 +63,7 @@ class _FavoriteDoctorListState extends State<FavoriteDoctorList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: const Text(
           'Danh sách bác sĩ quan tâm',
           style: TextStyle(fontSize: 18),

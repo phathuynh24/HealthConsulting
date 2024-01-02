@@ -98,6 +98,7 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
         children: [
           Scaffold(
             appBar: AppBar(
+              foregroundColor: Colors.white,
               title:
                   Text((!widget.isEdit) ? 'Tạo hồ sơ mới' : 'Điều chỉnh hồ sơ'),
               centerTitle: true,
@@ -577,6 +578,7 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Themes.gradientDeepClr,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
@@ -586,7 +588,7 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
                   padding: const EdgeInsets.all(12.0),
                   child: Text(
                     (!widget.isEdit) ? 'Tạo hồ sơ' : 'Lưu',
-                    style: const TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
                   ),
                 ),
               ),

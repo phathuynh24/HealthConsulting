@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
@@ -33,13 +34,11 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
   final TextEditingController _weightController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
 
-  double _bmi = 0.0;
-  String _bmiStatus = '';
-  String _bmiAdvice = '';
-
   DateTime? _selectedDate;
   bool _heightError = false;
   bool _weightError = false;
+
+  List<bool> _isShowList = [];
 
   @override
   void initState() {
@@ -72,7 +71,7 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
         children: [
           SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -80,98 +79,205 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
                     'Chỉ số BMI',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                       fontSize: 18,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
+                  GestureDetector(
+                    onTap: () {
                       _showBottomSheet(context, -1);
                     },
-                    icon: const Icon(Icons.add),
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 5),
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Themes.gradientDeepClr,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
+          Divider(
+            thickness: 0.9,
+            color: Colors.grey.shade200,
+            height: 0,
+          ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _bmiDataList.length,
-              itemBuilder: (context, index) {
-                final bmiData = _bmiDataList[index];
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                  ),
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
+            child: Container(
+              color: Colors.grey.shade100,
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: _bmiDataList.length,
+                itemBuilder: (context, index) {
+                  final bmiData = _bmiDataList[index];
+                  _isShowList.add(false);
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 15),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: ListTile(
-                    title: Container(
-                      margin: const EdgeInsets.only(
-                        bottom: 8,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.amber,
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(top: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 5,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            title: Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 8,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.amber,
+                                    ),
+                                    child: Text(
+                                      bmiData.bmi,
+                                      style: const TextStyle(
+                                          color: Themes.gradientDeepClr,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    bmiData.date,
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            child: Text(
-                              bmiData.bmi,
-                              style: const TextStyle(
-                                  color: Themes.textClr,
-                                  fontWeight: FontWeight.w600),
+                            subtitle: Text(
+                              calculateBirthdayToSelectedDate(
+                                  widget.userProfile.doB, bmiData.date),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            trailing: PopupMenuButton(
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Sửa'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Xóa'),
+                                ),
+                              ],
+                              onSelected: (value) {
+                                if (value == 'edit') {
+                                  _handleUpdate(index);
+                                } else if (value == 'delete') {
+                                  _handleDelete(index);
+                                }
+                              },
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Text(
-                            bmiData.date,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    subtitle: Text(
-                      calculateBirthdayToSelectedDate(
-                          widget.userProfile.doB, bmiData.date),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    trailing: PopupMenuButton(
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Text('Sửa'),
                         ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Text('Xóa'),
+                        Visibility(
+                          visible: _isShowList[index],
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 14, right: 14, top: 15),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: _getBMIStatusColor(
+                                  double.tryParse(bmiData.bmi)!),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    _getBMIStatus(
+                                        double.tryParse(bmiData.bmi)!),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(
+                                    _getBMIAdvice(
+                                        double.tryParse(bmiData.bmi)!),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isShowList[index] = !_isShowList[index];
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(bottom: 8, top: 8),
+                                child: Text(
+                                  'Xem chi tiết',
+                                  style: TextStyle(
+                                    color:
+                                        Themes.gradientDeepClr.withOpacity(0.7),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Icon(
+                                (_isShowList[index])
+                                    ? FontAwesomeIcons.angleDown
+                                    : FontAwesomeIcons.angleUp,
+                                size: 14,
+                                color: Themes.gradientDeepClr.withOpacity(0.7),
+                              )
+                            ],
+                          ),
                         ),
                       ],
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _handleUpdate(index);
-                        } else if (value == 'delete') {
-                          _handleDelete(index);
-                        }
-                      },
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -196,8 +302,15 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
           child: Container(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              left: 8,
+              right: 8,
             ),
-            color: Colors.white,
+            decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                )),
             child: Column(
               children: [
                 const SizedBox(
@@ -207,7 +320,7 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
                   'Chỉ số BMI',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Themes.primaryColor,
+                    color: Themes.gradientDeepClr,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -276,7 +389,7 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
                                     child: Icon(
                                       Icons.calendar_month_sharp,
                                       size: 40,
-                                      color: Themes.iconClr,
+                                      color: Themes.gradientDeepClr,
                                     ),
                                   ),
                                 ),
@@ -388,7 +501,7 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
                   height: 20,
                 ),
                 Material(
-                  color: Themes.buttonClr,
+                  color: Themes.gradientDeepClr,
                   borderRadius: BorderRadius.circular(5),
                   child: InkWell(
                     onTap: () {
@@ -401,13 +514,12 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 30),
+                          vertical: 10, horizontal: 40),
                       child: Text(
-                        btnText.toUpperCase(),
+                        btnText,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -477,10 +589,10 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
 
       Navigator.pop(context);
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã lưu thông tin.'),
+          backgroundColor: Colors.green,
         ),
       );
     }
@@ -508,14 +620,15 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã xóa thành công.'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Đã xảy ra lỗi khi xóa.'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -551,12 +664,18 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
 
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dữ liệu đã được cập nhật thành công.')),
+        const SnackBar(
+          content: Text('Dữ liệu đã được cập nhật thành công.'),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã xảy ra lỗi khi cập nhật dữ liệu.')),
+        const SnackBar(
+          content: Text('Đã xảy ra lỗi khi cập nhật dữ liệu.'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -566,52 +685,71 @@ class _HealthBMIScreenState extends State<HealthBMIScreen> {
     double height = double.tryParse(_heightController.text) ?? 0.0;
     if (weight > 0 && height > 0) {
       double bmiValue = weight / ((height / 100) * (height / 100));
-      setState(() {
-        _bmi = bmiValue;
-        switch (_bmi) {
-          case < 16:
-            _bmiStatus = 'Gầy độ III';
-            _bmiAdvice =
-                'Bạn cần phải áp dụng một chế độ dinh dưỡng tốt nhất để có thể tăng cân, đảm bảo sức khỏe hoặc đi khám tại CSYT gần nhất.';
-            break;
-          case >= 16 && < 17:
-            _bmiStatus = 'Gầy độ II';
-            _bmiAdvice =
-                'Bạn nên thêm một số thực phẩm dinh dưỡng để cải thiện trạng thái dinh dưỡng hoặc đi khám tại CSYT gần nhất.';
-            break;
-          case >= 17 && < 18.5:
-            _bmiStatus = 'Gầy độ I';
-            _bmiAdvice =
-                'Bạn hãy cân nhắc bổ sung thêm dầu và thức ăn giàu năng lượng để tăng cường cân nặng hoặc đi khám tại CSYT gần nhất.';
-            break;
-          case >= 18.5 && < 25:
-            _bmiStatus = 'Chỉ số BMI bình thường';
-            _bmiAdvice = 'Bạn có một cơ thể tốt và tương đối khỏe mạnh.';
-            break;
-          case >= 25 && < 30:
-            _bmiStatus = 'Thừa cân';
-            _bmiAdvice =
-                'Bạn cần phải điều chỉnh chế độ ăn hợp lí, theo dõi thường xuyên hoặc đi khám tại CSYT gần nhất.';
-            break;
-          case >= 30 && < 35:
-            _bmiStatus = 'Béo phì độ I';
-            _bmiAdvice =
-                'Bạn hãy tập thể dục đều đặn và giảm lượng calo ăn uống để giảm cân hoặc đi khám tại CSYT gần nhất.';
-            break;
-          case >= 35 && < 40:
-            _bmiStatus = 'Béo phì độ II';
-            _bmiAdvice =
-                'Bạn cần sự tư vấn từ chuyên gia dinh dưỡng để xây dựng chế độ ăn khoa học và thực hiện đều đặn.';
-            break;
-          default:
-            _bmiStatus = 'Béo phì độ III';
-            _bmiAdvice =
-                'Bạn cần liên hệ với bác sĩ để có kế hoạch giảm cân và theo dõi sức khỏe toàn diện.';
-            break;
-        }
-      });
+
       return bmiValue;
     }
     return 0;
+  }
+
+  _getBMIStatus(double bmi) {
+    switch (bmi) {
+      case < 16:
+        return 'Gầy độ III';
+      case >= 16 && < 17:
+        return 'Gầy độ II';
+      case >= 17 && < 18.5:
+        return 'Gầy độ I';
+      case >= 18.5 && < 25:
+        return 'Chỉ số BMI bình thường';
+      case >= 25 && < 30:
+        return 'Thừa cân';
+      case >= 30 && < 35:
+        return 'Béo phì độ I';
+      case >= 35 && < 40:
+        return 'Béo phì độ II';
+      default:
+        return 'Béo phì độ III';
+    }
+  }
+
+  _getBMIAdvice(double bmi) {
+    switch (bmi) {
+      case < 16:
+        return 'Bạn cần phải áp dụng một chế độ dinh dưỡng tốt nhất để có thể tăng cân, đảm bảo sức khỏe hoặc đi khám tại CSYT gần nhất.';
+      case >= 16 && < 17:
+        return 'Bạn nên thêm một số thực phẩm dinh dưỡng để cải thiện trạng thái dinh dưỡng hoặc đi khám tại CSYT gần nhất.';
+      case >= 17 && < 18.5:
+        return 'Bạn hãy cân nhắc bổ sung thêm dầu và thức ăn giàu năng lượng để tăng cường cân nặng hoặc đi khám tại CSYT gần nhất.';
+      case >= 18.5 && < 25:
+        return 'Bạn có một cơ thể tốt và tương đối khỏe mạnh.';
+      case >= 25 && < 30:
+        return 'Bạn cần phải điều chỉnh chế độ ăn hợp lí, theo dõi thường xuyên hoặc đi khám tại CSYT gần nhất.';
+      case >= 30 && < 35:
+        return 'Bạn hãy tập thể dục đều đặn và giảm lượng calo ăn uống để giảm cân hoặc đi khám tại CSYT gần nhất.';
+      case >= 35 && < 40:
+        return 'Bạn cần sự tư vấn từ chuyên gia dinh dưỡng để xây dựng chế độ ăn khoa học và thực hiện đều đặn.';
+      default:
+        return 'Bạn cần liên hệ với bác sĩ để có kế hoạch giảm cân và theo dõi sức khỏe toàn diện.';
+    }
+  }
+
+  Color _getBMIStatusColor(double bmi) {
+    if (bmi < 16) {
+      return Colors.red; // Màu đỏ cho Gầy độ III
+    } else if (bmi >= 16 && bmi < 17) {
+      return Colors.orange; // Màu cam cho Gầy độ II
+    } else if (bmi >= 17 && bmi < 18.5) {
+      return Colors.yellow.shade700; // Màu vàng cho Gầy độ I
+    } else if (bmi >= 18.5 && bmi < 25) {
+      return Colors.green; // Màu xanh lá cho BMI bình thường
+    } else if (bmi >= 25 && bmi < 30) {
+      return Colors.blue; // Màu xanh dương cho Thừa cân
+    } else if (bmi >= 30 && bmi < 35) {
+      return Colors.purple; // Màu tím cho Béo phì độ I
+    } else if (bmi >= 35 && bmi < 40) {
+      return Colors.deepPurple; // Màu tím đậm cho Béo phì độ II
+    } else {
+      return Colors.black; // Màu đen cho Béo phì độ III
+    }
   }
 }

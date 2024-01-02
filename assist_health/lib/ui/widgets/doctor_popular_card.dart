@@ -31,7 +31,7 @@ class DoctorPopularCardWidget extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(
-            height: 110,
+            height: 115,
             width: 200,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(

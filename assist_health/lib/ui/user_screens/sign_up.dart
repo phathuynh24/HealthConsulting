@@ -21,10 +21,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _phone = TextEditingController();
   final TextEditingController _password = TextEditingController();
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     phoneNumber = ModalRoute.of(context)!.settings.arguments as String;
     _phone.text = phoneNumber;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
       color: Themes.backgroundClr,
       child: SingleChildScrollView(
@@ -69,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: TextField(
                   controller: _phone,
                   decoration: const InputDecoration(
-                    labelText: "Số điện thoại",
+                    hintText: '0362300000',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.phone),
                     enabled: false,

@@ -36,6 +36,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         toolbarHeight: 50,
         title: const Text('Thanh toán bằng QR Code'),
         titleTextStyle: const TextStyle(fontSize: 16),

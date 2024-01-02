@@ -43,17 +43,15 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
               },
               child: Text('OK'),
             ),
-                      ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DoctorListRevenue()),
-              );
-            },
-            child: Text('Go to Doctor List'),
-          ),
-
-
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DoctorListRevenue()),
+                );
+              },
+              child: Text('Go to Doctor List'),
+            ),
           ],
         );
       },
@@ -80,7 +78,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Revenue Chart'),
+        title: Text('Sơ đồ doanh thu'),
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -104,16 +102,19 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                 Map<String, double> monthlyRevenue = {};
                 for (AppointmentSchedule appointment in appointmentSchedules) {
                   DateTime? paymentTime = appointment.paymentStartTime;
-                  String monthYear = '${paymentTime?.month}/${paymentTime?.year}';
+                  String monthYear =
+                      '${paymentTime?.month}/${paymentTime?.year}';
                   DateTime dateTime = _getDateTime(monthYear);
                   if (dateTime.year == _selectedYear) {
                     num serviceFee = appointment.doctorInfo?.serviceFee ?? 0.0;
-                    monthlyRevenue[monthYear] = (monthlyRevenue[monthYear] ?? 0.0) + serviceFee;
+                    monthlyRevenue[monthYear] =
+                        (monthlyRevenue[monthYear] ?? 0.0) + serviceFee;
                   }
                 }
                 //Sắp xếp lại tháng
                 monthlyRevenue = Map.fromEntries(monthlyRevenue.entries.toList()
-                ..sort((a, b) => _getDateTime(a.key).compareTo(_getDateTime(b.key))));
+                  ..sort((a, b) =>
+                      _getDateTime(a.key).compareTo(_getDateTime(b.key))));
                 print('Monthly Revenue: $monthlyRevenue');
 
                 return Column(
@@ -125,7 +126,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                           onPressed: () {
                             showDataDialog(monthlyRevenue);
                           },
-                          child: Text('Monthly Revenue'),
+                          child: Text('Doanh thu theo tháng'),
                         ),
                         SizedBox(width: 16),
                         DropdownButton<int>(
@@ -147,7 +148,8 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                     ),
                     SizedBox(height: 18),
                     Container(
-                      width: 400,
+                      padding: EdgeInsets.all(8),
+                      width: double.infinity,
                       height: 600,
                       child: LineChart(
                         LineChartData(
@@ -155,16 +157,33 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                           maxX: 12,
                           minY: 0,
                           maxY: monthlyRevenue.values.isNotEmpty
-                              ? monthlyRevenue.values.reduce((a, b) => a > b ? a : b)
+                              ? monthlyRevenue.values
+                                  .reduce((a, b) => a > b ? a : b)
                               : 0,
                           titlesData: FlTitlesData(
                             show: true,
                             bottomTitles: AxisTitles(
-                              axisNameWidget: const Text('Month'),
+                              axisNameWidget: const Text(
+                                'Tháng',
+                                style: TextStyle(fontSize: 15, height: 1.5),
+                              ),
+                              axisNameSize: 22,
                               sideTitles: SideTitles(
                                 showTitles: true,
+                                reservedSize: 25,
                                 interval: 1,
-                                
+                              ),
+                            ),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 50,
+                              ),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 50,
                               ),
                             ),
                           ),
@@ -172,28 +191,32 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                             show: false,
                           ),
                           borderData: FlBorderData(
-                          border: Border.all(color: Colors.black),
-                        ),
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: monthlyRevenue.entries
-                                .where((entry) =>
-                                    _getDateTime(entry.key).year == _selectedYear)
-                                .map((entry) => FlSpot(
-                                      _getDateTime(entry.key).month.toDouble(),
-                                      entry.value.toDouble(),
-                                    ))
-                                .toList(),
-                                isCurved: true,
-                                color: Colors.blue,
-                                barWidth: 4,
-                                belowBarData: BarAreaData(show: true, color: Colors.blue.withOpacity(0.3)),
-                                dotData: FlDotData(show: true),
-                               
+                            border: Border.all(color: Colors.black),
                           ),
-                        ],
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: monthlyRevenue.entries
+                                  .where((entry) =>
+                                      _getDateTime(entry.key).year ==
+                                      _selectedYear)
+                                  .map((entry) => FlSpot(
+                                        _getDateTime(entry.key)
+                                            .month
+                                            .toDouble(),
+                                        entry.value.toDouble(),
+                                      ))
+                                  .toList(),
+                              isCurved: true,
+                              color: Colors.blue,
+                              barWidth: 4,
+                              belowBarData: BarAreaData(
+                                  show: true,
+                                  color: Colors.blue.withOpacity(0.3)),
+                              dotData: FlDotData(show: true),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                     )
                   ],
                 );

@@ -45,6 +45,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
         appBar: AppBar(
+          foregroundColor: Colors.white,
           toolbarHeight: 50,
           title: const Text('Nhận lịch hẹn'),
           titleTextStyle: const TextStyle(fontSize: 16),
@@ -329,7 +330,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               const SizedBox(
-                                                  width: 100,
+                                                  width: 110,
                                                   child: Text(
                                                     'Mã lịch khám',
                                                     style: TextStyle(

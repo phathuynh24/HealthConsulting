@@ -32,10 +32,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     "Chấn thương chỉnh hình",
     "Tim mạch",
     "Tiêu hóa"
-    "Hô hấp"
-    "Huyết học"
-    "Nội tiết"
-
+        "Hô hấp"
+        "Huyết học"
+        "Nội tiết"
   ];
   String? _selectedSpecialtyRadio;
   String? _selectedSpecialty;
@@ -76,6 +75,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         toolbarHeight: 55,
         title: Container(
           height: 40,
@@ -87,7 +87,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             controller: _searchController,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(6),
+              contentPadding: const EdgeInsets.all(10),
               hintText: 'Tên bác sĩ',
               hintStyle: const TextStyle(color: Colors.white70),
               prefixIcon: const Icon(

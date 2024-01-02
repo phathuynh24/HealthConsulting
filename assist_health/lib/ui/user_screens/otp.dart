@@ -22,19 +22,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Themes.backgroundClr,
-      appBar: AppBar(
-        backgroundColor: Themes.hearderClr,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Themes.iconClr,
-          ),
-        ),
-        elevation: 0,
-      ),
       body: Container(
         margin: const EdgeInsets.only(left: 25, right: 25),
         alignment: Alignment.center,
@@ -49,12 +36,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               ),
               const SizedBox(height: 25),
               const Text(
-                "Phone Verification",
+                "Nhập mã xác thực",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               const Text(
-                "We need to register your phone without getting started!",
+                "Vui lòng nhập mã xác thực để đăng ký số điện thoại tài khoản",
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -93,8 +80,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               settings: RouteSettings(arguments: phoneNumber)),
                           (route) => false);
                     },
-                    child: const Text("Verify Phone Number")),
+                    child: const Text(
+                      "Tiếp tục",
+                      style: TextStyle(color: Colors.white),
+                    )),
               ),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   TextButton(
@@ -106,7 +97,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             (route) => false);
                       },
                       child: const Text(
-                        "Edit Phone Number ?",
+                        "Điều chỉnh số diện thoại",
                         style: TextStyle(color: Themes.buttonClr),
                       ))
                 ],

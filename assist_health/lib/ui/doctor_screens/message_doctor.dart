@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MessageDoctorScreen extends StatefulWidget {
-  const MessageDoctorScreen({Key? key}) : super(key: key);
+  const MessageDoctorScreen({super.key});
 
   @override
   State<MessageDoctorScreen> createState() => _MessageDoctorScreenState();
