@@ -744,6 +744,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
       paymentStartTime: _paymentStartTime,
       status: 'Chờ duyệt',
       paymentStatus: 'Chờ xác nhận',
+      idDoc: DateTime.now().toString(),
     );
 
     try {

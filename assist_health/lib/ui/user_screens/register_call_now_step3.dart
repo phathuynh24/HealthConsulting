@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
@@ -5,10 +8,12 @@ import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/widgets/half_circle.dart';
 import 'package:assist_health/ui/widgets/my_separator.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
+import 'package:assist_health/video_call/pages/call.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
 class RegisterCallNowStep3 extends StatefulWidget {
@@ -24,6 +29,9 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
   bool _isVisibleInformation = true;
   bool _isVisiblePayment = true;
 
+  final String _channel = 'video_call';
+  final ClientRole _role = ClientRole.Broadcaster;
+
   @override
   void initState() {
     super.initState();
@@ -34,8 +42,12 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        return false;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const UserNavBar()),
+          (route) => false,
+        );
+        return true;
       },
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
@@ -104,6 +116,27 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                                   style: const TextStyle(
                                     color: Colors.blueGrey,
                                     fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  decoration: BoxDecoration(
+                                      color: Colors.orange.shade400
+                                          .withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: const Text(
+                                    'Vui lòng đợi 3-5 phút để hệ thống xác nhận và cho phép tham gia cuộc gọi. Trong lúc đó bạn có thể chuẩn bị thông tin về triệu chứng hoặc đơn thuốc đã sử dụng. Ngoài ra, bạn cần ở nơi yên tĩnh và có tín hiệu Internet tốt để đảm bảo chất lượng tư vấn.',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
+                                    textAlign: TextAlign.justify,
                                   ),
                                 ),
                               ],
@@ -325,7 +358,7 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               const SizedBox(
-                                                  width: 100,
+                                                  width: 110,
                                                   child: Text(
                                                     'Mã lịch khám',
                                                     style: TextStyle(
@@ -784,13 +817,14 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                                                     )),
                                                 Expanded(
                                                     child: Text(
-                                                  _appointmentSchedule!.status!,
+                                                  _appointmentSchedule!
+                                                      .paymentStatus!,
                                                   style: TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.bold,
                                                     color: getPaymentStatusColor(
                                                         _appointmentSchedule!
-                                                            .status!),
+                                                            .paymentStatus!),
                                                   ),
                                                   textAlign: TextAlign.right,
                                                 ))
@@ -857,14 +891,7 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UserNavBar()),
-                      (route) => false,
-                    );
-                  },
+                  onTap: onJoin,
                   child: Container(
                     width: double.infinity,
                     height: 50,
@@ -873,60 +900,14 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                       right: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Về trang chủ',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    // Navigator.of(context)
-                    //     .push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) =>
-                    //         AddOrEditProfileScreen(
-                    //       isEdit: false,
-                    //     ),
-                    //   ),
-                    // )
-                    //     .whenComplete(() {
-                    //   UserProfile addedProfile =
-                    //       UserProfile.fromJson(profiles[1]
-                    //               .data()
-                    //           as Map<String, dynamic>);
-                    //   _updateSelectedProfile(
-                    //       addedProfile);
-                    //   Navigator.of(context).pop();
-                    // });
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 50,
-                    margin: const EdgeInsets.only(
-                      left: 5,
-                      right: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Themes.gradientDeepClr,
+                      color: Colors.greenAccent.shade700,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Chat với bác sĩ',
+                          'Vào cuộc gọi',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
@@ -943,6 +924,28 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
         ),
       ),
     );
+  }
+
+  Future<void> onJoin() async {
+    await _handleCameraAndMic(Permission.camera);
+    await _handleCameraAndMic(Permission.microphone);
+    // ignore: use_build_context_synchronously
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CallPage(
+                channelName: _channel,
+                role: _role,
+                appointmentSchedule: _appointmentSchedule!,
+                isDoctor: false,
+                isUser: true,
+              )),
+    );
+  }
+
+  Future<void> _handleCameraAndMic(Permission permission) async {
+    final status = await permission.request();
+    log(status.toString());
   }
 
   void _showDetailProfileBottomSheet(
@@ -969,7 +972,7 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                   ),
                 ),
                 Container(
-                  height: 560,
+                  height: 610,
                   padding: const EdgeInsets.symmetric(
                     vertical: 15,
                   ),

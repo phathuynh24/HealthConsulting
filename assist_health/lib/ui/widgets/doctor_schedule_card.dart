@@ -11,26 +11,17 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
-class ScheduleCard extends StatelessWidget {
+class DoctorScheduleCard extends StatelessWidget {
   AppointmentSchedule appointmentSchedule;
-  ScheduleCard({required this.appointmentSchedule, super.key});
+  DoctorScheduleCard({required this.appointmentSchedule, super.key});
   final String _channel = 'video_call';
   final ClientRole _role = ClientRole.Broadcaster;
 
   @override
   Widget build(BuildContext context) {
-    initializeDateFormatting('vi_VN', null);
-    String appointmentDate = DateFormat('dd/MM/yyyy', 'vi_VN')
-        .format(appointmentSchedule.selectedDate!)
-        .toString();
-    String appointmentStartTime =
-        '${appointmentSchedule.time!} - $appointmentDate';
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -62,9 +53,9 @@ class ScheduleCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'STT 1',
-                          style: TextStyle(
+                        Text(
+                          appointmentSchedule.time!,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Themes.gradientDeepClr,
@@ -108,23 +99,6 @@ class ScheduleCard extends StatelessWidget {
                     height: 10,
                   ),
                   const SizedBox(height: 5),
-                  ListTile(
-                    title: Text(
-                      appointmentSchedule.doctorInfo!.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                    trailing: CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(
-                          appointmentSchedule.doctorInfo!.imageURL),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 15,
@@ -134,14 +108,14 @@ class ScheduleCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Giờ khám',
+                          'Bệnh nhân',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade700,
                           ),
                         ),
                         Text(
-                          appointmentStartTime,
+                          appointmentSchedule.userProfile!.name,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -159,7 +133,7 @@ class ScheduleCard extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          'Chuyên khoa',
+                          'Giới tính ',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade700,
@@ -167,8 +141,7 @@ class ScheduleCard extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            getAllOfSpecialties(
-                                appointmentSchedule.doctorInfo!.specialty),
+                            appointmentSchedule.userProfile!.gender,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -189,7 +162,7 @@ class ScheduleCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Bệnh nhân',
+                          'Tuổi',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade700,
@@ -197,7 +170,7 @@ class ScheduleCard extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            appointmentSchedule.userProfile!.name,
+                            '${calculateAge(appointmentSchedule.userProfile!.doB)} tuổi',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -259,8 +232,8 @@ class ScheduleCard extends StatelessWidget {
                 channelName: _channel,
                 role: _role,
                 appointmentSchedule: appointmentSchedule,
-                isDoctor: false,
-                isUser: true,
+                isDoctor: true,
+                isUser: false,
               )),
     );
   }
@@ -307,7 +280,7 @@ class ScheduleCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text(
-                          'Xác nhận thông tin',
+                          'Thông tin người khám',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500),
                         ),
@@ -412,42 +385,6 @@ class ScheduleCard extends StatelessWidget {
                                             ],
                                           ),
                                         ),
-                                        Positioned(
-                                          top: 0,
-                                          right: 0,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 2,
-                                                        horizontal: 4),
-                                                decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                    color: Themes
-                                                        .gradientDeepClr
-                                                        .withOpacity(0.9),
-                                                    border: Border.all(
-                                                      color: Colors.white,
-                                                      width: 3,
-                                                    )),
-                                                child: Center(
-                                                    child: Text(
-                                                  appointmentSchedule
-                                                      .userProfile!
-                                                      .relationship,
-                                                  style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12),
-                                                )),
-                                              ),
-                                            ],
-                                          ),
-                                        )
                                       ],
                                     ),
                                   ],
@@ -726,7 +663,7 @@ class ScheduleCard extends StatelessWidget {
                             ),
                             child: const Center(
                               child: Text(
-                                'Xác nhận',
+                                'Tiếp tục',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w500),
@@ -755,5 +692,24 @@ class ScheduleCard extends StatelessWidget {
     }
 
     return '';
+  }
+
+  int calculateAge(String dateString) {
+    DateTime currentDate = DateTime.now();
+    List<String> dateParts = dateString.split('/');
+    int day = int.parse(dateParts[0]);
+    int month = int.parse(dateParts[1]);
+    int year = int.parse(dateParts[2]);
+
+    DateTime birthDate = DateTime(year, month, day);
+    int age = currentDate.year - birthDate.year;
+
+    if (currentDate.month < birthDate.month ||
+        (currentDate.month == birthDate.month &&
+            currentDate.day < birthDate.day)) {
+      age--;
+    }
+
+    return age;
   }
 }

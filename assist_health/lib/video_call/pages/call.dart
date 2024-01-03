@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/doctor_screens/examination_results.dart';
+import 'package:assist_health/ui/user_screens/schedule_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
@@ -15,11 +17,15 @@ import '../utils/settings.dart';
 class CallPage extends StatefulWidget {
   final String? channelName;
   final ClientRole? role;
+  bool isDoctor;
+  bool isUser;
   AppointmentSchedule appointmentSchedule;
   CallPage({
     super.key,
     this.channelName,
     this.role,
+    required this.isDoctor,
+    required this.isUser,
     required this.appointmentSchedule,
   });
 
@@ -157,57 +163,7 @@ class _CallPageState extends State<CallPage> {
           // Call
           RawMaterialButton(
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Bạn có muốn thoát cuộc gọi không?'),
-                  actions: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 15, right: 15, bottom: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Text(
-                                'Không',
-                                style: TextStyle(
-                                  color: Colors.greenAccent.shade700
-                                      .withOpacity(0.7),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            onTap: () => Navigator.pop(context),
-                          ),
-                          InkWell(
-                              child: const Padding(
-                                padding: EdgeInsets.all(8),
-                                child: Text(
-                                  'Thoát',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                appointmentSchedule!.isExamined = true;
-                                appointmentSchedule!
-                                    .updateAppointmentIsExaminated();
-                                Navigator.of(context)
-                                    .popUntil((route) => route.isFirst);
-                              }),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
+              showDialogWithConfirmation(context);
             },
             shape: const CircleBorder(),
             elevation: 2.0,
@@ -291,31 +247,118 @@ class _CallPageState extends State<CallPage> {
     );
   }
 
+  void showDialogWithConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Bạn có muốn thoát cuộc gọi không?',
+          style: TextStyle(fontSize: 18),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15, bottom: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'Không',
+                      style: TextStyle(
+                        color: Colors.greenAccent.shade700.withOpacity(0.7),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  onTap: () => Navigator.pop(context),
+                ),
+                InkWell(
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Text(
+                      'Thoát',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    _engine.leaveChannel();
+                    if (widget.isDoctor) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExaminationResultsScreen(
+                            appointmentSchedule: appointmentSchedule!,
+                            isFromCall: true,
+                          ),
+                        ),
+                      );
+                    }
+                    if (widget.isUser) {
+                      appointmentSchedule!.isExamined = true;
+                      appointmentSchedule!.updateAppointmentIsExaminated();
+                      if (appointmentSchedule!.status == 'Gọi ngay') {
+                        appointmentSchedule!.updateAppointmentStatus('Đã khám');
+                      }
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ScheduleFeedbackScreen(
+                            appointmentSchedule: appointmentSchedule!,
+                            isFromCall: true,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cuộc gọi'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+    return WillPopScope(
+      onWillPop: () async {
+        showDialogWithConfirmation(context);
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Cuộc gọi'),
+          centerTitle: true,
+          foregroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
           ),
         ),
-      ),
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            _viewRows(),
-            _panel(),
-            _toolbar(),
-          ],
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Stack(
+            children: <Widget>[
+              _viewRows(),
+              _panel(),
+              _toolbar(),
+            ],
+          ),
         ),
       ),
     );

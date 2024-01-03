@@ -88,7 +88,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         title: Row(
                           children: [
                             SizedBox(width: 160, child: Text(category)),
-                            SizedBox(
+                            const SizedBox(
                               width: 5,
                             ),
                             if (isSelected) const Icon(Icons.check),
@@ -222,22 +222,22 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ),
                   ElevatedButton(
                     onPressed: _showCategoryDialog,
-                    child: Text(
+                    style: ElevatedButton.styleFrom(
+                      primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
+                      onPrimary: Colors.white, // Đặt màu chữ là màu trắng
+                    ),
+                    child: const Text(
                       'Chọn chủ đề',
                       style: TextStyle(
                         fontSize: 18,
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
-                      onPrimary: Colors.white, // Đặt màu chữ là màu trắng
                     ),
                   ),
                   const SizedBox(height: 10),
                   Wrap(
                     children: selectedCategories.map((category) {
                       return Container(
-                        margin: EdgeInsets.only(right: 5),
+                        margin: const EdgeInsets.only(right: 5),
                         child: Chip(
                           label: Text(category),
                           onDeleted: () {
@@ -383,7 +383,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
           ],

@@ -3,6 +3,7 @@
 import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/register_call_now_step1.dart';
 import 'package:assist_health/ui/user_screens/register_call_step1.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_picker_timeline/date_picker_widget.dart';
@@ -1590,7 +1591,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
           ),
         ),
         bottomNavigationBar: Container(
-          height: 135,
+          height: 75,
           padding: const EdgeInsets.all(8),
           decoration: const BoxDecoration(
             border: Border(
@@ -1602,39 +1603,39 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
           ),
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.all(13),
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade100.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.blue,
-                    width: 1,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      FontAwesomeIcons.solidCommentDots,
-                      color: Colors.blue,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'Chat với bác sĩ',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
+              // Container(
+              //   padding: const EdgeInsets.all(13),
+              //   margin: const EdgeInsets.symmetric(horizontal: 5),
+              //   decoration: BoxDecoration(
+              //     color: Colors.blue.shade100.withOpacity(0.5),
+              //     borderRadius: BorderRadius.circular(8),
+              //     border: Border.all(
+              //       color: Colors.blue,
+              //       width: 1,
+              //     ),
+              //   ),
+              //   child: const Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Icon(
+              //         FontAwesomeIcons.solidCommentDots,
+              //         color: Colors.blue,
+              //       ),
+              //       SizedBox(
+              //         width: 10,
+              //       ),
+              //       Text(
+              //         'Chat với bác sĩ',
+              //         style: TextStyle(
+              //           color: Colors.blue,
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 10,
+              // ),
               Row(
                 children: [
                   Expanded(
@@ -1643,7 +1644,9 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Container()));
+                                builder: (context) => RegisterCallNowStep1(
+                                      doctorInfo: _doctorInfo!,
+                                    )));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(15),

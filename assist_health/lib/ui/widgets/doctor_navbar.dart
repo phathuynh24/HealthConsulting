@@ -1,9 +1,10 @@
 import 'package:assist_health/others/theme.dart';
-import 'package:assist_health/ui/doctor_screens/message_doctor.dart';
+import 'package:assist_health/ui/doctor_screens/advise_topbar.dart';
+import 'package:assist_health/ui/doctor_screens/home_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
-import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class DoctorNavBar extends StatefulWidget {
   const DoctorNavBar({super.key});
@@ -16,11 +17,13 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    const PublicQuestionsScreen(),
+    const HomeDoctor(),
+    //const PublicQuestionsScreen(),
     // Screen 2
-    const MessageDoctorScreen(),
-    // Screen 3
     const SetScheduleScreen(),
+    // Screen 3
+    //const MessageDoctorScreen(),
+    const AdviseTopBar(),
     // Screen 4
     Container(),
   ];
@@ -50,19 +53,19 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_filled),
-              label: "Home",
+              label: "Trang chủ",
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-              label: "Messages",
+              icon: Icon(CupertinoIcons.calendar),
+              label: "Lịch khám",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: "Schedule",
+              icon: Icon(Icons.phone),
+              label: "Tư vấn",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: "Settings",
+              icon: Icon(FontAwesomeIcons.userDoctor),
+              label: "Tài khoản",
             ),
           ],
         ),

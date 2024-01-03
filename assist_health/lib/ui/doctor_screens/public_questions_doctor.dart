@@ -7,18 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/models/other/question.dart';
 import 'package:assist_health/others/theme.dart';
-import 'package:assist_health/ui/user_screens/community.dart';
 import 'package:assist_health/ui/user_screens/question_detail.dart';
 import 'package:intl/intl.dart';
 
-class PublicQuestionsScreen extends StatefulWidget {
-  const PublicQuestionsScreen({super.key});
+class PublicQuestionsDoctorScreen extends StatefulWidget {
+  const PublicQuestionsDoctorScreen({super.key});
 
   @override
-  State<PublicQuestionsScreen> createState() => _PublicQuestionsScreenState();
+  State<PublicQuestionsDoctorScreen> createState() =>
+      _PublicQuestionsDoctorScreenState();
 }
 
-class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
+class _PublicQuestionsDoctorScreenState
+    extends State<PublicQuestionsDoctorScreen> {
   List<bool> isLikedList = [];
   List<String> selectedFilterCategories = [];
   final List<String> categories = [
@@ -74,77 +75,6 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
     return false;
   }
 
-  Widget _buildActionButton(Question question, int index) {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      return FutureBuilder<bool>(
-        future: _currentUserIsAdmin(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data == true) {
-            return IconButton(
-              icon: const Icon(Icons.delete),
-              color: Colors.blue,
-              onPressed: () async {
-                bool confirmDelete =
-                    await _showDeleteConfirmationDialog(context);
-                if (confirmDelete) {
-                  await _deleteQuestion(question.id);
-                }
-              },
-            );
-          } else {
-            bool isLiked =
-                isLikedList.length > index ? isLikedList[index] : false;
-            return IconButton(
-              icon: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
-                color: Colors.red,
-              ),
-              onPressed: () {
-                setState(() {
-                  isLikedList[index] = !isLikedList[index];
-                  question.isLiked = isLikedList[index];
-                  toggleLikeStatus(question);
-                });
-              },
-            );
-          }
-        },
-      );
-    }
-
-    return Container();
-  }
-
-  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirm Delete'),
-              content:
-                  const Text('Are you sure you want to delete this question?'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('Delete'),
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
-  }
-
   Future<int> _countAnswers(String questionId) async {
     int count = 0;
     try {
@@ -176,37 +106,6 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
       },
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
-        appBar: AppBar(
-          foregroundColor: Colors.white,
-          title: const Text(
-            'Hỏi đáp cộng đồng',
-            style: TextStyle(fontSize: 20),
-          ),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.filter_list),
-              onPressed: () async {
-                List<String>? result = await _showCategoryFilterDialog(context);
-                if (result != null) {
-                  setState(() {
-                    selectedFilterCategories = result;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -227,7 +126,6 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                             showUserQuestions = false;
                             User? user = FirebaseAuth.instance.currentUser;
                             currentUserId = user?.uid ?? '';
-                            print('showUserQuestions: $showUserQuestions');
                           });
                         },
                         child: Container(
@@ -274,7 +172,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              'Câu hỏi của tôi',
+                              'Câu hỏi xử lý',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: showUserQuestions
@@ -328,19 +226,29 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                       answerCount: 0,
                       questionUserId: document['questionUserId'],
                       date: date,
+                      answers: List<Map<String, dynamic>>.from(
+                          document.get('answers') ?? []),
                     );
                     questions.add(question);
                     isLikedList.add(false);
                   }
-                  final filteredQuestions = questions
-                      .where((question) =>
-                          (!showUserQuestions ||
-                              (showUserQuestions &&
-                                  question.questionUserId == currentUserId)) &&
-                          (selectedFilterCategories.isEmpty ||
-                              question.categories.any((category) =>
-                                  selectedFilterCategories.contains(category))))
-                      .toList();
+
+                  List<Question> filteredQuestions = [];
+                  filteredQuestions = questions.where((question) {
+                    bool isDoctor = !showUserQuestions ||
+                        (showUserQuestions &&
+                            question.answers.any((element) =>
+                                element['userId'] ==
+                                FirebaseAuth.instance.currentUser!.uid));
+
+                    bool hasSelectedCategories =
+                        selectedFilterCategories.isEmpty ||
+                            question.categories.any((category) =>
+                                selectedFilterCategories.contains(category));
+
+                    return isDoctor && hasSelectedCategories;
+                  }).toList();
+
                   filteredQuestions.sort((a, b) => b.date!.compareTo(a.date!));
                   return ListView.builder(
                     shrinkWrap: true,
@@ -502,24 +410,24 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           icon: const Icon(
-            Icons.add,
+            Icons.filter_list,
             color: Colors.white,
           ),
           backgroundColor: Themes.gradientDeepClr,
           label: const Text(
-            'Đặt câu hỏi',
+            'Lọc theo chủ đề',
             style: TextStyle(
               fontSize: 18,
               color: Colors.white,
             ),
           ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CommunityScreen(),
-              ),
-            );
+          onPressed: () async {
+            List<String>? result = await _showCategoryFilterDialog(context);
+            if (result != null) {
+              setState(() {
+                selectedFilterCategories = result;
+              });
+            }
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

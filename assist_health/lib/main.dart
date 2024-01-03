@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/ui/other_screens/welcome.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -27,7 +28,10 @@ void main() async {
       //     arguments: initialNotification?.notificationResponse?.payload);
     });
   }
-  runApp(const MyApp());
+  initializeDateFormatting('en_US').then((_) {
+    // Khởi chạy ứng dụng của bạn
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

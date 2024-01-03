@@ -19,10 +19,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
+// ignore: must_be_immutable
 class HealthProfileDetailScreen extends StatefulWidget {
   final UserProfile profile;
+  bool? isUserOfProfile = true;
 
-  const HealthProfileDetailScreen({super.key, required this.profile});
+  HealthProfileDetailScreen(
+      {super.key, required this.profile, this.isUserOfProfile});
 
   @override
   State<HealthProfileDetailScreen> createState() =>
@@ -58,9 +61,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Hồ sơ người thân',
-          style: TextStyle(fontSize: 20),
+        title: Text(
+          (widget.isUserOfProfile!) ? 'Hồ sơ người thân' : 'Hồ sơ sức khỏe',
+          style: const TextStyle(fontSize: 20),
         ),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -217,42 +220,44 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                           ],
                         ),
                         const Spacer(),
-                        TextButton(
-                          onPressed: () async {
-                            dynamic result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddOrEditProfileScreen(
-                                  isEdit: true,
-                                  profile: _currentProfile,
+                        if (widget.isUserOfProfile!)
+                          TextButton(
+                            onPressed: () async {
+                              dynamic result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddOrEditProfileScreen(
+                                    isEdit: true,
+                                    profile: _currentProfile,
+                                  ),
                                 ),
-                              ),
-                            );
-                            if (result != null && result is Map) {
-                              bool isEdited = result['isEdited'];
-                              UserProfile editedUserProfile = result['profile'];
-                              if (isEdited) {
-                                setState(() {
-                                  _currentProfile = editedUserProfile;
-                                });
+                              );
+                              if (result != null && result is Map) {
+                                bool isEdited = result['isEdited'];
+                                UserProfile editedUserProfile =
+                                    result['profile'];
+                                if (isEdited) {
+                                  setState(() {
+                                    _currentProfile = editedUserProfile;
+                                  });
+                                }
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text('Điều chỉnh hồ sơ thành công!'),
+                                  backgroundColor: Colors.green,
+                                ));
                               }
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                content: Text('Điều chỉnh hồ sơ thành công!'),
-                                backgroundColor: Colors.green,
-                              ));
-                            }
-                          },
-                          child: const Text(
-                            'Điều chỉnh',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 16.0,
+                            },
+                            child: const Text(
+                              'Điều chỉnh',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16.0,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -364,33 +369,34 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                               fontWeight: FontWeight.w500),
                         ),
                         const Spacer(),
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Themes.gradientDeepClr,
-                                  Themes.gradientLightClr
-                                ],
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
+                        if (widget.isUserOfProfile!)
+                          GestureDetector(
+                            onTap: () {
+                              _showBottomSheet(context);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Themes.gradientDeepClr,
+                                    Themes.gradientLightClr
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: const Text(
+                                'Cập nhật',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
                               ),
                             ),
-                            child: const Text(
-                              'Cập nhật',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500),
-                            ),
                           ),
-                        ),
                       ],
                     ),
                     Container(

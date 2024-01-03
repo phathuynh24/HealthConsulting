@@ -29,6 +29,7 @@ class AppointmentSchedule {
   String? idDoc;
   String? idFeedback;
   bool? isExamined;
+  bool? isResult;
 
   AppointmentSchedule({
     this.doctorInfo,
@@ -51,11 +52,11 @@ class AppointmentSchedule {
     this.idDoc,
     this.idFeedback,
     this.isExamined,
+    this.isResult,
   });
 
   Future<void> saveAppointmentToFirestore() async {
     try {
-      String idDoc = '${DateTime.now()}';
       String idDocUser = FirebaseAuth.instance.currentUser!.uid;
       // Upload files and get URLs
       List<String> fileUrls =
@@ -85,6 +86,7 @@ class AppointmentSchedule {
           'paymentStatus': paymentStatus,
           'idDoc': idDoc,
           'isExamined': false,
+          'isResult': false,
         },
       );
     } catch (e) {
@@ -120,6 +122,7 @@ class AppointmentSchedule {
         'statusReasonCanceled': statusReasonCanceled,
         'paymentStatus': paymentStatus,
         'isExamined': isExamined ?? false,
+        'isResult': isResult ?? false,
       });
 
       print('Appointment updated in Firestore successfully.');
@@ -181,6 +184,7 @@ class AppointmentSchedule {
       idDoc: json['idDoc'],
       idFeedback: json['idFeedback'] ?? '',
       isExamined: json['isExamined'] ?? false,
+      isResult: json['isResult'] ?? false,
     );
   }
 
@@ -227,8 +231,21 @@ class AppointmentSchedule {
     CollectionReference appointmentScheduleCollection =
         FirebaseFirestore.instance.collection('appointment_schedule');
 
-    appointmentScheduleCollection.doc(idDoc!).update({
-      'isExamined': isExamined,
+    appointmentScheduleCollection.doc(idDoc).update({
+      'isExamined': true,
+    }).then((value) {
+      print('Cập nhật thành công');
+    }).catchError((error) {
+      print('Cập nhật thất bại: $error');
+    });
+  }
+
+  void updateAppointmentIsResult() {
+    CollectionReference appointmentScheduleCollection =
+        FirebaseFirestore.instance.collection('appointment_schedule');
+
+    appointmentScheduleCollection.doc(idDoc).update({
+      'isResult': true,
     }).then((value) {
       print('Cập nhật thành công');
     }).catchError((error) {
@@ -251,5 +268,4 @@ class AppointmentSchedule {
       print('Error updating appointment feedback: $e');
     }
   }
-
 }

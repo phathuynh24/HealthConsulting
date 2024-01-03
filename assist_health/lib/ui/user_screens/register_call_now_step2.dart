@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/register_call_now_step3.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -442,6 +443,7 @@ class _RegisterCallNowStep2State extends State<RegisterCallNowStep2> {
                           try {
                             await _saveExaminationForm();
                           } catch (e) {
+                            // ignore: use_build_context_synchronously
                             showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -481,16 +483,17 @@ class _RegisterCallNowStep2State extends State<RegisterCallNowStep2> {
 
   _saveExaminationForm() async {
     try {
+      appointmentSchedule!.idDoc = '${DateTime.now()}';
       await appointmentSchedule!.saveAppointmentToFirestore().whenComplete(() {
-        // Navigator.pushAndRemoveUntil(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => RegisterCallStep4(
-        //       appointmentSchedule: appointmentSchedule,
-        //     ),
-        //   ),
-        //   (Route<dynamic> route) => false,
-        // );
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegisterCallNowStep3(
+              appointmentSchedule: appointmentSchedule!,
+            ),
+          ),
+          (Route<dynamic> route) => false,
+        );
       });
       print('Dữ liệu đã được lưu thành công!');
     } catch (e) {

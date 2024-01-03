@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class DoctorListScreen extends StatefulWidget {
-  const DoctorListScreen({super.key});
+  String? filterSpecialty = '';
+  DoctorListScreen({super.key, this.filterSpecialty});
 
   @override
   State<DoctorListScreen> createState() => _DoctorListScreenState();
@@ -31,10 +33,10 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     "Nha khoa",
     "Chấn thương chỉnh hình",
     "Tim mạch",
-    "Tiêu hóa"
-        "Hô hấp"
-        "Huyết học"
-        "Nội tiết"
+    "Tiêu hóa",
+    "Hô hấp",
+    "Huyết học",
+    "Nội tiết",
   ];
   String? _selectedSpecialtyRadio;
   String? _selectedSpecialty;
@@ -46,8 +48,11 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     _selectedStatus = 'Tất cả';
     _selectedStatusRadio = _selectedStatus;
 
-    _selectedSpecialty = 'Tất cả';
-    _selectedSpecialtyRadio = '';
+    if (widget.filterSpecialty != null && widget.filterSpecialty != '') {
+      setSelectedSpecialty(widget.filterSpecialty!);
+    } else {
+      setSelectedSpecialty('Tất cả');
+    }
 
     _searchName = '';
   }
@@ -67,6 +72,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   void setSelectedSpecialty(String value) {
     setState(() {
       _selectedSpecialty = value;
+      _selectedSpecialtyRadio = value;
     });
   }
 
@@ -272,7 +278,6 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           }
 
           List<DoctorInfo> filterDoctorWithStatus;
-
           // Xử lý lọc trạng thái
           String status = '';
 
@@ -303,20 +308,122 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           }
           //---------------------------------------------------------
 
+          // Nếu trạng thái có danh sách trống
+          if (filterDoctorWithStatus.isEmpty) {
+            return Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                height: 500,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/empty-box.png',
+                      width: 250,
+                      height: 250,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    const Text(
+                      'Bạn chưa có lịch khám ở mục này',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    const Text(
+                      'Lịch khám của bạn sẽ được hiển thị tại đây.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blueGrey,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          //---------------------------------------------------------
+
+          // Xử lý lọc chuyên khoa
+          List<DoctorInfo> filterDoctorWithSpecialty = [];
+          if (_selectedSpecialtyRadio == 'Tất cả') {
+            filterDoctorWithSpecialty = filterDoctorWithStatus;
+          } else {
+            filterDoctorWithSpecialty = filterDoctorWithStatus
+                .where(
+                    (doctor) => doctor.specialty.contains(_selectedSpecialty))
+                .toList();
+          }
+          //---------------------------------------------------------
+
+          // Nếu chuyên khoa có danh sách trống
+          if (filterDoctorWithSpecialty.isEmpty) {
+            return Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                height: 500,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/empty-box.png',
+                      width: 250,
+                      height: 250,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    const Text(
+                      'Không có dữ liệu',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    const Text(
+                      'Vui lòng chọn trạng thái hoặc chuyên khoa khác ',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blueGrey,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          //---------------------------------------------------------
+
           // Xử lý lọc tìm kiếm tên bác sĩ
           List<DoctorInfo> filterDoctorWithName;
           if (_searchName!.trim() != '') {
-            filterDoctorWithName = filterDoctorWithStatus
+            filterDoctorWithName = filterDoctorWithSpecialty
                 .where((doctor) => doctor.name
                     .toLowerCase()
                     .contains(_searchName!.toLowerCase()))
                 .toList();
           } else {
-            filterDoctorWithName = filterDoctorWithStatus;
+            filterDoctorWithName = filterDoctorWithSpecialty;
           }
           //---------------------------------------------------------
 
-          // Xử lý kh không tìm ra kết quả
+          // Xử lý không tìm ra kết quả
           if (filterDoctorWithName.isEmpty) {
             return SingleChildScrollView(
               child: Container(
@@ -543,14 +650,57 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      const Text(
-                                        'Chuyên khoa: Răng hàm mặt',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          height: 1.5,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            'Chuyên khoa: ',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              height: 1.5,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              height: 28,
+                                              width: 148,
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount:
+                                                    doctor.specialty.length,
+                                                itemBuilder: (context, index) {
+                                                  final specialty =
+                                                      doctor.specialty[index];
+                                                  return Container(
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 2),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 9),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      color: Colors.blueGrey
+                                                          .withOpacity(0.1),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        specialty,
+                                                        style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -997,6 +1147,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                             ),
                           ),
                           Container(
+                            height: 600,
                             width: MediaQuery.of(context).size.width * 0.9,
                             margin: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
@@ -1006,11 +1157,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                   width: 1,
                                 )),
                             child: ListView.builder(
-                              shrinkWrap: true,
                               itemCount: _specialtyOptions.length,
                               itemBuilder: (BuildContext context, int index) {
-                                String option =
-                                    'Tư vấn ${_specialtyOptions[index]}';
+                                String option = _specialtyOptions[index];
                                 return InkWell(
                                   onTap: () {
                                     setState(() {
@@ -1073,11 +1222,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      _selectedSpecialtyRadio = 'Tất cả';
-                                    });
-                                    setSelectedSpecialty(
-                                        _selectedSpecialtyRadio!);
+                                    setSelectedSpecialty('Tất cả');
                                     Navigator.of(context).pop();
                                   },
                                   child: Container(

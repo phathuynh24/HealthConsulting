@@ -8,9 +8,9 @@ class Question {
   bool isLiked;
   int likes;
   int answerCount;
-  List<String> answers;
   String questionUserId;
   DateTime? date;
+  List<Map<String, dynamic>> answers = [];
 
   Question({
     required this.id,

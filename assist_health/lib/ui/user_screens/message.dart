@@ -50,13 +50,13 @@ class _MessageScreenState extends State<MessageScreen> {
     });
 
     // Lấy danh sách hồ sơ sức khỏe
-    getUserProfiles();
+    await getUserProfiles();
 
     // Lấy danh sách bác sĩ
-    getDoctors();
+    await getDoctors();
 
     //Lấy danh sách admin
-    getAdmins();
+    await getAdmins();
 
     await _firestore
         .collection('chatroom')
@@ -268,6 +268,7 @@ class _MessageScreenState extends State<MessageScreen> {
                         children: [
                           ListView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: adminList.length,
                             itemBuilder: (context, index) {
                               return Column(
@@ -330,151 +331,158 @@ class _MessageScreenState extends State<MessageScreen> {
 
                     // Display doctor list
                     if (chatRoomList.isNotEmpty)
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: chatRoomList.length,
-                        itemBuilder: (context, index) {
-                          if (chatRoomList[index].idProfile !=
-                              chatRoomList[index].idUser) {
-                            bool isDoctorExist = false;
-                            DoctorInfo? doctor;
-                            UserProfile? userProfile;
+                      SingleChildScrollView(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: chatRoomList.length,
+                          itemBuilder: (context, index) {
+                            if (chatRoomList[index].idProfile !=
+                                chatRoomList[index].idUser) {
+                              bool isDoctorExist = false;
+                              DoctorInfo? doctor;
+                              UserProfile? userProfile;
 
-                            List<DoctorInfo> tempDoctorList = [];
-                            if (_searchText == '') {
-                              tempDoctorList = doctorList;
-                            } else {
-                              String searchText =
-                                  _searchText.trim().toLowerCase();
-                              tempDoctorList = doctorList
-                                  .where((element) => element.name
-                                      .toLowerCase()
-                                      .contains(searchText))
-                                  .toList();
-                            }
-                            // Xử lý không tìm ra kết quả
-                            if (tempDoctorList.isEmpty && index == 0) {
-                              return SingleChildScrollView(
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  height: 350,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Image.asset(
-                                        'assets/no_result_search_icon.png',
-                                        width: 250,
-                                        height: 250,
-                                        fit: BoxFit.contain,
-                                      ),
-                                      const Text(
-                                        'Không tìm thấy kết quả',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
+                              List<DoctorInfo> tempDoctorList = [];
+                              if (_searchText == '') {
+                                tempDoctorList = doctorList;
+                              } else {
+                                String searchText =
+                                    _searchText.trim().toLowerCase();
+                                tempDoctorList = doctorList
+                                    .where((element) => element.name
+                                        .toLowerCase()
+                                        .contains(searchText))
+                                    .toList();
+                              }
+                              // Xử lý không tìm ra kết quả
+                              if (tempDoctorList.isEmpty && index == 0) {
+                                return SingleChildScrollView(
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    height: 350,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Image.asset(
+                                          'assets/no_result_search_icon.png',
+                                          width: 250,
+                                          height: 250,
+                                          fit: BoxFit.contain,
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      const Text(
-                                        'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                          height: 1.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-                            //--------------------------------
-
-                            try {
-                              doctor = tempDoctorList.firstWhere(
-                                (element) =>
-                                    element.uid == chatRoomList[index].idDoctor,
-                              );
-                              isDoctorExist = true;
-                            } catch (e) {
-                              isDoctorExist = false;
-                            }
-
-                            if (isDoctorExist) {
-                              userProfile = userProfiles.firstWhere((element) =>
-                                  element.idDoc ==
-                                  chatRoomList[index].idProfile);
-                              return Column(
-                                children: [
-                                  ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatRoomNew(
-                                            chatRoomId:
-                                                chatRoomList[index].idDoc!,
-                                            userProfile: userProfile!,
-                                            doctorInfo: doctor!,
+                                        const Text(
+                                          'Không tìm thấy kết quả',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
                                           ),
                                         ),
-                                      );
-                                    },
-                                    leading: CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage: NetworkImage(
-                                        doctor!.imageURL,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      'Bác sĩ ${doctor.name}',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        height: 1.5,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    subtitle: Row(
-                                      children: [
-                                        const Icon(
-                                          CupertinoIcons.arrow_turn_down_right,
-                                          size: 20,
-                                          color: Colors.blueGrey,
-                                        ),
                                         const SizedBox(
-                                          width: 8,
+                                          height: 10,
                                         ),
-                                        Text(
-                                          'Bệnh nhân ${userProfile.name}',
-                                          style: const TextStyle(
-                                            color: Colors.blueGrey,
-                                            height: 1.5,
+                                        const Text(
+                                          'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
                                             fontSize: 14,
+                                            color: Colors.grey,
+                                            height: 1.5,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Divider(
-                                    color: Colors.grey.shade400,
-                                    thickness: 0.5,
-                                    height: 20,
-                                  ),
-                                ],
-                              );
-                            } else {
-                              return const SizedBox();
+                                );
+                              }
+                              //--------------------------------
+
+                              try {
+                                doctor = tempDoctorList.firstWhere(
+                                  (element) =>
+                                      element.uid ==
+                                      chatRoomList[index].idDoctor,
+                                );
+                                isDoctorExist = true;
+                              } catch (e) {
+                                isDoctorExist = false;
+                              }
+
+                              if (isDoctorExist) {
+                                userProfile = userProfiles.firstWhere(
+                                    (element) =>
+                                        element.idDoc ==
+                                        chatRoomList[index].idProfile);
+                                return Column(
+                                  children: [
+                                    ListTile(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 8),
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => ChatRoomNew(
+                                              chatRoomId:
+                                                  chatRoomList[index].idDoc!,
+                                              userProfile: userProfile!,
+                                              doctorInfo: doctor!,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      leading: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          doctor!.imageURL,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'Bác sĩ ${doctor.name}',
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          height: 1.5,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      subtitle: Row(
+                                        children: [
+                                          const Icon(
+                                            CupertinoIcons
+                                                .arrow_turn_down_right,
+                                            size: 20,
+                                            color: Colors.blueGrey,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                            'Bệnh nhân ${userProfile.name}',
+                                            style: const TextStyle(
+                                              color: Colors.blueGrey,
+                                              height: 1.5,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: Colors.grey.shade400,
+                                      thickness: 0.5,
+                                      height: 20,
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return const SizedBox();
+                              }
                             }
-                          }
-                          return const SizedBox();
-                        },
+                            return const SizedBox();
+                          },
+                        ),
                       ),
                   ],
                 ),

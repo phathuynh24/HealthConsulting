@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, file_names
+// ignore_for_file: avoid_print, file_names, use_build_context_synchronously
 
 import 'dart:async';
 
@@ -9,6 +9,7 @@ import 'package:assist_health/models/doctor/doctor_service.dart';
 import 'package:assist_health/models/doctor/doctor_study.dart';
 import 'package:assist_health/models/doctor/doctor_timeline.dart';
 import 'package:assist_health/models/other/appointment_schedule.dart';
+import 'package:assist_health/models/other/result.dart';
 import 'package:assist_health/models/user/user_bmi.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/models/user/user_height.dart';
@@ -69,12 +70,14 @@ Future<User?> logIn(String email, String password) async {
   }
 }
 
-Future logOut(BuildContext context) async {
+Future<void> logOut(BuildContext context) async {
   try {
-    await _auth.signOut().then((value) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-    });
+    await _auth.signOut();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
   } catch (e) {
     print("error");
   }
@@ -417,6 +420,30 @@ Stream<List<AppointmentSchedule>> getAppointmentSchdedules() {
   });
 }
 
+Stream<List<AppointmentSchedule>> getAppointmentSchdedulesForDocotr() {
+  return _firestore
+      .collection('appointment_schedule')
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<AppointmentSchedule> appointmentSchedules = [];
+    final List<AppointmentSchedule> tempAppointmentSchedules = [];
+
+    for (var appointmentScheduleDoc in querySnapshot.docs) {
+      final appointmentScheduleData =
+          appointmentScheduleDoc.data() as Map<String, dynamic>?;
+      final AppointmentSchedule appointmentSchedule =
+          AppointmentSchedule.fromJson(appointmentScheduleData!);
+      tempAppointmentSchedules.add(appointmentSchedule);
+    }
+
+    appointmentSchedules.addAll(tempAppointmentSchedules
+        .where((element) => element.doctorInfo!.uid == _auth.currentUser!.uid)
+        .toList());
+
+    return appointmentSchedules;
+  });
+}
+
 Stream<List<AppointmentSchedule>> getAllAppointmentSchdedules() {
   return _firestore
       .collection('appointment_schedule')
@@ -454,6 +481,24 @@ Stream<List<AppointmentSchedule>> getAppointmentSchedulesByDoctor(
     }
 
     return appointmentSchedules;
+  });
+}
+
+Stream<List<Result>> getResultAppointment(String idUser) {
+  return _firestore
+      .collection('examination_result')
+      .where('idUser', isEqualTo: idUser)
+      .snapshots()
+      .map((QuerySnapshot querySnapshot) {
+    final List<Result> resultAppointment = [];
+
+    for (var doc in querySnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>?;
+      final Result result = Result.fromJson(data!);
+      resultAppointment.add(result);
+    }
+
+    return resultAppointment;
   });
 }
 

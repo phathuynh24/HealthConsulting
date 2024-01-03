@@ -9,6 +9,7 @@ import 'package:assist_health/ui/user_screens/doctor_detail.dart';
 import 'package:assist_health/ui/user_screens/doctor_list.dart';
 import 'package:assist_health/ui/user_screens/health_profile_list.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
+import 'package:assist_health/ui/user_screens/view_result_list.dart';
 import 'package:assist_health/ui/widgets/doctor_popular_card.dart';
 import 'package:assist_health/ui/widgets/health_metrics_topnavbar.dart';
 import 'package:assist_health/video_call/pages/local_notifications.dart';
@@ -170,151 +171,144 @@ class _MyHomeScreen extends State<HomeScreen> {
               ),
             ),
           ),
-          title: GestureDetector(
-            onTap: () {
-              print('jjdj');
-            },
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: ClipOval(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Themes.gradientLightClr.withOpacity(0.4),
-                                Themes.gradientLightClr
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 5,
-                                offset: const Offset(0, 2),
-                              ),
+          title: Column(
+            children: [
+              Row(
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: ClipOval(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Themes.gradientLightClr.withOpacity(0.4),
+                              Themes.gradientLightClr
                             ],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
                           ),
-                          child: (imageURL != '')
-                              ? Image.network(imageURL, fit: BoxFit.cover,
-                                  errorBuilder: (BuildContext context,
-                                      Object exception,
-                                      StackTrace? stackTrace) {
-                                  return const Center(
-                                    child: Icon(
-                                      FontAwesomeIcons.userDoctor,
-                                      size: 40,
-                                      color: Colors.white,
-                                    ),
-                                  );
-                                })
-                              : const Center(
-                                  child: CircleAvatar(
-                                    radius: 25,
-                                    backgroundColor: Colors.transparent,
-                                    child: Icon(
-                                      Icons.person,
-                                      size: 25,
-                                      color: Colors.white,
-                                    ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 5,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: (imageURL != '')
+                            ? Image.network(imageURL, fit: BoxFit.cover,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                return const Center(
+                                  child: Icon(
+                                    FontAwesomeIcons.userDoctor,
+                                    size: 40,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              })
+                            : const Center(
+                                child: CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: Colors.transparent,
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 25,
+                                    color: Colors.white,
                                   ),
                                 ),
-                        ),
+                              ),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Chào bạn!",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                            letterSpacing: 1.1,
-                            wordSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                            letterSpacing: 1.1,
-                            wordSpacing: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    const IconButton(
-                      icon: Icon(
-                        CupertinoIcons.bell_fill,
-                        color: Colors.white,
-                      ),
-                      iconSize: 26,
-                      onPressed: null,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const DoctorListScreen()),
-                    );
-                  },
-                  child: Container(
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Icon(
-                          CupertinoIcons.search,
-                          color: Colors.blueGrey.shade300,
-                          size: 23,
-                        ),
-                        const SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          'Tên bác sĩ, chuyên khoa,...',
-                          style: TextStyle(
-                              color: Colors.blueGrey.shade400,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w300),
-                        ),
-                      ],
                     ),
                   ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Chào bạn!",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                          letterSpacing: 1.1,
+                          wordSpacing: 1.2,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                          letterSpacing: 1.1,
+                          wordSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // const Spacer(),
+                  // const IconButton(
+                  //   icon: Icon(
+                  //     CupertinoIcons.bell_fill,
+                  //     color: Colors.white,
+                  //   ),
+                  //   iconSize: 26,
+                  //   onPressed: null,
+                  // ),
+                ],
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DoctorListScreen()),
+                  );
+                },
+                child: Container(
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        CupertinoIcons.search,
+                        color: Colors.blueGrey.shade300,
+                        size: 23,
+                      ),
+                      const SizedBox(
+                        width: 4,
+                      ),
+                      Text(
+                        'Tên bác sĩ, chuyên khoa,...',
+                        style: TextStyle(
+                            color: Colors.blueGrey.shade400,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+            ],
           ),
         ),
         body: SingleChildScrollView(
@@ -449,8 +443,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (_) =>
-                                              const DoctorListScreen()),
+                                          builder: (_) => DoctorListScreen()),
                                     );
                                   }),
                                   itemDashboard(
@@ -503,8 +496,13 @@ class _MyHomeScreen extends State<HomeScreen> {
                                       'Kết quả khám',
                                       FontAwesomeIcons.briefcaseMedical,
                                       const Color(0xFF2EF76F),
-                                      const Color(0xFF2EA05A),
-                                      () {}),
+                                      const Color(0xFF2EA05A), () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const ViewResultListScreen()),
+                                    );
+                                  }),
                                 ],
                               ),
                             ),
@@ -556,7 +554,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (_) => const DoctorListScreen()),
+                                      builder: (_) => DoctorListScreen()),
                                 );
                               },
                               onTapCancel: () {
@@ -693,51 +691,97 @@ class _MyHomeScreen extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 15),
-                  child: Text(
-                    "Khám theo chuyên khoa",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black54,
-                    ),
-                  ),
+                const SizedBox(
+                  height: 8,
                 ),
-                SizedBox(
-                  height: 70,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: symptoms.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        padding: const EdgeInsets.symmetric(horizontal: 25),
-                        decoration: BoxDecoration(
-                          color: Themes.highlightClr,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              spreadRadius: 2,
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Icon(
+                              FontAwesomeIcons.briefcaseMedical,
+                              size: 18,
+                              color: Colors.greenAccent.shade700,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Text(
+                              "Khám theo chuyên khoa",
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            symptoms[index],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black54,
-                            ),
-                          ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        height: 85,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: symptoms.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => DoctorListScreen(
+                                            filterSpecialty: symptoms[index],
+                                          )),
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  left: 15,
+                                  top: 15,
+                                  bottom: 15,
+                                  right:
+                                      (index != symptoms.length - 1) ? 0 : 15,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 25, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFE5FDFF),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    symptoms[index],
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Themes.gradientDeepClr
+                                          .withOpacity(0.8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -829,9 +873,6 @@ class _MyHomeScreen extends State<HomeScreen> {
           imageURL = snapshot.get('imageURL');
           name = snapshot.get('name');
         });
-
-        print('User imageURL: $imageURL');
-        print('User name: $name');
       } else {
         print('User does not exist');
       }

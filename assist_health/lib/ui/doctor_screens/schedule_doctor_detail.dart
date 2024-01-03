@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
@@ -7,17 +9,15 @@ import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/doctor_screens/examination_results.dart';
 import 'package:assist_health/ui/user_screens/chatroom_new.dart';
-import 'package:assist_health/ui/user_screens/doctor_detail.dart';
-import 'package:assist_health/ui/user_screens/register_call_step1.dart';
-import 'package:assist_health/ui/user_screens/schedule_feedback.dart';
+import 'package:assist_health/ui/user_screens/health_profile_detail.dart';
 import 'package:assist_health/ui/user_screens/schedule_qr.dart';
 import 'package:assist_health/ui/widgets/half_circle.dart';
 import 'package:assist_health/ui/widgets/my_separator.dart';
 import 'package:assist_health/video_call/pages/call.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -27,18 +27,17 @@ import 'package:open_file/open_file.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
-class ScheduleDetail extends StatefulWidget {
+class ScheduleDoctorDetail extends StatefulWidget {
   AppointmentSchedule appointmentSchedule;
 
-  ScheduleDetail({required this.appointmentSchedule, super.key});
+  ScheduleDoctorDetail({required this.appointmentSchedule, super.key});
   @override
-  State<ScheduleDetail> createState() => _ScheduleDetailState();
+  State<ScheduleDoctorDetail> createState() => _ScheduleDoctorDetailState();
 }
 
-class _ScheduleDetailState extends State<ScheduleDetail> {
+class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
   AppointmentSchedule? _appointmentSchedule;
   int? _secondsRemaining;
 
@@ -52,19 +51,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     super.initState();
     _appointmentSchedule = widget.appointmentSchedule;
     loadFileFromStorage();
-    if (_appointmentSchedule!.status == 'Chờ duyệt' ||
-        _appointmentSchedule!.status == 'Đã duyệt') {
-      if (_appointmentSchedule!.status == 'Đã duyệt' &&
-          isWithinTimeRange(_appointmentSchedule!.time!,
-              _appointmentSchedule!.selectedDate!)) {
-        _buttonContext = 'Vào cuộc gọi';
-      } else {
-        _buttonContext = 'Hủy lịch khám';
-      }
-    } else if (_appointmentSchedule!.status == 'Đã khám' ||
-        _appointmentSchedule!.status == 'Đã hủy' ||
-        _appointmentSchedule!.status == 'Quá hẹn') {
-      _buttonContext = 'Đặt khám lại';
+    if (_appointmentSchedule!.status == 'Đã duyệt' &&
+        isWithinTimeRange(
+            _appointmentSchedule!.time!, _appointmentSchedule!.selectedDate!)) {
+      _buttonContext = 'Vào cuộc gọi';
+    } else if (_appointmentSchedule!.status == 'Đã khám') {
+      _buttonContext = 'Trả kết quả';
     }
     if (_appointmentSchedule!.paymentStatus == 'Thanh toán thành công' ||
         _appointmentSchedule!.paymentStatus == 'Thanh toán thất bại') {
@@ -160,86 +152,6 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           color: Colors.blueAccent.withOpacity(0.1),
           child: Column(
             children: [
-              (_appointmentSchedule!.status == 'Đã hủy')
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade100.withOpacity(0.7),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      child: RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            TextSpan(
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  height: 1.3,
-                                ),
-                                text:
-                                    'Lịch khám đã bị hủy bởi ${_appointmentSchedule!.statusReasonCanceled!}. Để được hỗ trợ vui lòng liên hệ số điện thoại '),
-                            TextSpan(
-                                text: '0362309724.',
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.1,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    final call =
-                                        Uri(scheme: 'tel', path: '0362309724');
-                                    if (await canLaunchUrl(call)) {
-                                      launchUrl(call);
-                                    }
-                                  }),
-                          ],
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-              (_appointmentSchedule!.status == 'Quá hẹn')
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.purple.shade100.withOpacity(0.7),
-                      ),
-                      child: RichText(
-                        textAlign: TextAlign.justify,
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            const TextSpan(
-                                style: TextStyle(
-                                  color: Colors.purple,
-                                  height: 1.3,
-                                ),
-                                text:
-                                    'Lịch khám đã Quá hẹn. Vui lòng chọn lại ngày khác (miễn phí). Hoặc có thể liên hệ nhân viên chăm sóc khách hàng qua số điện thoại '),
-                            TextSpan(
-                                text: '0362309724.',
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.1,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () async {
-                                    final call =
-                                        Uri(scheme: 'tel', path: '0362309724');
-                                    if (await canLaunchUrl(call)) {
-                                      launchUrl(call);
-                                    }
-                                  }),
-                          ],
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
               Container(
                   color: Colors.white,
                   margin: const EdgeInsets.only(
@@ -512,45 +424,32 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                         ),
                         child: Column(
                           children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            DoctorDetailScreen(
-                                                doctorInfo:
-                                                    _appointmentSchedule!
-                                                        .doctorInfo!)));
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                                child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '${_appointmentSchedule!.doctorInfo!.careerTitiles != '' ? _appointmentSchedule!.doctorInfo!.careerTitiles : 'Bác sĩ'} ${_appointmentSchedule!.doctorInfo!.name}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15, vertical: 10),
+                              child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '${_appointmentSchedule!.doctorInfo!.careerTitiles != '' ? _appointmentSchedule!.doctorInfo!.careerTitiles : 'Bác sĩ'} ${_appointmentSchedule!.doctorInfo!.name}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Image.network(
+                                          _appointmentSchedule!
+                                              .doctorInfo!.imageURL,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      SizedBox(
-                                        width: 50,
-                                        height: 50,
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          child: Image.network(
-                                            _appointmentSchedule!
-                                                .doctorInfo!.imageURL,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
-                              ),
+                                    ),
+                                  ]),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -631,7 +530,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                                         width: 10,
                                       ),
                                       Text(
-                                        'Nhắn tin với bác sĩ',
+                                        'Nhắn tin với bệnh nhân',
                                         style: TextStyle(
                                           color: Themes.gradientDeepClr,
                                         ),
@@ -1226,7 +1125,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           ),
         ),
       ),
-      bottomNavigationBar: (_buttonContext == 'Đặt khám lại' ||
+      bottomNavigationBar: (_buttonContext == 'Trả kết quả' ||
               _buttonContext == 'Vào cuộc gọi')
           ? Container(
               height: 70,
@@ -1242,73 +1141,59 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
               ),
               child: Row(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (_buttonContext == 'Đặt khám lại') {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegisterCallStep1(
-                                        isEdit: true,
-                                        appointmentSchedule:
-                                            _appointmentSchedule,
-                                        doctorInfo:
-                                            _appointmentSchedule!.doctorInfo!,
-                                      )));
-                        }
-                        if (_buttonContext == 'Vào cuộc gọi') {
-                          onJoin();
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(13),
-                        margin: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: (_buttonContext == 'Vào cuộc gọi')
-                              ? Colors.green
-                              : Themes.gradientDeepClr,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _buttonContext!,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                  if (_appointmentSchedule!.isResult! == false)
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          if (_buttonContext == 'Trả kết quả') {
+                            final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ExaminationResultsScreen(
+                                          appointmentSchedule:
+                                              _appointmentSchedule!,
+                                          isFromCall: false,
+                                        )));
+                            if (result) {
+                              setState(() {
+                                _appointmentSchedule!.isResult = true;
+                              });
+                            }
+                          }
+                          if (_buttonContext == 'Vào cuộc gọi') {
+                            onJoin();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(13),
+                          margin: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: (_buttonContext == 'Vào cuộc gọi')
+                                ? Colors.green
+                                : Themes.gradientDeepClr,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _buttonContext!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                   (_appointmentSchedule!.status == 'Đã khám')
                       ? Expanded(
                           child: GestureDetector(
                             onTap: () async {
-                              if (_appointmentSchedule!.idFeedback == '') {
-                                final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ScheduleFeedbackScreen(
-                                              appointmentSchedule:
-                                                  _appointmentSchedule!,
-                                              isFromCall: false,
-                                            )));
-                                if (result != null) {
-                                  setState(() {
-                                    _appointmentSchedule!.idFeedback =
-                                        result.toString();
-                                  });
-                                  _appointmentSchedule!
-                                      .updateAppointmentFeedback(
-                                          _appointmentSchedule!.idFeedback!);
-                                } else {
-                                  print('tbksksks');
-                                }
-                              } else {
+                              if (_appointmentSchedule!.idFeedback != '') {
                                 showFeedbackDialog(
                                     context, _appointmentSchedule!.idFeedback!);
+                              } else {
+                                showNotificationDialog(context);
                               }
                             },
                             child: Container(
@@ -1316,16 +1201,14 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                               margin: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 color: (_appointmentSchedule!.idFeedback == '')
-                                    ? Themes.gradientDeepClr
-                                    : Colors.grey.shade400,
+                                    ? Colors.grey.shade400
+                                    : Themes.gradientDeepClr,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               alignment: Alignment.center,
-                              child: Text(
-                                (_appointmentSchedule!.idFeedback == '')
-                                    ? 'Đánh giá'
-                                    : 'Xem đánh giá',
-                                style: const TextStyle(
+                              child: const Text(
+                                'Xem đánh giá',
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                 ),
@@ -1338,6 +1221,37 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
               ),
             )
           : const SizedBox(),
+    );
+  }
+
+  void showNotificationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'Thông báo',
+          style: TextStyle(
+            fontSize: 18,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: const Text(
+          'Chưa có đánh giá từ bệnh nhân.',
+          style: TextStyle(
+            fontSize: 16,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Đồng ý'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Đóng thông báo
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -1630,29 +1544,70 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                           const SizedBox(
                             height: 5,
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              height: 50,
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'Đóng',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    margin: const EdgeInsets.only(
+                                      left: 20,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'Đóng',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                HealthProfileDetailScreen(
+                                                    profile: userProfile,
+                                                    isUserOfProfile: false)));
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    margin: const EdgeInsets.only(
+                                      right: 20,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Themes.gradientDeepClr,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        'Xem hồ sơ',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1836,7 +1791,6 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   Future<void> onJoin() async {
     await _handleCameraAndMic(Permission.camera);
     await _handleCameraAndMic(Permission.microphone);
-    // ignore: use_build_context_synchronously
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -1844,8 +1798,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                 channelName: _channel,
                 role: _role,
                 appointmentSchedule: _appointmentSchedule!,
-                isDoctor: false,
-                isUser: true,
+                isDoctor: true,
+                isUser: false,
               )),
     );
   }
@@ -1862,7 +1816,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
           .where('idProfile',
               isEqualTo: _appointmentSchedule!.userProfile!.idDoc)
           .where('idDoctor', isEqualTo: _appointmentSchedule!.doctorInfo!.uid)
-          .where('idUser', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .where('idUser', isEqualTo: _appointmentSchedule!.idDocUser)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -1884,7 +1838,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
             await FirebaseFirestore.instance.collection('chatroom').add({
           'idProfile': _appointmentSchedule!.userProfile!.idDoc,
           'idDoctor': _appointmentSchedule!.doctorInfo!.uid,
-          'idUser': FirebaseAuth.instance.currentUser!.uid,
+          'idUser': _appointmentSchedule!.idDocUser,
         });
 
         String chatRoomId = docRef.id;

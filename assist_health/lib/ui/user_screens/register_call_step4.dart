@@ -4,9 +4,12 @@ import 'package:assist_health/models/other/appointment_schedule.dart';
 import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/user_screens/chatroom_new.dart';
 import 'package:assist_health/ui/widgets/half_circle.dart';
 import 'package:assist_health/ui/widgets/my_separator.dart';
 import 'package:assist_health/ui/widgets/user_navbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,8 +42,12 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        return false;
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const UserNavBar()),
+          (route) => false,
+        );
+        return true;
       },
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
@@ -1134,24 +1141,7 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // Navigator.of(context)
-                    //     .push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) =>
-                    //         AddOrEditProfileScreen(
-                    //       isEdit: false,
-                    //     ),
-                    //   ),
-                    // )
-                    //     .whenComplete(() {
-                    //   UserProfile addedProfile =
-                    //       UserProfile.fromJson(profiles[1]
-                    //               .data()
-                    //           as Map<String, dynamic>);
-                    //   _updateSelectedProfile(
-                    //       addedProfile);
-                    //   Navigator.of(context).pop();
-                    // });
+                    goToChatRoom();
                   },
                   child: Container(
                     width: double.infinity,
@@ -1533,5 +1523,58 @@ class _RegisterCallStep4 extends State<RegisterCallStep4> {
       return true;
     }
     return false;
+  }
+
+  void goToChatRoom() async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('chatroom')
+          .where('idProfile',
+              isEqualTo: _appointmentSchedule!.userProfile!.idDoc)
+          .where('idDoctor', isEqualTo: _appointmentSchedule!.doctorInfo!.uid)
+          .where('idUser', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Tài liệu đã tồn tại, lấy ID của tài liệu đầu tiên
+        String chatRoomId = querySnapshot.docs[0].id;
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomNew(
+              chatRoomId: chatRoomId,
+              userProfile: _appointmentSchedule!.userProfile!,
+              doctorInfo: _appointmentSchedule!.doctorInfo!,
+            ),
+          ),
+        );
+      } else {
+        // Tài liệu không tồn tại, tạo tài liệu mới
+        var docRef =
+            await FirebaseFirestore.instance.collection('chatroom').add({
+          'idProfile': _appointmentSchedule!.userProfile!.idDoc,
+          'idDoctor': _appointmentSchedule!.doctorInfo!.uid,
+          'idUser': FirebaseAuth.instance.currentUser!.uid,
+        });
+
+        String chatRoomId = docRef.id;
+
+        await docRef.update({'idDoc': chatRoomId});
+
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChatRoomNew(
+              chatRoomId: chatRoomId,
+              userProfile: _appointmentSchedule!.userProfile!,
+              doctorInfo: _appointmentSchedule!.doctorInfo!,
+            ),
+          ),
+        );
+      }
+
+      print('Chatroom created successfully');
+    } catch (e) {
+      print('Error creating or accessing chatroom: $e');
+    }
   }
 }

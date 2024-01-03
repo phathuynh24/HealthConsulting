@@ -239,7 +239,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                                       ? '${widget.question.gender}, ${widget.question.age} tuổi'
                                       : currentUserRole == 'admin'
                                           ? 'Quản trị viên'
-                                          : '${userData['name']}',
+                                          : 'Bác sĩ ${userData['name']}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,

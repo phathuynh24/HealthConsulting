@@ -251,14 +251,57 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      const Text(
-                                        'Chuyên khoa: Răng hàm mặt',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          height: 1.5,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            'Chuyên khoa: ',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              height: 1.5,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              height: 28,
+                                              width: 155,
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount:
+                                                    doctor.specialty.length,
+                                                itemBuilder: (context, index) {
+                                                  final specialty =
+                                                      doctor.specialty[index];
+                                                  return Container(
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 2),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 9),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      color: Colors.blueGrey
+                                                          .withOpacity(0.1),
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        specialty,
+                                                        style: const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              )),
+                                        ],
                                       ),
                                     ],
                                   ),

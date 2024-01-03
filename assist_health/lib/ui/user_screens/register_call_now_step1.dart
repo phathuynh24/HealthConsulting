@@ -590,8 +590,8 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
                   linkQRCode: _linkQRCode,
                   receivedAppointmentTime: _getFormattedDateTime(),
                   paymentStartTime: DateTime.now(),
-                  status: 'Gọi ngay',
-                  paymentStatus: 'Chờ xác nhận',
+                  status: 'Đã duyệt',
+                  paymentStatus: 'Thanh toán thành công',
                 );
                 Navigator.push(
                     context,

@@ -3,6 +3,7 @@ import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/doctor_screens/add_schedule.dart';
 import 'package:assist_health/ui/widgets/button.dart';
+import 'package:assist_health/ui/widgets/doctor_navbar.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,32 +40,61 @@ class _SetScheduleScreen extends State<SetScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_isInitialized) {
-      return const SizedBox(
-        height: double.infinity,
-        child: Center(
-          child: SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(),
+      return WillPopScope(
+        onWillPop: () async {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const DoctorNavBar()),
+            (route) => false,
+          );
+          return true;
+        },
+        child: const SizedBox(
+          height: double.infinity,
+          child: Center(
+            child: SizedBox(
+              height: 40,
+              width: 40,
+              child: CircularProgressIndicator(),
+            ),
           ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: Themes.backgroundClr,
-      appBar: AppBar(
-        title: const Text('Cài đặt lịch khám'),
-        centerTitle: true,
-        backgroundColor: Themes.hearderClr,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _addScheduleBar(),
-            _addDateBar(),
-            _showSchedule(),
-          ],
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const DoctorNavBar()),
+          (route) => false,
+        );
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Themes.backgroundClr,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          title: const Text('Đặt lịch khám'),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+          ),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _addScheduleBar(),
+              _addDateBar(),
+              _showSchedule(),
+            ],
+          ),
         ),
       ),
     );
