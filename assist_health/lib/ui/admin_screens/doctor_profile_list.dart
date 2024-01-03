@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_add.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_detail.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_update.dart';
@@ -13,8 +14,22 @@ class DoctorProfileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
-        title: const Text('Danh sách Bác sĩ'),
+        foregroundColor: Colors.white,
+        title: const Text('Danh sách Bác sĩ',
+        style: TextStyle(fontSize: 20),
+        ),
+        centerTitle: true,
+         flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),   
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance

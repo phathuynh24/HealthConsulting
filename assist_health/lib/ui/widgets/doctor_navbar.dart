@@ -1,6 +1,11 @@
+import 'package:assist_health/models/doctor/doctor_info.dart';
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/doctor_screens/doctor_account.dart';
+import 'package:assist_health/ui/doctor_screens/doctor_chart.dart';
+import 'package:assist_health/ui/doctor_screens/doctor_info.dart';
 import 'package:assist_health/ui/doctor_screens/message_doctor.dart';
 import 'package:assist_health/ui/doctor_screens/set_schedule.dart';
+import 'package:assist_health/ui/user_screens/home.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +25,11 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
     // Screen 2
     const MessageDoctorScreen(),
     // Screen 3
-    const SetScheduleScreen(),
+    const DoctorChartScreen(),
     // Screen 4
-    Container(),
+    DoctorInfoScreen(),
+    //Screen 5 
+    const DoctorAccountScreen(),
   ];
 
   @override
@@ -57,12 +64,16 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
               label: "Messages",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month),
-              label: "Schedule",
+              icon: Icon(Icons.bar_chart_outlined),
+              label: "Thống kê",
+            ),
+              BottomNavigationBarItem(
+              icon: Icon(Icons.info),
+              label: "Thông tin",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
-              label: "Settings",
+              label: "Tài khoản",
             ),
           ],
         ),

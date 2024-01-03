@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:assist_health/others/methods.dart';
 import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/user_screens/otp.dart';
@@ -15,7 +17,33 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return WillPopScope(
+      onWillPop: () async {
+        return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Xác nhận thoát ứng dụng"),
+              content: const Text("Bạn có chắc chắn muốn thoát ứng dụng?"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // Không thoát ứng dụng
+                  },
+                  child: const Text("Hủy"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    exit(0);
+                  },
+                  child: const Text("Xác nhận"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    child: Material(
       color: Themes.backgroundClr,
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -166,6 +194,7 @@ class WelcomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_add.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_detail.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_update.dart';
@@ -11,7 +12,20 @@ class DoctorListRevenue extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách Bác sĩ'),
+        foregroundColor: Colors.white,
+        title: Text('Danh sách Bác sĩ',
+        style: TextStyle(fontSize: 20),
+        ),
+        centerTitle: true,
+         flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),  
       ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
