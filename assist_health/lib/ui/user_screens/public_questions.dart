@@ -74,63 +74,48 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
     return false;
   }
 
-  Widget _buildActionButton(Question question, int index) {
-    User? user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      return FutureBuilder<bool>(
-        future: _currentUserIsAdmin(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data == true) {
-            return IconButton(
-              icon: const Icon(Icons.delete),
-              color: Colors.blue,
-              onPressed: () async {
-                bool confirmDelete =
-                    await _showDeleteConfirmationDialog(context);
-                if (confirmDelete) {
-                  await _deleteQuestion(question.id);
-                }
-              },
-            );
-          } else {
-            bool isLiked =
-                isLikedList.length > index ? isLikedList[index] : false;
-            return IconButton(
-              icon: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
-                color: Colors.red,
-              ),
-              onPressed: () {
-                setState(() {
-                  isLikedList[index] = !isLikedList[index];
-                  question.isLiked = isLikedList[index];
-                  toggleLikeStatus(question);
-                });
-              },
-            );
-          }
-        },
-      );
-    }
-
-    return Container();
+ Widget _buildActionButton(Question question, int index) {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    return FutureBuilder<bool>(
+      future: _currentUserIsAdmin(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data == true) {
+          return IconButton(
+            icon: const Icon(Icons.delete),
+            color: Colors.blue,
+            onPressed: () async {
+              bool confirmDelete = await _showDeleteConfirmationDialog(context);
+              if (confirmDelete) {
+                await _deleteQuestion(question.id);
+              }
+            },
+          );
+        } else {
+          return Container(); // Return an empty container for non-admin users
+        }
+      },
+    );
   }
+
+  return Container(); // Return an empty container for unauthenticated users
+}
+
 
   Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
     return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Confirm Delete'),
+              title: const Text('Xác nhận xóa'),
               content:
-                  const Text('Are you sure you want to delete this question?'),
+                  const Text('Bạn có muốn xóa câu hỏi này không?'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
-                  child: const Text('Cancel'),
+                  child: const Text('Hủy'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -415,8 +400,8 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                                         },
                                       ),
                                       const SizedBox(width: 5),
-                                      // _buildActionButton(
-                                      //     filteredQuestions[index], index),
+                                      _buildActionButton(
+                                          filteredQuestions[index], index),
                                     ],
                                   ),
                                 ),

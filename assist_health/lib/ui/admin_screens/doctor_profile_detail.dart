@@ -1,3 +1,4 @@
+import 'package:assist_health/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,7 +11,20 @@ class DoctorProfileDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thông tin Bác sĩ'),
+        foregroundColor: Colors.white,
+        title: const Text('Thông tin Bác sĩ',
+         style: TextStyle(fontSize: 20),
+        ),
+        centerTitle: true,
+          flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),   
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future:

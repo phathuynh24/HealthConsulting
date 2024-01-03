@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously
 
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/other_screens/welcome.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -79,7 +80,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+      return WillPopScope(
+      onWillPop: () async {
+        // Navigate back to the WelcomeScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+      );
+      return true;
+      },
+    child: Material(
       color: Themes.backgroundClr,
       child: SingleChildScrollView(
         child: SafeArea(
@@ -268,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
-      ),
+      ),)
     );
   }
 

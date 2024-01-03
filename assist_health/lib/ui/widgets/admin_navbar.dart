@@ -1,7 +1,9 @@
 import 'package:assist_health/others/theme.dart';
+import 'package:assist_health/ui/admin_screens/admin_account.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_add.dart';
 import 'package:assist_health/ui/admin_screens/doctor_profile_list.dart';
 import 'package:assist_health/ui/admin_screens/message_admin.dart';
+import 'package:assist_health/ui/doctor_screens/doctor_account.dart';
 import 'package:assist_health/ui/user_screens/public_questions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +24,9 @@ class _AdminNavBarState extends State<AdminNavBar> {
     const PublicQuestionsScreen(),
     // Screen 2
     const RevenueChartScreen(),
-    // Screen 3
-    const DoctorProfileList(),
-    // Screen 4
     const MessageAdminScreen(),
+    const DoctorProfileList(),
+    AdminAccountScreen(),
   ];
 
   @override
@@ -52,8 +53,8 @@ class _AdminNavBarState extends State<AdminNavBar> {
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: "Trang chủ",
+              icon: Icon(Icons.people_outline_sharp),
+              label: "Cộng đồng",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_outlined),
@@ -66,6 +67,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
             BottomNavigationBarItem(
               icon: Icon(FontAwesomeIcons.userDoctor),
               label: "Bác sĩ",
+            ),
+             BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: "Tài khoản",
             ),
           ],
         ),

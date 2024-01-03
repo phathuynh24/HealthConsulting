@@ -129,7 +129,6 @@ class _MessageScreenState extends State<MessageScreen> {
   }
 
   getAdmins() async {
-    // Lấy danh sách admin
     await _firestore
         .collection('users')
         .where("role", whereIn: ["admin"])
