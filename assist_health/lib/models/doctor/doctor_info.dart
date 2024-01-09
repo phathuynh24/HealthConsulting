@@ -19,6 +19,8 @@ class DoctorInfo {
   int graduationYear;
   int consultingTime;
   int serviceFee;
+  String? startTime;
+  String? endTime;
   List<String> specialty;
   List<String> educations;
   List<String> experiences;
@@ -40,6 +42,8 @@ class DoctorInfo {
     this.graduationYear,
     this.consultingTime,
     this.serviceFee,
+    this.startTime,
+    this.endTime,
     this.specialty,
     this.educations,
     this.experiences,
@@ -63,6 +67,8 @@ class DoctorInfo {
       'graduationYear': graduationYear,
       'consultingTime': consultingTime,
       'serviceFee': serviceFee,
+      'startTime': startTime,
+      'endTime': endTime,
       'specialty': specialty,
       'educations': educations,
       'experiences': experiences,
@@ -95,6 +101,8 @@ class DoctorInfo {
       map['graduationYear'] ?? '',
       map['consultingTime'] ?? 0,
       map['serviceFee'] ?? 0,
+      map['startTime'] ?? '08:00',
+      map['endTime'] ?? '16:00',
       specialty,
       educations,
       experiences,
@@ -127,6 +135,8 @@ class DoctorInfo {
       json['graduationYear'] ?? '',
       json['consultingTime'] ?? 0,
       json['serviceFee'] ?? 0,
+      json['startTime'] ?? '08:00',
+      json['endTime'] ?? '16:00',
       specialty,
       educations,
       experiences,

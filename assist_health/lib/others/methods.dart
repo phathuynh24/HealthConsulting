@@ -15,7 +15,7 @@ import 'package:assist_health/models/user/user_profile.dart';
 import 'package:assist_health/models/user/user_height.dart';
 import 'package:assist_health/models/user/user_temperature.dart';
 import 'package:assist_health/models/user/user_weight.dart';
-import 'package:assist_health/ui/other_screens/login.dart';
+import 'package:assist_health/screens/other_screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -584,4 +584,13 @@ bool isAfterEndTime(String time, DateTime selectedDate) {
 
   // Kiểm tra xem thời gian hiện tại có sau endTime hay không
   return now.isAfter(endTime);
+}
+
+String findIntervalIndex(String time) {
+  List<String> timeParts = time.split('-');
+  String endTimeString = timeParts[1].trim();
+  List<int> endTimeParts = endTimeString.split(':').map(int.parse).toList();
+  int index = (endTimeParts[0] - 8) * 60 ~/ 15 + endTimeParts[1] ~/ 15;
+
+  return index.toString();
 }

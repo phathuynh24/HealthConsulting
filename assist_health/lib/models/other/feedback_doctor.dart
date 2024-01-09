@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class FeedbackDoctor {
   String? username;
   double? rating;
@@ -18,12 +20,13 @@ class FeedbackDoctor {
   });
 
   factory FeedbackDoctor.fromJson(Map<String, dynamic> json) {
+    Timestamp timestampSelectedDate = json['rateDate'];
+    DateTime selectedDate = timestampSelectedDate.toDate();
     return FeedbackDoctor(
       username: json['username'],
       rating: json['rating'],
       content: json['content'],
-      rateDate:
-          json['rateDate'] != null ? DateTime.parse(json['rateDate']) : null,
+      rateDate: selectedDate,
       idDoctor: json['idDoctor'],
       idUser: json['idUser'],
       idDoc: json['idDoc'],

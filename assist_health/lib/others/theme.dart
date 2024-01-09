@@ -22,11 +22,4 @@ class Themes {
   static const gradientDeepClr = deepBlue;
   static const gradientLightClr = lightBlue;
   static const textClr = lightMediumPurpleClr;
-
-  // static final light = ThemeData(
-  //   primaryColor: darkPurpleClr,
-  //   brightness: Brightness.light,
-  // );
-  // static final dark =
-  //     ThemeData(primaryColor: Colors.yellow, brightness: Brightness.light);
 }

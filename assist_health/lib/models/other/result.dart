@@ -12,7 +12,7 @@ class Result {
   String? idUser;
   String? idProfile;
   String? nameProfile;
-  String? idAppointment;
+  String? appointmentCode;
   String? timeExamination;
   DateTime? dateExamination;
   DateTime? timeResult;
@@ -28,7 +28,7 @@ class Result {
     this.idUser,
     this.idProfile,
     this.nameProfile,
-    this.idAppointment,
+    this.appointmentCode,
     this.timeExamination,
     this.dateExamination,
     this.timeResult,
@@ -51,7 +51,7 @@ class Result {
       idUser: json['idUser'],
       idProfile: json['idProfile'],
       nameProfile: json['nameProfile'],
-      idAppointment: json['appointmentCode'],
+      appointmentCode: json['appointmentCode'],
       timeExamination: json['timeExamination'],
       listUrls: json['fileUrls']?.cast<String>() ?? [],
       listFiles: [],
@@ -64,6 +64,7 @@ class Result {
     // Lấy ngày giờ hiện tại làm ID document
     DateTime now = DateTime.now();
     String documentId = now.toString();
+    listUrls = [];
 
     // Tạo một document mới trong collection "examination_result" với ID là ngày giờ hiện tại
     DocumentReference documentReference = FirebaseFirestore.instance
@@ -80,7 +81,7 @@ class Result {
       'idUser': idUser,
       'idProfile': idProfile,
       'nameProfile': nameProfile,
-      'idAppointment': idAppointment,
+      'appointmentCode': appointmentCode,
       'dateExamination': dateExamination,
       'timeExamination': timeExamination,
       'timeResult': timeResult,
