@@ -1,14 +1,16 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
-import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/others/methods.dart';
+
 import 'package:assist_health/src/models/doctor/doctor_info.dart';
+import 'package:assist_health/src/others/methods.dart';
+import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/view_result_list.dart';
 import 'package:assist_health/src/widgets/doctor_popular_card.dart';
 import 'package:assist_health/src/widgets/health_metrics_topnavbar.dart';
@@ -88,6 +90,7 @@ class _MyHomeScreen extends State<HomeScreen> {
     getUserData(_auth.currentUser!.uid);
     _doctorStreamController.addStream(getInfoDoctors());
   }
+
 
   @override
   void dispose() {
@@ -244,15 +247,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  // const Spacer(),
-                  // const IconButton(
-                  //   icon: Icon(
-                  //     CupertinoIcons.bell_fill,
-                  //     color: Colors.white,
-                  //   ),
-                  //   iconSize: 26,
-                  //   onPressed: null,
-                  // ),
                 ],
               ),
               const SizedBox(
@@ -421,9 +415,10 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 shrinkWrap: true,
                                 padding: EdgeInsets.zero,
                                 physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 0,
+                              //Adding
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 0,
+                                mainAxisSpacing: 10,
                                 children: [
                                   itemDashboard(
                                       'Gọi video với bác sĩ',
@@ -485,6 +480,28 @@ class _MyHomeScreen extends State<HomeScreen> {
                                   itemDashboard(
                                       'Kết quả khám',
                                       FontAwesomeIcons.briefcaseMedical,
+                                      const Color(0xFF2EF76F),
+                                      const Color(0xFF2EA05A), () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const ViewResultListScreen()),
+                                    );
+                                  }),
+                                 itemDashboard(
+                                      'Cửa hàng',
+                                      FontAwesomeIcons.cartShopping,
+                                      Color.fromARGB(255, 241, 85, 0),
+                                      Color.fromARGB(255, 160, 122, 46), () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const HomeStoreScreen()),
+                                    );
+                                  }),
+                                  itemDashboard(
+                                      'ChatBot',
+                                      FontAwesomeIcons.robot,
                                       const Color(0xFF2EF76F),
                                       const Color(0xFF2EA05A), () {
                                     Navigator.of(context).push(
