@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/models/doctor/doctor_info.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/chatbot_screen/chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
@@ -777,6 +778,16 @@ class _MyHomeScreen extends State<HomeScreen> {
               ],
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ChatScreen()),
+                  );
+          },
+          child: Icon(Icons.comment),
+          backgroundColor: Colors.blue,
         ),
       ),
     );
