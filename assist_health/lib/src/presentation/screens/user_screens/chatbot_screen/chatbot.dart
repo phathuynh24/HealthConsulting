@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:assist_health/src/models/other/message.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +16,9 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
   List<Message> msgs = [];
@@ -55,20 +60,47 @@ class _ChatScreenState extends State<ChatScreen> {
                 {"role": "user", "content": text},
               ]
             }));
+       
+        Map<String, dynamic> messages = {
+          "sendby": _auth.currentUser!.displayName,
+          "message": text,
+          "type": "text",
+          "time": FieldValue.serverTimestamp(),
+        };
+
+        await _firestore
+            .collection('chatbot')
+            .doc(_auth.currentUser!.uid)
+            .collection('chats')
+            .add(messages);
+        
         if (response.statusCode == 200) {
           var json = jsonDecode(utf8.decode(response.bodyBytes));
+          String reply = json["choices"][0]["message"]["content"]
+                        .toString()
+                        .trimLeft();
           setState(() {
             isTyping = false;
             msgs.insert(
                 0,
                 Message(
                     false,
-                    json["choices"][0]["message"]["content"]
-                        .toString()
-                        .trimLeft()));
+                    reply));
           });
           scrollController.animateTo(0.0,
               duration: const Duration(seconds: 1), curve: Curves.easeOut);
+          Map<String, dynamic> messages = {
+            "sendby": "assistant",
+            "message": reply,
+            "type": "text",
+            "time": FieldValue.serverTimestamp(),
+          };
+
+          await _firestore
+              .collection('chatbot')
+              .doc(_auth.currentUser!.uid)
+              .collection('chats')
+              .add(messages);
         }
       }
     } on Exception {
