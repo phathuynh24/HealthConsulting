@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: WelcomeScreen(),
-      // home: ChatScreen(),
+      //home: ChatScreen(),
       //debugShowCheckedModeBanner: config.debugTag,
       //onGenerateRoute: AppRouter.generateRoute,
 
