@@ -92,7 +92,6 @@ class _MyHomeScreen extends State<HomeScreen> {
     _doctorStreamController.addStream(getInfoDoctors());
   }
 
-
   @override
   void dispose() {
     setOffline();
@@ -386,19 +385,16 @@ class _MyHomeScreen extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: Container(
-                        height: 230,
+                        height: 225,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 13,
-                        ),
-                        margin: const EdgeInsets.only(
-                          bottom: 3,
+                          horizontal: 10,
                         ),
                         child: Column(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
-                                vertical: 5,
+                                vertical: 10,
                               ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -408,7 +404,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     color: Colors.blueGrey.withOpacity(0.2),
                                     spreadRadius: 1,
                                     blurRadius: 5,
-                                    offset: const Offset(0, 0),
                                   ),
                                 ],
                               ),
@@ -416,7 +411,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 shrinkWrap: true,
                                 padding: EdgeInsets.zero,
                                 physics: const NeverScrollableScrollPhysics(),
-                              //Adding
                                 crossAxisCount: 4,
                                 crossAxisSpacing: 0,
                                 mainAxisSpacing: 10,
@@ -489,11 +483,11 @@ class _MyHomeScreen extends State<HomeScreen> {
                                               const ViewResultListScreen()),
                                     );
                                   }),
-                                 itemDashboard(
+                                  itemDashboard(
                                       'Cửa hàng',
                                       FontAwesomeIcons.cartShopping,
-                                      Color.fromARGB(255, 241, 85, 0),
-                                      Color.fromARGB(255, 160, 122, 46), () {
+                                      const Color.fromARGB(255, 241, 85, 0),
+                                      const Color.fromARGB(255, 160, 122, 46), () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (_) =>
@@ -505,11 +499,11 @@ class _MyHomeScreen extends State<HomeScreen> {
                                       FontAwesomeIcons.robot,
                                       const Color(0xFF2EF76F),
                                       const Color(0xFF2EA05A), () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const ViewResultListScreen()),
-                                    );
+                                    // Navigator.of(context).push(
+                                    //   MaterialPageRoute(
+                                    //       builder: (_) =>
+                                    //           const ViewResultListScreen()),
+                                    // );
                                   }),
                                 ],
                               ),
@@ -799,9 +793,9 @@ class _MyHomeScreen extends State<HomeScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ChatScreen()),
-                  );
+              context,
+              MaterialPageRoute(builder: (_) => ChatScreen()),
+            );
           },
           child: Icon(Icons.comment),
           backgroundColor: Colors.blue,
