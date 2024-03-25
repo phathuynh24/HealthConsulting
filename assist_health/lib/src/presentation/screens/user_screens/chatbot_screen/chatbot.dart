@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:assist_health/src/models/other/message.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
@@ -7,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -25,10 +25,11 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isTyping = false;
 
   String messageRequired = "";
-
+//D:\Nam_3\HK1\flutter_base\SE121.O11-Do_An_1\assist_health\lib\.evn
   void sendMsg() async {
+    await dotenv.load(fileName: "lib/.evn");
     String text = controller.text;
-    String apiKey = "";
+    String? apiKey = dotenv.env['CHATBOT_API_KEY'] ?? "";
     controller.clear();
     try {
       if (text.isNotEmpty) {
@@ -60,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 {"role": "user", "content": text},
               ]
             }));
-       
+
         Map<String, dynamic> messages = {
           "sendby": _auth.currentUser!.displayName,
           "message": text,
@@ -73,19 +74,14 @@ class _ChatScreenState extends State<ChatScreen> {
             .doc(_auth.currentUser!.uid)
             .collection('chats')
             .add(messages);
-        
+
         if (response.statusCode == 200) {
           var json = jsonDecode(utf8.decode(response.bodyBytes));
-          String reply = json["choices"][0]["message"]["content"]
-                        .toString()
-                        .trimLeft();
+          String reply =
+              json["choices"][0]["message"]["content"].toString().trimLeft();
           setState(() {
             isTyping = false;
-            msgs.insert(
-                0,
-                Message(
-                    false,
-                    reply));
+            msgs.insert(0, Message(false, reply));
           });
           scrollController.animateTo(0.0,
               duration: const Duration(seconds: 1), curve: Curves.easeOut);
