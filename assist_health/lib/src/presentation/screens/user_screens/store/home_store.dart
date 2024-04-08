@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:assist_health/src/others/theme.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/cart_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_xlider/flutter_xlider.dart';
 
 class HomeStoreScreen extends StatefulWidget {
   const HomeStoreScreen({Key? key}) : super(key: key);
@@ -15,51 +14,70 @@ class HomeStoreScreen extends StatefulWidget {
 }
 
 class _HomeStoreScreenState extends State<HomeStoreScreen> {
+  late Stream<QuerySnapshot> _productStream;
   List<CartItem> cartItems = [];
   final List<String> categories = [
-    'Thuốc tim mạch',
-    'Thuốc bôi ngoài da',
-    'Thuốc giảm đau',
-    'Thuốc kháng sinh',
-    'Thuốc dạ dày'
+    'Hỗ trợ hô hấp',
+    'Dinh dưỡng',
+    'Hỗ trợ làm đẹp',
+    'Hỗ trợ tiêu hóa',
+    'Phát triển trẻ nhỏ',
+    'Vitamin - khoáng chất'
   ];
+
+  String selectedCategory = '';
+  double _lowerValue = 0;
+  double _upperValue = 100000;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    _productStream = FirebaseFirestore.instance.collection('products').snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-       appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Nhà Thuốc Trực Tuyến',
-          style: TextStyle(fontSize: 20),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          title: const Text(
+            'Nhà Thuốc Trực Tuyến',
+            style: TextStyle(fontSize: 20),
+          ),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartScreen(cartItems: cartItems),
+                  ),
+                );
+              },
+              icon: Icon(Icons.shopping_cart),
+            ),
+            IconButton(
+              onPressed: _openFilterScreen,
+              icon: Icon(Icons.filter_list),
+            )
+          ],
         ),
-      ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(
-              color: Colors.white, // Màu nền của phần tìm kiếm
+              color: Colors.white,
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
@@ -91,123 +109,223 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                         MaterialPageRoute(
-                                    builder: (context) => CartScreen( cartItems: cartItems,),
-                                  ), 
-                            );
-                      },
-                      icon: Icon(Icons.shopping_cart),
-                      color: Colors.white,
-                    ),
-                  ),
                 ],
               ),
-            ), 
-           Container(
-                  // color: Colors.blueGrey, // Màu nền mới của phần slider
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: CarouselSlider(
-                    items: [
-                      Image.asset('assets/image.png', fit: BoxFit.cover),
-                      Image.asset('assets/slider2.jpg', fit: BoxFit.cover),
-                    ],
-                    options: CarouselOptions(
-                      height: 250.0, // Chiều cao của slider
-                      viewportFraction: 1.0, // Ảnh chiếm toàn bộ chiều rộng của màn hình
-                      initialPage: 0,
-                      enableInfiniteScroll: true,
-                      reverse: false,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 3),
-                      autoPlayCurve: Curves.fastOutSlowIn,
-                      pauseAutoPlayOnTouch: true,
-                      enlargeCenterPage: true,
-                    ),
-                  ),
-                ),
+            ),
             Container(
-              height: 50, // Độ cao của danh mục
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: CarouselSlider(
+                items: [
+                  Image.asset('assets/image.png', fit: BoxFit.cover),
+                  Image.asset('assets/slider2.jpg', fit: BoxFit.cover),
+                ],
+                options: CarouselOptions(
+                  height: 250.0,
+                  viewportFraction: 1.0,
+                  initialPage: 0,
+                  enableInfiniteScroll: true,
+                  reverse: false,
+                  autoPlay: true,
+                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  pauseAutoPlayOnTouch: true,
+                  enlargeCenterPage: true,
+                ),
+              ),
+            ),
+            Container(
+              height: 50,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      // Xử lý khi người dùng chọn một danh mục
+                      setState(() {
+                        if (selectedCategory == categories[index]) {
+                          selectedCategory = '';
+                        } else {
+                          selectedCategory = categories[index];
+                        }
+                      });
                     },
                     child: Card(
-                      color: Themes.gradientLightClr,
+                      color: selectedCategory == categories[index] ? Themes.gradientDeepClr : Themes.gradientLightClr,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           categories[index],
-                          style:TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                          )
                           ),
+                        ),
                       ),
                     ),
                   );
                 },
               ),
             ),
-            
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2, // Đặt số cột là 2
-                children: <Widget>[
-                  for (int i = 0; i < 4; i++)
-                    SizedBox(
-                      height: 200, // Đặt chiều cao của mỗi Card
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                          SizedBox(
-                            height: 100,
-                            child:Image.asset('assets/empty-box.png',
-                            fit: BoxFit.cover,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _productStream,
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  final List<Widget> productWidgets = snapshot.data!.docs
+                      .where((doc) =>
+                          selectedCategory.isEmpty || doc['category'] == selectedCategory)
+                      .where((doc) {
+                        final price = doc['price'] as num;
+                        return price >= _lowerValue && price <= _upperValue;
+                      })
+                      .map((DocumentSnapshot doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final List<String> imageUrls = List<String>.from(data['imageUrls']);
+
+                        final String firstImageUrl = imageUrls.isNotEmpty ? imageUrls[0] : '';
+
+                        return SizedBox(
+                          height: 200,
+                          child: Card(
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 100,
+                                  child: firstImageUrl.isNotEmpty
+                                      ? Image.network(
+                                          firstImageUrl,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Placeholder(),
+                                ),
+                                Text(data['name']),
+                                Text('${data['price']} VNĐ'),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Themes.gradientLightClr,
+                                    onPrimary: Colors.white,
+                                  ),
+                                  child: Text('Thêm vào giỏ hàng'),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetailScreen(
+                                          productName: data['name'],
+                                          productPrice: data['price'],
+                                          imageUrls: (data['imageUrls'] as List<dynamic>).cast<String>(),
+                                          category: data['category'], 
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                           
-                            Text('Sản phẩm $i'),
-                            Text('${10000 * (i + 1)} VNĐ'),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Themes.gradientLightClr, // Màu nền của nút
-                                onPrimary: Colors.white, // Màu chữ của nút
-                              ),
-                              child: Text('Thêm vào giỏ hàng'),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailScreen(
-                                      productName: 'Sản phẩm $i', // Thay đổi thông tin sản phẩm tương ứng
-                                      productPrice: 10000 * (i + 1), // Thay đổi thông tin sản phẩm tương ứng
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
+                        );
+                      })
+                      .toList();
+
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    children: productWidgets,
+                  );
+                },
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openFilterScreen() async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => FilterScreen(lowerValue: _lowerValue, upperValue: _upperValue),
+    ),
+  );
+  if (result != null && result is List<double> && result.length == 2) {
+    setState(() {
+      _lowerValue = result[0];
+      _upperValue = result[1];
+    });
+  }
+}
+}
+
+class FilterScreen extends StatefulWidget {
+  final double lowerValue;
+  final double upperValue;
+
+  const FilterScreen({Key? key, required this.lowerValue, required this.upperValue}) : super(key: key);
+
+  @override
+  _FilterScreenState createState() => _FilterScreenState();
+}
+
+class _FilterScreenState extends State<FilterScreen> {
+  late double _lowerValue;
+  late double _upperValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _lowerValue = widget.lowerValue;
+    _upperValue = widget.upperValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chọn Khoảng Giá'),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FlutterSlider(
+            values: [_lowerValue, _upperValue],
+            rangeSlider: true,
+            max: 100000,
+            min: 0,
+            onDragging: (handlerIndex, lowerValue, upperValue) {
+              setState(() {
+                _lowerValue = lowerValue;
+                _upperValue = upperValue;
+              });
+            },
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _lowerValue = 0;
+                    _upperValue = 100000;
+                  });
+                },
+                child: Text('Reset'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, [_lowerValue, _upperValue]);
+                },
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

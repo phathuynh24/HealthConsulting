@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //final config = AppConfig.of(context)!;
-
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: WelcomeScreen(),

@@ -3,6 +3,9 @@ import 'package:assist_health/src/presentation/screens/admin_screens/admin_accou
 import 'package:assist_health/src/presentation/screens/admin_screens/content_topbar.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/message_admin.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/product.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
@@ -28,6 +31,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
     const DoctorProfileList(),
     // Screen 5
     const AdminAccountScreen(),
+    //Screen 6
+    ProductListScreen(),
+    //Screen 7
+    AdminOrderManagementScreen(),
   ];
 
   @override
@@ -72,6 +79,14 @@ class _AdminNavBarState extends State<AdminNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: "Tài khoản",
+            ),
+             BottomNavigationBarItem(
+              icon: Icon(Icons.store),
+              label: "Thêm sản phẩm",
+            ),
+             BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_bag),
+              label: "Đơn hàng",
             ),
           ],
         ),

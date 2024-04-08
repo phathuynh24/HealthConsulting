@@ -1,6 +1,8 @@
+import 'dart:convert'; // Import for jsonDecode
 
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
@@ -14,11 +16,27 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   int totalPrice = 0;
+  late List<CartItem> cartItems = [];
 
   @override
   void initState() {
     super.initState();
+    fetchCartItems();
     calculateTotalPrice();
+  }
+
+  void fetchCartItems() {
+    FirebaseFirestore.instance
+        .collection('user_carts')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((DocumentSnapshot document) {
+        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+        setState(() {
+          cartItems.add(CartItem.fromJson(data)); // Parse JSON data to CartItem
+        });
+      });
+    });
   }
 
   void calculateTotalPrice() {
@@ -32,9 +50,19 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void removeItem(int index) {
+    FirebaseFirestore.instance
+        .collection('user_carts')
+        .where('productName', isEqualTo: cartItems[index].productName)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((DocumentSnapshot document) {
+        document.reference.delete();
+      });
+    });
+
     setState(() {
-      widget.cartItems.removeAt(index);
-      calculateTotalPrice();
+      cartItems.removeAt(index);
+      calculateTotalPrice(); // Update total price after removing item
     });
   }
 
@@ -59,22 +87,22 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       body: ListView.builder(
-        itemCount: widget.cartItems.length,
+        itemCount: cartItems.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(
-              widget.cartItems[index].productName,
+              cartItems[index].productName,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              '${widget.cartItems[index].productPrice} VNĐ',
+              '${cartItems[index].productPrice} VNĐ',
               style: TextStyle(color: Colors.grey),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'x${widget.cartItems[index].quantity}',
+                  'x${cartItems[index].quantity}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
@@ -100,13 +128,15 @@ class _CartScreenState extends State<CartScreen> {
                 onPressed: () {
                   // Xử lý thanh toán ở đây
                 },
-
-                  style:ElevatedButton.styleFrom(
-                     primary: Themes.gradientLightClr, 
-                  ),
-                  child: Text(
+                style: ElevatedButton.styleFrom(
+                  primary: Themes.gradientLightClr,
+                ),
+                child: Text(
                   'Thanh toán',
-                  style:TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
