@@ -5,6 +5,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/store/cart_s
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:intl/intl.dart';
 
 class HomeStoreScreen extends StatefulWidget {
   const HomeStoreScreen({Key? key}) : super(key: key);
@@ -32,7 +33,8 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
   @override
   void initState() {
     super.initState();
-    _productStream = FirebaseFirestore.instance.collection('products').snapshots();
+    _productStream =
+        FirebaseFirestore.instance.collection('products').snapshots();
   }
 
   @override
@@ -65,11 +67,11 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                   ),
                 );
               },
-              icon: Icon(Icons.shopping_cart),
+              icon: const Icon(Icons.shopping_cart),
             ),
             IconButton(
               onPressed: _openFilterScreen,
-              icon: Icon(Icons.filter_list),
+              icon: const Icon(Icons.filter_list),
             )
           ],
         ),
@@ -78,7 +80,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
           children: <Widget>[
             Container(
               color: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   Expanded(
@@ -88,7 +90,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
                       ),
-                      child: TextField(
+                      child: const TextField(
                         decoration: InputDecoration(
                           hintText: 'Tìm kiếm sản phẩm...',
                           border: InputBorder.none,
@@ -97,15 +99,15 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.blue,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       onPressed: () {},
-                      icon: Icon(Icons.search),
+                      icon: const Icon(Icons.search),
                       color: Colors.white,
                     ),
                   ),
@@ -113,7 +115,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: CarouselSlider(
                 items: [
                   Image.asset('assets/image.png', fit: BoxFit.cover),
@@ -126,14 +128,14 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                   enableInfiniteScroll: true,
                   reverse: false,
                   autoPlay: true,
-                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayInterval: const Duration(seconds: 3),
                   autoPlayCurve: Curves.fastOutSlowIn,
                   pauseAutoPlayOnTouch: true,
                   enlargeCenterPage: true,
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               height: 50,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -150,12 +152,14 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       });
                     },
                     child: Card(
-                      color: selectedCategory == categories[index] ? Themes.gradientDeepClr : Themes.gradientLightClr,
+                      color: selectedCategory == categories[index]
+                          ? Themes.gradientDeepClr
+                          : Themes.gradientLightClr,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           categories[index],
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -169,69 +173,74 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: _productStream,
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return Text('Đã xảy ra lỗi: ${snapshot.error}');
                   }
 
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                   final List<Widget> productWidgets = snapshot.data!.docs
                       .where((doc) =>
-                          selectedCategory.isEmpty || doc['category'] == selectedCategory)
+                          selectedCategory.isEmpty ||
+                          doc['category'] == selectedCategory)
                       .where((doc) {
-                        final price = doc['price'] as num;
-                        return price >= _lowerValue && price <= _upperValue;
-                      })
-                      .map((DocumentSnapshot doc) {
-                        final data = doc.data() as Map<String, dynamic>;
-                        final List<String> imageUrls = List<String>.from(data['imageUrls']);
+                    final price = doc['price'] as num;
+                    return price >= _lowerValue && price <= _upperValue;
+                  }).map((DocumentSnapshot doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final List<String> imageUrls =
+                        List<String>.from(data['imageUrls']);
 
-                        final String firstImageUrl = imageUrls.isNotEmpty ? imageUrls[0] : '';
+                    final String firstImageUrl =
+                        imageUrls.isNotEmpty ? imageUrls[0] : '';
 
-                        return SizedBox(
-                          height: 200,
-                          child: Card(
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(
-                                  height: 100,
-                                  child: firstImageUrl.isNotEmpty
-                                      ? Image.network(
-                                          firstImageUrl,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Placeholder(),
-                                ),
-                                Text(data['name']),
-                                Text('${data['price']} VNĐ'),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    primary: Themes.gradientLightClr,
-                                    onPrimary: Colors.white,
-                                  ),
-                                  child: Text('Thêm vào giỏ hàng'),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProductDetailScreen(
-                                          productName: data['name'],
-                                          productPrice: data['price'],
-                                          imageUrls: (data['imageUrls'] as List<dynamic>).cast<String>(),
-                                          category: data['category'], 
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
+                    return SizedBox(
+                      height: 200,
+                      child: Card(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              height: 100,
+                              child: firstImageUrl.isNotEmpty
+                                  ? Image.network(
+                                      firstImageUrl,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : const Placeholder(),
                             ),
-                          ),
-                        );
-                      })
-                      .toList();
+                            Text(data['name']),
+                            Text(
+                                '${NumberFormat('#,###').format(data['price'])} VNĐ'),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Themes.gradientLightClr,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Thêm vào giỏ hàng'),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductDetailScreen(
+                                      productName: data['name'],
+                                      productPrice: data['price'],
+                                      imageUrls:
+                                          (data['imageUrls'] as List<dynamic>)
+                                              .cast<String>(),
+                                      category: data['category'],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList();
 
                   return GridView.count(
                     crossAxisCount: 2,
@@ -247,26 +256,29 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
   }
 
   void _openFilterScreen() async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => FilterScreen(lowerValue: _lowerValue, upperValue: _upperValue),
-    ),
-  );
-  if (result != null && result is List<double> && result.length == 2) {
-    setState(() {
-      _lowerValue = result[0];
-      _upperValue = result[1];
-    });
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            FilterScreen(lowerValue: _lowerValue, upperValue: _upperValue),
+      ),
+    );
+    if (result != null && result is List<double> && result.length == 2) {
+      setState(() {
+        _lowerValue = result[0];
+        _upperValue = result[1];
+      });
+    }
   }
-}
 }
 
 class FilterScreen extends StatefulWidget {
   final double lowerValue;
   final double upperValue;
 
-  const FilterScreen({Key? key, required this.lowerValue, required this.upperValue}) : super(key: key);
+  const FilterScreen(
+      {Key? key, required this.lowerValue, required this.upperValue})
+      : super(key: key);
 
   @override
   _FilterScreenState createState() => _FilterScreenState();
@@ -287,7 +299,7 @@ class _FilterScreenState extends State<FilterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chọn Khoảng Giá'),
+        title: const Text('Chọn Khoảng Giá'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -304,7 +316,7 @@ class _FilterScreenState extends State<FilterScreen> {
               });
             },
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -315,13 +327,13 @@ class _FilterScreenState extends State<FilterScreen> {
                     _upperValue = 100000;
                   });
                 },
-                child: Text('Reset'),
+                child: const Text('Reset'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context, [_lowerValue, _upperValue]);
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           ),

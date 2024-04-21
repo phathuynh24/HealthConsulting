@@ -86,10 +86,8 @@ class OrderDetailScreen extends StatelessWidget {
         title: Text('Chi tiết đơn hàng'),
       ),
       body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection('orders')
-            .doc(orderId)
-            .get(),
+        future:
+            FirebaseFirestore.instance.collection('orders').doc(orderId).get(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.hasError) {
@@ -155,18 +153,20 @@ class OrderDetailScreen extends StatelessWidget {
                       onPressed: () {
                         // Xử lý xác nhận đơn hàng
                       },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.green,
-                      ),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.green
+                              // primary: Colors.green,
+                              ),
                       child: Text('Xác nhận đơn hàng'),
                     ),
                     ElevatedButton(
                       onPressed: () {
                         // Xử lý xóa đơn hàng
                       },
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.red,
-                      ),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.red
+                              // primary: Colors.red,
+                              ),
                       child: Text('Xóa đơn hàng'),
                     ),
                   ],

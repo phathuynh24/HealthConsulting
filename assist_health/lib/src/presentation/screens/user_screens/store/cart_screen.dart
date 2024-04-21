@@ -4,11 +4,12 @@ import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CartScreen extends StatefulWidget {
   final List<CartItem> cartItems;
 
-  CartScreen({required this.cartItems});
+  const CartScreen({super.key, required this.cartItems});
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -30,12 +31,12 @@ class _CartScreenState extends State<CartScreen> {
         .collection('user_carts')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((DocumentSnapshot document) {
+      for (var document in querySnapshot.docs) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         setState(() {
           cartItems.add(CartItem.fromJson(data)); // Parse JSON data to CartItem
         });
-      });
+      }
     });
   }
 
@@ -55,9 +56,9 @@ class _CartScreenState extends State<CartScreen> {
         .where('productName', isEqualTo: cartItems[index].productName)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((DocumentSnapshot document) {
+      for (var document in querySnapshot.docs) {
         document.reference.delete();
-      });
+      }
     });
 
     setState(() {
@@ -71,7 +72,7 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: Text(
+        title: const Text(
           'Giỏ Hàng',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -92,21 +93,21 @@ class _CartScreenState extends State<CartScreen> {
           return ListTile(
             title: Text(
               cartItems[index].productName,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Text(
-              '${cartItems[index].productPrice} VNĐ',
-              style: TextStyle(color: Colors.grey),
+              '${NumberFormat('#,###').format(cartItems[index].productPrice)} VNĐ',
+              style: const TextStyle(color: Colors.grey),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'x${cartItems[index].quantity}',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: Icon(Icons.remove_shopping_cart),
+                  icon: const Icon(Icons.remove_shopping_cart),
                   onPressed: () => removeItem(index),
                 ),
               ],
@@ -121,17 +122,17 @@ class _CartScreenState extends State<CartScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Tổng tiền: ${totalPrice.toString()} VNĐ',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               ElevatedButton(
                 onPressed: () {
                   // Xử lý thanh toán ở đây
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Themes.gradientLightClr,
+                  backgroundColor: Themes.gradientLightClr,
                 ),
-                child: Text(
+                child: const Text(
                   'Thanh toán',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/cart_screen.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productName;
@@ -9,7 +10,8 @@ class ProductDetailScreen extends StatefulWidget {
   final List<String> imageUrls;
   final String category; // Thêm category cho sản phẩm
   static const String defaultImageUrl = 'assets/empty-box.png';
-  ProductDetailScreen({
+  const ProductDetailScreen({
+    super.key,
     required this.productName,
     required this.productPrice,
     required this.imageUrls,
@@ -110,7 +112,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: Text('Chi tiết sản phẩm'),
+        title: const Text('Chi tiết sản phẩm'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -141,7 +143,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -155,7 +157,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: List.generate(widget.imageUrls.length, (index) {
@@ -166,7 +168,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           });
                         },
                         child: Container(
-                          margin: EdgeInsets.only(bottom: 10),
+                          margin: const EdgeInsets.only(bottom: 10),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
@@ -174,7 +176,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 5,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
@@ -195,56 +197,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 widget.productName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
-                '${widget.productPrice} VNĐ',
-                style: TextStyle(fontSize: 18, color: Colors.blue),
+                '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
+                style: const TextStyle(fontSize: 18, color: Colors.blue),
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Mô tả sản phẩm:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 'Đây là mô tả chi tiết về sản phẩm.',
                 style: TextStyle(fontSize: 16),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 children: [
-                  Text(
+                  const Text(
                     'Số lượng:',
                     style: TextStyle(fontSize: 18),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   IconButton(
                     onPressed: decreaseQuantity,
-                    icon: Icon(Icons.remove),
+                    icon: const Icon(Icons.remove),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Text(
                     quantity.toString(),
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   IconButton(
                     onPressed: increaseQuantity,
-                    icon: Icon(Icons.add),
+                    icon: const Icon(Icons.add),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Sản phẩm cùng loại',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Hiển thị danh sách các sản phẩm cùng loại
               // Hiển thị danh sách các sản phẩm cùng loại
               StreamBuilder<QuerySnapshot>(
@@ -258,7 +261,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     return Text('Đã xảy ra lỗi: ${snapshot.error}');
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                   final List<Widget> productWidgets =
                       snapshot.data!.docs.map((DocumentSnapshot doc) {
@@ -275,7 +278,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           navigateToProductDetail(doc.id);
                         },
                         child: Container(
-                          margin: EdgeInsets.symmetric(
+                          margin: const EdgeInsets.symmetric(
                               horizontal: 8), // Khoảng cách giữa các sản phẩm
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,24 +289,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 width: 100, // Đảm bảo kích thước của ảnh
                                 fit: BoxFit.cover,
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(
                                 data['name'],
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Text(
-                                '${data['price']} VNĐ',
-                                style:
-                                    TextStyle(fontSize: 14, color: Colors.blue),
+                                '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
+                                style: const TextStyle(
+                                    fontSize: 18, color: Colors.blue),
                               ),
                             ],
                           ),
                         ),
                       );
                     } else {
-                      return SizedBox(); // Trả về widget trống nếu là sản phẩm hiện tại
+                      return const SizedBox(); // Trả về widget trống nếu là sản phẩm hiện tại
                     }
                   }).toList();
                   return SingleChildScrollView(
@@ -315,16 +318,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 },
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
                   onPressed: addToCart,
                   style: ElevatedButton.styleFrom(
-                    primary: Themes.gradientLightClr,
-                    padding: EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    backgroundColor: Themes.gradientLightClr,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 16),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Thêm vào giỏ hàng',
                     style: TextStyle(
                         fontSize: 18,
@@ -350,7 +354,7 @@ class CartItem {
       {required this.productName,
       required this.productPrice,
       this.quantity = 1});
-      factory CartItem.fromJson(Map<String, dynamic> json) {
+  factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       productName: json['productName'],
       productPrice: json['productPrice'],

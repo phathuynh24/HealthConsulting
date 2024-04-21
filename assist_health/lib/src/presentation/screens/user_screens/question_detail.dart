@@ -348,7 +348,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                 _deleteAnswerFromFirebase(answerData);
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.red,
+                backgroundColor: Colors.red,
                 textStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),

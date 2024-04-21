@@ -304,8 +304,10 @@ class _DoctorInfoScreenState extends State<DoctorInfoScreen> {
                   saveDoctorInfo();
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  onPrimary: Colors.white, // Change the text color
+                  backgroundColor: Colors.blue, // Đặt màu nền của nút
+                  foregroundColor: Colors.white, // Đặt màu chữ của nút
+                  // primary: Colors.blue,
+                  // onPrimary: Colors.white, // Change the text color
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                         10), // Adjust the border radius as needed

@@ -223,8 +223,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
                   ElevatedButton(
                     onPressed: _showCategoryDialog,
                     style: ElevatedButton.styleFrom(
-                      primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
-                      onPrimary: Colors.white, // Đặt màu chữ là màu trắng
+                      backgroundColor:
+                          Themes.gradientLightClr, // Đặt màu nền là màu đỏ
+                      foregroundColor: Colors.white,
+                      // primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
+                      // onPrimary: Colors.white, // Đặt màu chữ là màu trắng
                     ),
                     child: const Text(
                       'Chọn chủ đề',

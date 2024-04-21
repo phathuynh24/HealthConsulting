@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddProductScreen extends StatefulWidget {
+  const AddProductScreen({super.key});
+
   @override
   _AddProductScreenState createState() => _AddProductScreenState();
 }
@@ -21,7 +23,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String? _selectedCategory;
   int _selectedImageIndex = -1; // Chỉ mục của ảnh được chọn, mặc định là -1
 
-  List<String> _categories = [
+  final List<String> _categories = [
     'Hỗ trợ hô hấp',
     'Dinh dưỡng',
     'Hỗ trợ làm đẹp',
@@ -31,25 +33,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
   ];
 
   Future<void> _pickImages(int index) async {
-  final imagePicker = ImagePicker();
-  final List<XFile>? pickedImages = await imagePicker.pickMultiImage();
+    final imagePicker = ImagePicker();
+    final List<XFile> pickedImages = await imagePicker.pickMultiImage();
 
-  if (pickedImages != null) {
     List<String> imagePaths = pickedImages.map((image) => image.path).toList();
     setState(() {
-      _imageUrls = [..._imageUrls, ...imagePaths]; // Thêm ảnh mới vào danh sách hiện có
-      _selectedImageIndex = index; 
+      _imageUrls = [
+        ..._imageUrls,
+        ...imagePaths
+      ]; // Thêm ảnh mới vào danh sách hiện có
+      _selectedImageIndex = index;
     });
   }
-}
-
 
   Future<void> _saveProduct() async {
     final String name = _nameController.text.trim();
     final int price = int.tryParse(_priceController.text.trim()) ?? 0;
     final int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
-    if (name.isNotEmpty && price > 0 && quantity > 0 && _imageUrls.length==3&&_selectedCategory!=null) {
+    if (name.isNotEmpty &&
+        price > 0 &&
+        quantity > 0 &&
+        _imageUrls.length == 3 &&
+        _selectedCategory != null) {
       try {
         List<String> imageUrls = [];
         for (String imagePath in _imageUrls) {
@@ -59,7 +65,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
               .child(DateTime.now().toString());
           final File imageFile = File(imagePath);
           final UploadTask uploadTask = storageRef.putFile(imageFile);
-          final TaskSnapshot storageSnapshot = await uploadTask.whenComplete(() {});
+          final TaskSnapshot storageSnapshot =
+              await uploadTask.whenComplete(() {});
 
           final String imageUrl = await storageSnapshot.ref.getDownloadURL();
           imageUrls.add(imageUrl);
@@ -75,7 +82,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           description: _descriptionController.text.trim(),
         );
 
-        final productRef = await FirebaseFirestore.instance.collection('products').add(newProduct.toMap());
+        final productRef = await FirebaseFirestore.instance
+            .collection('products')
+            .add(newProduct.toMap());
         await productRef.update({'category': _selectedCategory});
 
         setState(() {
@@ -95,14 +104,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('An error occurred while saving the product. Please try again later.'),
+              title: const Text('Error'),
+              content: const Text(
+                  'An error occurred while saving the product. Please try again later.'),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text('Close'),
+                  child: const Text('Close'),
                 ),
               ],
             );
@@ -114,14 +124,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Thông báo'),
-            content: Text('Hãy điền hết các thông tin và ảnh.'),
+            title: const Text('Thông báo'),
+            content: const Text('Hãy điền hết các thông tin và ảnh.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Close'),
+                child: const Text('Close'),
               ),
             ],
           );
@@ -159,72 +169,72 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Tên sản phẩm',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.shopping_bag),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _priceController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Gía sản phẩm',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.attach_money),
               ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _quantityController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Số lượng',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.format_list_numbered),
               ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             TextField(
               controller: _descriptionController,
               maxLines: null,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Mô tả sản phẩm',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.description),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             //Demo
-      //         DropdownButtonFormField<String>(
-      //             decoration: InputDecoration(
-      //               prefixIcon: Icon(Icons.category_sharp),
-      //               labelText: 'Phân loại',
-      //               border: OutlineInputBorder(),
-      //               contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      //             ),
-      //             value: _selectedCategory,
-      //             onChanged: _onCategoryChanged,
-      //             items: _categories.map<DropdownMenuItem<String>>((String value) {
-      //               return DropdownMenuItem<String>(
-      //                 value: value,
-      //                 child: Padding(
-      //                   padding: EdgeInsets.symmetric(vertical: 8.0),
-      //                   child: Text(
-      //                     value,
-      //                     style: TextStyle(fontSize: 16.0),
-      //                   ),
-      //                 ),
-      //               );
-      //   }).toList(),
-      // ),
+            //         DropdownButtonFormField<String>(
+            //             decoration: InputDecoration(
+            //               prefixIcon: Icon(Icons.category_sharp),
+            //               labelText: 'Phân loại',
+            //               border: OutlineInputBorder(),
+            //               contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            //             ),
+            //             value: _selectedCategory,
+            //             onChanged: _onCategoryChanged,
+            //             items: _categories.map<DropdownMenuItem<String>>((String value) {
+            //               return DropdownMenuItem<String>(
+            //                 value: value,
+            //                 child: Padding(
+            //                   padding: EdgeInsets.symmetric(vertical: 8.0),
+            //                   child: Text(
+            //                     value,
+            //                     style: TextStyle(fontSize: 16.0),
+            //                   ),
+            //                 ),
+            //               );
+            //   }).toList(),
+            // ),
 
             DropdownButton<String>(
               value: _selectedCategory,
@@ -236,56 +246,62 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 16.0),
-          Row(
-                children: List.generate(
-                  3,
-                  (index) => Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        _pickImages(index); // Gọi hàm _pickImages khi người dùng nhấn vào ô
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(right: 8.0),
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(8.0),
-                          image: _imageUrls.isNotEmpty && index < _imageUrls.length
-                              ? DecorationImage(
-                                  image: FileImage(File(_imageUrls[index])),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
-                        ),
-                        child: _imageUrls.isNotEmpty && index < _imageUrls.length
-                            ? null // Không hiển thị Icon nếu có ảnh được chọn
-                            : Icon(Icons.add_a_photo, size: 40.0),
+            const SizedBox(height: 16.0),
+            Row(
+              children: List.generate(
+                3,
+                (index) => Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      _pickImages(
+                          index); // Gọi hàm _pickImages khi người dùng nhấn vào ô
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8.0),
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(8.0),
+                        image:
+                            _imageUrls.isNotEmpty && index < _imageUrls.length
+                                ? DecorationImage(
+                                    image: FileImage(File(_imageUrls[index])),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
                       ),
+                      child: _imageUrls.isNotEmpty && index < _imageUrls.length
+                          ? null // Không hiển thị Icon nếu có ảnh được chọn
+                          : const Icon(Icons.add_a_photo, size: 40.0),
                     ),
                   ),
                 ),
               ),
-            SizedBox(height: 16.0),
+            ),
+            const SizedBox(height: 16.0),
             //Canh giua
-             Center(
+            Center(
               child: ElevatedButton(
                 onPressed: _saveProduct,
-                child: Text(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32.0, vertical: 12.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  backgroundColor:
+                      Themes.gradientLightClr, // Đặt màu nền của nút
+                  foregroundColor: Colors.white, // Đặt màu chữ của nút
+                  // primary: Themes.gradientLightClr,
+                  // onPrimary: Colors.white,
+                ),
+                child: const Text(
                   'Lưu',
                   style: TextStyle(
                     fontSize: 18.0,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  primary: Themes.gradientLightClr,
-                  onPrimary: Colors.white,
                 ),
               ),
             ),
