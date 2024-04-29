@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: ">=3.0.6 <4.0.0"
 
 dependencies:
   flutter:
@@ -71,7 +71,6 @@ dev_dependencies:
 # The following section is specific to Flutter.
 
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -89,21 +88,24 @@ flutter:
   # https://flutter.dev/assets-and-images/#from-packages
 
   assets:
-     - assets/doctor1.jpg
-     - assets/doctor2.jpg
-     - assets/doctor3.jpg
-     - assets/doctor4.jpg
-     - assets/doctors.png
-     - assets/slider1.jpg
-     - assets/slider2.jpg
-     - assets/slider3.jpeg
-     - assets/empty-box.png
-     - assets/lined heart.png
-     - assets/sample_image.png
-     - assets/sample_image.jpeg
-     - assets/guidanceVietQR.png
-     - assets/health_care_logo.jpg
-     - assets/health_care_logo_nobg.png
-     - assets/no_result_search_icon.png
-     - assets/image.png
-     - lib/.evn
+    - assets/doctor1.jpg
+    - assets/doctor2.jpg
+    - assets/doctor3.jpg
+    - assets/doctor4.jpg
+    - assets/doctors.png
+    - assets/slider1.jpg
+    - assets/slider2.jpg
+    - assets/slider3.jpeg
+    - assets/empty-box.png
+    - assets/lined heart.png
+    - assets/sample_image.png
+    - assets/sample_image.jpeg
+    - assets/guidanceVietQR.png
+    - assets/health_care_logo.jpg
+    - assets/health_care_logo_nobg.png
+    - assets/no_result_search_icon.png
+    - assets/image.png
+    - assets/vnpay_logo.png
+    - assets/ship_cod_logo.png
+    - assets/momo_logo.png
+    - lib/.evn

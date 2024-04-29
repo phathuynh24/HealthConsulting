@@ -1,8 +1,8 @@
-import 'dart:convert'; // Import for jsonDecode
-
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/purchase_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,17 +18,27 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   int totalPrice = 0;
   late List<CartItem> cartItems = [];
+  late String currentUserId = '';
 
   @override
   void initState() {
     super.initState();
+    getCurrentUserId();
     fetchCartItems();
     calculateTotalPrice();
+  }
+
+  void getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      currentUserId = user.uid;
+    }
   }
 
   void fetchCartItems() {
     FirebaseFirestore.instance
         .collection('user_carts')
+        .where('userId', isEqualTo: currentUserId)
         .get()
         .then((QuerySnapshot querySnapshot) {
       for (var document in querySnapshot.docs) {
@@ -53,7 +63,7 @@ class _CartScreenState extends State<CartScreen> {
   void removeItem(int index) {
     FirebaseFirestore.instance
         .collection('user_carts')
-        .where('productName', isEqualTo: cartItems[index].productName)
+        .where('id', isEqualTo: cartItems[index].id)
         .get()
         .then((QuerySnapshot querySnapshot) {
       for (var document in querySnapshot.docs) {
@@ -63,7 +73,7 @@ class _CartScreenState extends State<CartScreen> {
 
     setState(() {
       cartItems.removeAt(index);
-      calculateTotalPrice(); // Update total price after removing item
+      calculateTotalPrice();
     });
   }
 
@@ -127,7 +137,13 @@ class _CartScreenState extends State<CartScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Xử lý thanh toán ở đây
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PurchaseScreen(cartItems: widget.cartItems),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Themes.gradientLightClr,

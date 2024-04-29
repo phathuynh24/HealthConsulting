@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/others/theme.dart';
@@ -23,9 +24,10 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  int quantity = 0;
+  int quantity = 1;
   List<CartItem> cartItems = [];
   late String selectedImageUrl;
+  late String currentUserId;
 
   @override
   void initState() {
@@ -34,6 +36,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       selectedImageUrl = widget.imageUrls.first;
     } else {
       selectedImageUrl = ProductDetailScreen.defaultImageUrl;
+    }
+    getCurrentUserId();
+  }
+
+  void getCurrentUserId() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      currentUserId = user.uid;
+    } else {
+      // Handle the case where user is not signed in
     }
   }
 
@@ -53,17 +65,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   void addToCart() {
     CartItem newItem = CartItem(
+      id: UniqueKey().toString(),
       productName: widget.productName,
       productPrice: widget.productPrice,
       quantity: quantity,
     );
     cartItems.add(newItem);
-    // Lưu thông tin sản phẩm vào Firestore
     FirebaseFirestore.instance.collection('user_carts').add({
+      'id': newItem.id,
       'productName': widget.productName,
       'productPrice': widget.productPrice,
       'quantity': quantity,
-      // Thêm các thông tin khác của sản phẩm nếu cần
+      'userId': currentUserId,
     });
     Navigator.push(
       context,
@@ -76,7 +89,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void navigateToProductDetail(String productId) {
-    // Lấy thông tin của sản phẩm từ Firestore dựa trên productId
     FirebaseFirestore.instance
         .collection('products')
         .doc(productId)
@@ -248,8 +260,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              // Hiển thị danh sách các sản phẩm cùng loại
-              // Hiển thị danh sách các sản phẩm cùng loại
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('products')
@@ -274,7 +284,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               : (data['imageUrls'] as List<dynamic>).first;
                       return GestureDetector(
                         onTap: () {
-                          // Gọi hàm điều hướng đến trang chi tiết sản phẩm
                           navigateToProductDetail(doc.id);
                         },
                         child: Container(
@@ -297,7 +306,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
+                                '${NumberFormat('#,###').format(
+                                  data['price'],
+                                )} VNĐ',
                                 style: const TextStyle(
                                     fontSize: 18, color: Colors.blue),
                               ),
@@ -317,7 +328,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   );
                 },
               ),
-
               const SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,
@@ -346,16 +356,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 }
 
 class CartItem {
+  final String id;
   final String productName;
   final int productPrice;
   int quantity;
 
   CartItem(
-      {required this.productName,
+      {required this.id,
+      required this.productName,
       required this.productPrice,
       this.quantity = 1});
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
+      id: json['id'],
       productName: json['productName'],
       productPrice: json['productPrice'],
       quantity: json['quantity'] ?? 1,

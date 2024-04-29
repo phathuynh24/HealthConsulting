@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminOrderManagementScreen extends StatelessWidget {
+  const AdminOrderManagementScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,11 +33,11 @@ class AdminOrderManagementScreen extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('Không có đơn đặt hàng nào.'));
+            return const Center(child: Text('Không có đơn đặt hàng nào.'));
           }
 
           return ListView(
@@ -44,15 +46,16 @@ class AdminOrderManagementScreen extends StatelessWidget {
                   document.data() as Map<String, dynamic>;
 
               return Card(
-                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                 child: ListTile(
                   title: Text(
                     'Mã đơn hàng: ${document.id}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text('Tổng tiền: ${data['totalPrice']} đ'),
                   trailing: IconButton(
-                    icon: Icon(Icons.remove_red_eye),
+                    icon: const Icon(Icons.remove_red_eye),
                     onPressed: () {
                       // Hiển thị chi tiết đơn hàng khi nhấp vào
                       Navigator.push(
@@ -83,7 +86,7 @@ class OrderDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết đơn hàng'),
+        title: const Text('Chi tiết đơn hàng'),
       ),
       body: FutureBuilder(
         future:
@@ -95,11 +98,11 @@ class OrderDetailScreen extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('Không tìm thấy đơn hàng.'));
+            return const Center(child: Text('Không tìm thấy đơn hàng.'));
           }
 
           Map<String, dynamic> data =
@@ -112,24 +115,24 @@ class OrderDetailScreen extends StatelessWidget {
               children: [
                 Text(
                   'Mã đơn hàng: $orderId',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
                   ),
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 Text('Tên khách hàng: ${data['customerName']}'),
                 Text('Địa chỉ: ${data['address']}'),
                 Text('Tổng tiền: ${data['totalPrice']} đ'),
-                SizedBox(height: 16.0),
-                Text(
+                const SizedBox(height: 16.0),
+                const Text(
                   'Sản phẩm đã đặt hàng:',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0,
                   ),
                 ),
-                SizedBox(height: 8.0),
+                const SizedBox(height: 8.0),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: data['products'].length,
@@ -137,7 +140,7 @@ class OrderDetailScreen extends StatelessWidget {
                     return ListTile(
                       title: Text(
                         data['products'][index]['name'],
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
                         'Số lượng: ${data['products'][index]['quantity']}',
@@ -145,7 +148,7 @@ class OrderDetailScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -157,7 +160,7 @@ class OrderDetailScreen extends StatelessWidget {
                           ElevatedButton.styleFrom(backgroundColor: Colors.green
                               // primary: Colors.green,
                               ),
-                      child: Text('Xác nhận đơn hàng'),
+                      child: const Text('Xác nhận đơn hàng'),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -167,7 +170,7 @@ class OrderDetailScreen extends StatelessWidget {
                           ElevatedButton.styleFrom(backgroundColor: Colors.red
                               // primary: Colors.red,
                               ),
-                      child: Text('Xóa đơn hàng'),
+                      child: const Text('Xóa đơn hàng'),
                     ),
                   ],
                 ),
