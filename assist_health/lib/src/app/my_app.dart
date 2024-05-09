@@ -6,7 +6,7 @@ import 'package:assist_health/src/presentation/screens/other_screens/welcome.dar
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../presentation/screens/user_screens/chatbot_screen/chatbot.dart';
+import '../presentation/screens/user_screens/chatbot/chatbot.dart';
 import 'auth_bloc/bloc.dart';
 
 class MyApp extends StatelessWidget {

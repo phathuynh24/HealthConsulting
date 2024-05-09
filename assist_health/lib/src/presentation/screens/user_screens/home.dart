@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:assist_health/src/models/doctor/doctor_info.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/chatbot_screen/chatbot.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/chatbot/chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
@@ -21,8 +21,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+
+import 'disease_prediction/bloc.dart';
+import 'disease_prediction/disease_prediction_screen.dart';
+import 'doctor_recommendation/doctor_recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -480,14 +485,16 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (_) =>
-                                              const ViewResultListScreen()),
+                                              // const ViewResultListScreen()),
+                                              DoctorRecommendationScreen()),
                                     );
                                   }),
                                   itemDashboard(
                                       'Cửa hàng',
                                       FontAwesomeIcons.cartShopping,
                                       const Color.fromARGB(255, 241, 85, 0),
-                                      const Color.fromARGB(255, 160, 122, 46), () {
+                                      const Color.fromARGB(255, 160, 122, 46),
+                                      () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (_) =>
@@ -495,16 +502,22 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
-                                      'ChatBot',
-                                      FontAwesomeIcons.robot,
-                                      const Color(0xFF2EF76F),
-                                      const Color(0xFF2EA05A), () {
-                                    // Navigator.of(context).push(
-                                    //   MaterialPageRoute(
-                                    //       builder: (_) =>
-                                    //           const ViewResultListScreen()),
-                                    // );
-                                  }),
+                                    'Khuyến nghị',
+                                    FontAwesomeIcons.robot,
+                                    const Color(0xFF2EF76F),
+                                    const Color(0xFF2EA05A),
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              BlocProvider<SymptomsBloc>(
+                                            create: (context) => SymptomsBloc(),
+                                            child: SymptomsScreen(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ),

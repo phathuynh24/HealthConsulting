@@ -24,20 +24,36 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Message> msgs = [];
   bool isTyping = false;
 
-  String messageRequired = "";
-//D:\Nam_3\HK1\flutter_base\SE121.O11-Do_An_1\assist_health\lib\.evn
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void sendMsg() async {
-    await dotenv.load(fileName: "lib/.evn");
     String text = controller.text;
     String? apiKey = dotenv.env['CHATBOT_API_KEY'] ?? "";
     controller.clear();
     try {
       if (text.isNotEmpty) {
         setState(() {
-          msgs.insert(0, Message(true, text));
+          msgs.add(Message(true, text));
           isTyping = true;
         });
-        scrollController.animateTo(0.0,
+
+        Map<String, dynamic> messages = {
+          "sendby": _auth.currentUser!.displayName,
+          "message": text,
+          "type": "text",
+          "time": FieldValue.serverTimestamp(),
+        };
+
+        await _firestore
+            .collection('chatbot')
+            .doc(_auth.currentUser!.uid)
+            .collection('chats')
+            .add(messages);
+
+        scrollController.animateTo(scrollController.position.maxScrollExtent,
             duration: const Duration(seconds: 1), curve: Curves.easeOut);
         var response = await http.post(
             Uri.parse("https://api.openai.com/v1/chat/completions"),
@@ -56,24 +72,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 {
                   "role": "user",
                   "content":
-                      "Use language appropriate to the question asked and if the question is not directly related to the medical or health topic, politely reject it"
+                      "Use Vietnamese languge and if the question is not directly related to the medical or health topic, politely reject it"
                 },
                 {"role": "user", "content": text},
               ]
             }));
-
-        Map<String, dynamic> messages = {
-          "sendby": _auth.currentUser!.displayName,
-          "message": text,
-          "type": "text",
-          "time": FieldValue.serverTimestamp(),
-        };
-
-        await _firestore
-            .collection('chatbot')
-            .doc(_auth.currentUser!.uid)
-            .collection('chats')
-            .add(messages);
 
         if (response.statusCode == 200) {
           var json = jsonDecode(utf8.decode(response.bodyBytes));
@@ -81,10 +84,9 @@ class _ChatScreenState extends State<ChatScreen> {
               json["choices"][0]["message"]["content"].toString().trimLeft();
           setState(() {
             isTyping = false;
-            msgs.insert(0, Message(false, reply));
+            msgs.add(Message(false, reply));
           });
-          scrollController.animateTo(0.0,
-              duration: const Duration(seconds: 1), curve: Curves.easeOut);
+
           Map<String, dynamic> messages = {
             "sendby": "assistant",
             "message": reply,
@@ -97,12 +99,22 @@ class _ChatScreenState extends State<ChatScreen> {
               .doc(_auth.currentUser!.uid)
               .collection('chats')
               .add(messages);
+
+          scrollController.animateTo(scrollController.position.maxScrollExtent,
+              duration: const Duration(seconds: 1), curve: Curves.easeOut);
         }
       }
     } on Exception {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Some error occurred, please try again!")));
+    }
+  }
+
+  void _scrollToBottom() {
+    if (scrollController.hasClients) {
+      double offset = scrollController.position.maxScrollExtent + 3000;
+      scrollController.jumpTo(offset);
     }
   }
 
@@ -126,40 +138,69 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Chat view
           Expanded(
-            child: ListView.builder(
-                controller: scrollController,
-                itemCount: msgs.length,
-                shrinkWrap: true,
-                reverse: true,
-                itemBuilder: (context, index) {
-                  return Padding(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _firestore
+                  .collection('chatbot')
+                  .doc(_auth.currentUser!.uid)
+                  .collection('chats')
+                  .orderBy("time", descending: false)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text('Error occurred while loading data.'),
+                  );
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text('No messages available.'),
+                  );
+                }
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _scrollToBottom();
+                });
+                return ListView.builder(
+                  controller: scrollController,
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> map = snapshot.data!.docs[index].data()
+                        as Map<String, dynamic>;
+                    final isSentByMe =
+                        map['sendby'] == _auth.currentUser!.displayName;
+                    return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: isTyping && index == 0
-                          ? Column(
-                              children: [
-                                BubbleNormal(
-                                  text: msgs[0].msg,
-                                  isSender: true,
-                                  color: Colors.blue.shade100,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 16, top: 4),
-                                  child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text("Đang nhắn...")),
-                                )
-                              ],
-                            )
-                          : BubbleNormal(
-                              text: msgs[index].msg,
-                              isSender: msgs[index].isSender,
-                              color: msgs[index].isSender
-                                  ? Colors.blue.shade100
-                                  : Colors.grey.shade200,
-                            ));
-                }),
+                      child: Column(
+                        children: [
+                          BubbleNormal(
+                            text: map["message"],
+                            isSender: isSentByMe,
+                            color: isSentByMe
+                                ? Colors.blue.shade100
+                                : Colors.grey.shade200,
+                          ),
+                          if (isTyping &&
+                              index == snapshot.data!.docs.length - 1)
+                            const Padding(
+                              padding: EdgeInsets.only(left: 16, top: 4),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text("Đang nhắn..."),
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
           // Chat input
           Row(
@@ -171,8 +212,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(10)),
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: TextField(
@@ -184,8 +226,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         textInputAction: TextInputAction.send,
                         showCursor: true,
                         decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Nhập tin nhắn"),
+                          border: InputBorder.none,
+                          hintText: "Nhập tin nhắn",
+                        ),
                       ),
                     ),
                   ),
@@ -199,17 +242,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(30)),
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   child: const Icon(
                     Icons.send,
                     color: Colors.white,
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 8,
-              )
+              const SizedBox(width: 8),
             ],
           ),
         ],
