@@ -2,21 +2,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/store/cart_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/cart/cart_screen.dart';
 import 'package:intl/intl.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final String productName;
   final int productPrice;
+  final int productOldPrice;
+
   final List<String> imageUrls;
-  final String category; // Thêm category cho sản phẩm
+  final String category;
   static const String defaultImageUrl = 'assets/empty-box.png';
   const ProductDetailScreen({
     super.key,
     required this.productName,
     required this.productPrice,
+    required this.productOldPrice,
     required this.imageUrls,
-    required this.category, // Thêm category vào constructor
+    required this.category,
   });
 
   @override
@@ -44,9 +47,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       currentUserId = user.uid;
-    } else {
-      // Handle the case where user is not signed in
-    }
+    } else {}
   }
 
   void decreaseQuantity() {
@@ -68,15 +69,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       id: UniqueKey().toString(),
       productName: widget.productName,
       productPrice: widget.productPrice,
+      productOldPrice: widget.productOldPrice,
       quantity: quantity,
+      imageUrls: widget.imageUrls,
+      category: widget.category,
     );
     cartItems.add(newItem);
     FirebaseFirestore.instance.collection('user_carts').add({
       'id': newItem.id,
       'productName': widget.productName,
       'productPrice': widget.productPrice,
+      'productOldPrice': widget.productOldPrice,
       'quantity': quantity,
       'userId': currentUserId,
+      'imageUrls': newItem.imageUrls,
+      'category': newItem.category,
     });
     Navigator.push(
       context,
@@ -104,6 +111,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailScreen(
+              productOldPrice: data['old_price'],
               productName: data['name'],
               productPrice: data['price'],
               imageUrls: (data['imageUrls'] as List<dynamic>).cast<String>(),
@@ -170,42 +178,44 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(widget.imageUrls.length, (index) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedImageUrl = widget.imageUrls[index];
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: SizedBox(
-                            height: 80,
-                            width: 80,
-                            child: ClipRRect(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: List.generate(widget.imageUrls.length, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedImageUrl = widget.imageUrls[index];
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                widget.imageUrls[index],
-                                fit: BoxFit.cover,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: SizedBox(
+                              height: 80,
+                              width: 80,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  widget.imageUrls[index],
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
                 ],
               ),
@@ -215,12 +225,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 10),
               Text(
                 '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
-                style: const TextStyle(fontSize: 18, color: Colors.blue),
+                style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(width: 10),
+              Text(
+                '${NumberFormat('#,###').format(widget.productOldPrice)} VNĐ',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                  decoration: TextDecoration.lineThrough,
+                ),
+              ),
+              const SizedBox(height: 10),
               const Text(
                 'Mô tả sản phẩm:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -359,18 +380,27 @@ class CartItem {
   final String id;
   final String productName;
   final int productPrice;
+  final int productOldPrice;
   int quantity;
+  final List<String> imageUrls;
+  final String category;
 
   CartItem(
       {required this.id,
       required this.productName,
       required this.productPrice,
+      required this.productOldPrice,
+      required this.imageUrls,
+      required this.category,
       this.quantity = 1});
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       id: json['id'],
       productName: json['productName'],
       productPrice: json['productPrice'],
+      productOldPrice: json['productOldPrice'],
+      imageUrls: List<String>.from(json['imageUrls']),
+      category: json['category'],
       quantity: json['quantity'] ?? 1,
     );
   }

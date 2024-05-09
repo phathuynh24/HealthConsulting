@@ -108,4 +108,7 @@ flutter:
     - assets/vnpay_logo.png
     - assets/ship_cod_logo.png
     - assets/momo_logo.png
+    - assets/empty-cart.png
+    - assets/empty-location.png
+    - assets/empty-order.png
     - lib/.evn

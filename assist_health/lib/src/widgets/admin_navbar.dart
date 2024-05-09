@@ -6,6 +6,7 @@ import 'package:assist_health/src/presentation/screens/admin_screens/message_adm
 import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/voucher/add_voucher_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
@@ -22,7 +23,8 @@ class _AdminNavBarState extends State<AdminNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    const RevenueChartScreen(),
+    // const RevenueChartScreen(),
+    AddVoucherScreen(),
     // Screen 2
     const ContentTopBar(),
     // Screen 3
@@ -32,9 +34,9 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 5
     const AdminAccountScreen(),
     //Screen 6
-    ProductListScreen(),
+    const ProductListScreen(),
     //Screen 7
-    AdminOrderManagementScreen(),
+    const AdminOrderManagementScreen(),
   ];
 
   @override
@@ -80,11 +82,11 @@ class _AdminNavBarState extends State<AdminNavBar> {
               icon: Icon(Icons.settings),
               label: "Tài khoản",
             ),
-             BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(Icons.store),
               label: "Thêm sản phẩm",
             ),
-             BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(Icons.shopping_bag),
               label: "Đơn hàng",
             ),

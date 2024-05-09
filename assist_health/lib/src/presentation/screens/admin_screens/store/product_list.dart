@@ -5,27 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductListScreen extends StatefulWidget {
+  const ProductListScreen({super.key});
+
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
   late Stream<QuerySnapshot> _productStream;
-  String _selectedCategory = 'Tất cả'; 
-  List<String> _categories = [
-    'Tất cả', 
-    'Hỗ trợ hô hấp', 
-    'Dinh dưỡng', 
-    'Hỗ trợ làm đẹp', 
+  String _selectedCategory = 'Tất cả';
+  final List<String> _categories = [
+    'Tất cả',
+    'Hỗ trợ hô hấp',
+    'Dinh dưỡng',
+    'Hỗ trợ làm đẹp',
     'Hỗ trợ tiêu hóa',
-    'Phát triển trẻ nhỏ', 
+    'Phát triển trẻ nhỏ',
     'Vitamin - khoáng chất'
   ];
 
   @override
   void initState() {
     super.initState();
-    _productStream = FirebaseFirestore.instance.collection('products').snapshots();
+    _productStream =
+        FirebaseFirestore.instance.collection('products').snapshots();
   }
 
   // Hàm để lọc danh sách sản phẩm theo loại sản phẩm được chọn
@@ -33,13 +36,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
     if (_selectedCategory == 'Tất cả') {
       return products; // Trả về danh sách sản phẩm gốc nếu loại sản phẩm được chọn là 'Tất cả'
     } else {
-      return products.where((product) => product.category == _selectedCategory).toList(); // Lọc danh sách sản phẩm theo loại sản phẩm được chọn
+      return products
+          .where((product) => product.category == _selectedCategory)
+          .toList(); // Lọc danh sách sản phẩm theo loại sản phẩm được chọn
     }
   }
 
   Future<void> deleteProduct(String productId) async {
     try {
-      await FirebaseFirestore.instance.collection('products').doc(productId).delete();
+      await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productId)
+          .delete();
       print('Xóa sản phẩm thành công');
     } catch (e) {
       print('Đã xảy ra lỗi khi xóa sản phẩm: $e');
@@ -52,8 +60,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Xác nhận xóa'),
-          content: SingleChildScrollView(
+          title: const Text('Xác nhận xóa'),
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text('Bạn có chắc chắn muốn xóa sản phẩm này?'),
@@ -62,13 +70,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Hủy'),
+              child: const Text('Hủy'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Xóa'),
+              child: const Text('Xóa'),
               onPressed: () async {
                 await deleteProduct(productId);
                 Navigator.of(context).pop();
@@ -102,7 +110,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         actions: [
           // Thêm nút PopupMenuButton để chọn loại sản phẩm
           PopupMenuButton<String>(
-            icon: Icon(
+            icon: const Icon(
               Icons.filter_list,
               color: Colors.white, // Màu của biểu tượng
             ),
@@ -117,7 +125,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   value: category,
                   child: Text(
                     category,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black, // Màu của chữ
                     ),
                   ),
@@ -136,22 +144,23 @@ class _ProductListScreenState extends State<ProductListScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
 
           final List<Product> products = snapshot.data!.docs.map((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return Product(
-              id: doc.id,
-              name: data['name'],
-              price: data['price'],
-              quantity: data['quantity'],
-              imageUrls: List<String>.from(data['imageUrls']),
-              category: data['category']
-            );
+                id: doc.id,
+                name: data['name'],
+                price: data['price'],
+                oldPrice: data['old_price'],
+                quantity: data['quantity'],
+                imageUrls: List<String>.from(data['imageUrls']),
+                category: data['category']);
           }).toList();
 
-          final List<Product> filteredProducts = filterProductsByCategory(products); // Lọc danh sách sản phẩm theo loại sản phẩm được chọn
+          final List<Product> filteredProducts = filterProductsByCategory(
+              products); // Lọc danh sách sản phẩm theo loại sản phẩm được chọn
 
           return ListView.builder(
             itemCount: filteredProducts.length,
@@ -160,58 +169,57 @@ class _ProductListScreenState extends State<ProductListScreen> {
               final bool isEven = index % 2 == 0;
               final Color? tileColor = isEven ? Colors.white : Colors.grey[200];
 
-              // return ListTile(
-              //   tileColor: tileColor,
-              //   leading: Image.network(product.imageUrl),
-              //   title: Text(product.name),
-              //   subtitle: Text('Giá: ${product.price}, Số lượng: ${product.quantity}'),
-              //   trailing: IconButton(
-              //     icon: Icon(Icons.delete, color: Colors.red),
-              //     onPressed: () => showDeleteConfirmationDialog(product.id),
-              //   ),
-              // );
-                    return Card(
-        color: tileColor, // Màu nền của Card
-        elevation: 4, // Độ nâng của Card
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10), // Bo tròn góc của Card
-        ),
-        child: InkWell(
-          onTap: () {
-            // Xử lý khi người dùng nhấn vào ListTile
-    },
-    child: Padding(
-      padding: EdgeInsets.all(8), // Đệm bao quanh nội dung của ListTile
-      child: Row(
-        children: [
-          // Leading (Ảnh)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8), // Bo tròn góc của ảnh
-            child: Image.network(
-              product.imageUrls.isNotEmpty ? product.imageUrls[0] : '', // Lấy URL ảnh đầu tiên từ danh sách, hoặc trả về chuỗi rỗng nếu danh sách trống
-              width: 80, // Chiều rộng của ảnh
-              height: 80, // Chiều cao của ảnh
-              fit: BoxFit.cover, // Thay đổi kích thước ảnh để nó phù hợp với không gian được cung cấp
-            ),
-          ),
-          SizedBox(width: 16), // Khoảng cách giữa ảnh và nội dung
+              return Card(
+                color: tileColor, // Màu nền của Card
+                elevation: 4, // Độ nâng của Card
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(10), // Bo tròn góc của Card
+                ),
+                child: InkWell(
+                  onTap: () {
+                    // Xử lý khi người dùng nhấn vào ListTile
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(
+                        8), // Đệm bao quanh nội dung của ListTile
+                    child: Row(
+                      children: [
+                        // Leading (Ảnh)
+                        ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(8), // Bo tròn góc của ảnh
+                          child: Image.network(
+                            product.imageUrls.isNotEmpty
+                                ? product.imageUrls[0]
+                                : '', // Lấy URL ảnh đầu tiên từ danh sách, hoặc trả về chuỗi rỗng nếu danh sách trống
+                            width: 80, // Chiều rộng của ảnh
+                            height: 80, // Chiều cao của ảnh
+                            fit: BoxFit
+                                .cover, // Thay đổi kích thước ảnh để nó phù hợp với không gian được cung cấp
+                          ),
+                        ),
+                        const SizedBox(
+                            width: 16), // Khoảng cách giữa ảnh và nội dung
 
-          // Title và Subtitle
+                        // Title và Subtitle
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 product.name,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                               ),
-                              SizedBox(height: 4), // Khoảng cách giữa title và subtitle
+                              const SizedBox(
+                                  height:
+                                      4), // Khoảng cách giữa title và subtitle
                               Text(
                                 'Giá: ${product.price}, Số lượng: ${product.quantity}',
-                                style: TextStyle(fontSize: 14),
+                                style: const TextStyle(fontSize: 14),
                               ),
                             ],
                           ),
@@ -219,8 +227,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                         // Trailing (IconButton)
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => showDeleteConfirmationDialog(product.id),
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () =>
+                              showDeleteConfirmationDialog(product.id),
                         ),
                       ],
                     ),
@@ -235,12 +244,12 @@ class _ProductListScreenState extends State<ProductListScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddProductScreen()),
+            MaterialPageRoute(builder: (context) => const AddProductScreen()),
           );
         },
         backgroundColor: Themes.gradientLightClr,
         foregroundColor: Colors.white,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/favorite_doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/order_detail_screen.dart';
 import 'package:assist_health/src/widgets/health_metrics_topnavbar.dart';
 import 'package:assist_health/src/widgets/user_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -262,6 +263,43 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                   title: const Text(
                                     "Chỉ số sức khỏe",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 10,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                OrderDetailsPage()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.shopping_cart,
+                                    color: Color.fromARGB(255, 223, 133, 15),
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Đơn mua",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15,

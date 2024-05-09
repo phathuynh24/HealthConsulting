@@ -44,7 +44,8 @@ class _CartScreenState extends State<CartScreen> {
       for (var document in querySnapshot.docs) {
         Map<String, dynamic> data = document.data() as Map<String, dynamic>;
         setState(() {
-          cartItems.add(CartItem.fromJson(data)); // Parse JSON data to CartItem
+          cartItems.add(CartItem.fromJson(data));
+          calculateTotalPrice();
         });
       }
     });
@@ -52,9 +53,12 @@ class _CartScreenState extends State<CartScreen> {
 
   void calculateTotalPrice() {
     int total = 0;
-    for (var item in widget.cartItems) {
+
+    // Tính toán giá cho tất cả các sản phẩm trong giỏ hàng
+    for (var item in cartItems) {
       total += item.quantity * item.productPrice;
     }
+
     setState(() {
       totalPrice = total;
     });
@@ -98,8 +102,25 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       body: ListView.builder(
-        itemCount: cartItems.length,
+        itemCount: cartItems.isEmpty ? 1 : cartItems.length,
         itemBuilder: (context, index) {
+          if (cartItems.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                      height: 400,
+                      width: 300,
+                      child: Image.asset('assets/empty-cart.png')),
+                  const Text(
+                    'Chưa có đơn hàng trong giỏ',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            );
+          }
           return ListTile(
             title: Text(
               cartItems[index].productName,
@@ -125,41 +146,43 @@ class _CartScreenState extends State<CartScreen> {
           );
         },
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PurchaseScreen(cartItems: widget.cartItems),
+      bottomNavigationBar: (cartItems.isNotEmpty)
+          ? BottomAppBar(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Themes.gradientLightClr,
-                ),
-                child: const Text(
-                  'Thanh toán',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const PurchaseScreen(address: null),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Themes.gradientLightClr,
+                      ),
+                      child: const Text(
+                        'Thanh toán',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : null,
     );
   }
 }

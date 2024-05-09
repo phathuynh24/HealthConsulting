@@ -1,5 +1,10 @@
 import 'dart:convert';
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/address/list_addresses.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/purchase_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -21,6 +26,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   List<String> cities = [];
   List<String> districts = [];
   List<String> wards = [];
+
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final addressController = TextEditingController();
 
   @override
   void initState() {
@@ -136,8 +145,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             Container(
               height: 48,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
@@ -171,8 +181,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             Container(
               height: 48,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
@@ -350,8 +362,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             Container(
               height: 48,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: addressController,
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
@@ -388,7 +401,44 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             )),
             backgroundColor: MaterialStateProperty.all(Themes.gradientLightClr),
           ),
-          onPressed: () {},
+          onPressed: () {
+            if (nameController.text.isNotEmpty &&
+                phoneController.text.isNotEmpty &&
+                selectedCity != null &&
+                selectedDistrict != null &&
+                selectedWard != null &&
+                addressController.text.isNotEmpty) {
+              String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+              bool isDefaultAddress = isDefault;
+              FirebaseFirestore.instance.collection('addresses').add({
+                'userId': currentUserId,
+                'name': nameController.text,
+                'phone': phoneController.text,
+                'fullAddress':
+                    '${addressController.text}, $selectedWard,$selectedDistrict,$selectedCity',
+                'isDefault': isDefaultAddress,
+              }).then((value) {
+                print('Address added successfully!');
+                return FirebaseFirestore.instance
+                    .collection('addresses')
+                    .doc(value.id)
+                    .get();
+              }).then((newAddress) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PurchaseScreen(
+                      address: newAddress,
+                    ),
+                  ),
+                );
+              }).catchError((error) {
+                print('Failed to add address: $error');
+              });
+            } else {
+              print('Please fill in all required fields');
+            }
+          },
           child: const Text(
             'Lưu địa chỉ này',
             style: TextStyle(
