@@ -10,6 +10,48 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+class CustomContainerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Vẽ đường viền container
+    final paint = Paint()
+      ..color = Colors.grey[300]!
+      ..strokeWidth = 4;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        const Radius.circular(0),
+      ),
+      paint,
+    );
+
+    // Vẽ các lỗ hổng ở giữa thân container
+    final holePaint = Paint()..color = Colors.white;
+
+    const holeRadius = 15.0;
+
+    // Vẽ lỗ hổng bên trái
+    canvas.drawCircle(
+      Offset(size.width, size.height / 2),
+      holeRadius,
+      holePaint,
+    );
+
+    // Vẽ lỗ hổng bên phải
+    canvas.drawCircle(
+      Offset(0, size.height / 2),
+      holeRadius,
+      holePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
 class PurchaseScreen extends StatefulWidget {
   final DocumentSnapshot<Object?>? address;
 
@@ -26,6 +68,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late String currentUserId;
   List<QueryDocumentSnapshot> cartItems = [];
+  List<QueryDocumentSnapshot> vouchers = [];
 
   int calculateTotalPrice() {
     int totalPrice = 0;
@@ -43,6 +86,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   void initState() {
     super.initState();
     getCurrentUser();
+    getVouchers();
   }
 
   void getCurrentUser() {
@@ -52,6 +96,18 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         currentUserId = user.uid;
       });
     }
+  }
+
+  void getVouchers() {
+    _firestore
+        .collection('applied_voucher')
+        .where('userId', isEqualTo: currentUserId)
+        .snapshots()
+        .listen((snapshot) {
+      setState(() {
+        vouchers = snapshot.docs;
+      });
+    });
   }
 
   @override
@@ -270,56 +326,6 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                       height: 10,
                       color: Colors.grey[300],
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(20),
-                    //   child: Column(
-                    //     children: [
-                    //       const Row(
-                    //         children: [
-                    //           Icon(Icons.local_offer,
-                    //               color: Themes.gradientLightClr),
-                    //           SizedBox(width: 10),
-                    //           Text(
-                    //             'Mã giảm giá',
-                    //             style: TextStyle(
-                    //                 fontSize: 16, fontWeight: FontWeight.bold),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //       const SizedBox(
-                    //         height: 10,
-                    //       ),
-                    //       Row(
-                    //         children: [
-                    //           const Expanded(
-                    //             child: SizedBox(
-                    //               height: 50,
-                    //               child: TextField(
-                    //                 decoration: InputDecoration(
-                    //                   border: OutlineInputBorder(),
-                    //                   hintText: 'Nhập mã giảm giá của bạn',
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //           TextButton(
-                    //             onPressed: () {
-                    //               // Xử lý khi văn bản "Áp dụng" được nhấp
-                    //             },
-                    //             child: const Text(
-                    //               'Áp dụng',
-                    //               style: TextStyle(
-                    //                 fontWeight: FontWeight.bold,
-                    //                 fontSize: 16,
-                    //                 color: Themes.gradientLightClr,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -341,7 +347,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              VoucherScreen()),
+                                              const VoucherScreen()),
                                     );
                                   },
                                   icon: const Icon(Icons.arrow_forward_ios)),
@@ -360,6 +366,49 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                               // ),
                             ],
                           ),
+                          ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: vouchers.length,
+                              itemBuilder: (context, index) {
+                                var voucher = vouchers[index];
+                                return Container(
+                                  margin: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white, // Màu của Container
+                                    border: Border.all(
+                                      color: Colors.blue, // Màu của viền
+                                      width: 2, // Độ dày của viền
+                                    ),
+                                  ),
+                                  child: CustomPaint(
+                                    painter: CustomContainerPainter(),
+                                    child: ListTile(
+                                      leading: Image.asset(
+                                        'assets/coupon.png',
+                                        width: 100,
+                                        height: 100,
+                                      ),
+                                      title: Text(
+                                        voucher[
+                                            'voucherCode'], // Giả sử voucherCode là trường chứa mã giảm giá
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      subtitle: Text(
+                                        'Discount : ${voucher['discount']}%',
+                                        style: const TextStyle(
+                                            fontSize: 18,
+                                            color: Themes.gradientDeepClr,
+                                            fontWeight: FontWeight
+                                                .bold), // Thêm "Discount : " trước giá trị discount
+                                      ),
+                                      onTap: () {
+                                        // Thực hiện hành động khi chọn voucher
+                                      },
+                                    ),
+                                  ),
+                                );
+                              })
                         ],
                       ),
                     ),
@@ -445,83 +494,149 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        width: double.infinity,
-        color: Colors.grey[200], // Màu nền cho container
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore
-                  .collection('user_carts')
-                  .where('userId', isEqualTo: currentUserId)
-                  .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> cartSnapshot) {
-                if (cartSnapshot.hasError) {
-                  return const Text('Something went wrong');
-                }
+      bottomNavigationBar: IntrinsicHeight(
+        child: Container(
+          width: double.infinity,
+          color: Colors.grey[200],
+          // margin: const EdgeInsets.all(10),
+          // padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder<QuerySnapshot>(
+                stream: _firestore
+                    .collection('user_carts')
+                    .where('userId', isEqualTo: currentUserId)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> cartSnapshot) {
+                  if (cartSnapshot.hasError) {
+                    return const Text('Something went wrong');
+                  }
 
-                if (cartSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Text("Loading");
-                }
+                  if (cartSnapshot.connectionState == ConnectionState.waiting) {
+                    return const Text("Loading");
+                  }
 
-                var cartItems = cartSnapshot.data!.docs;
+                  var cartItems = cartSnapshot.data!.docs;
 
-                if (cartItems.isEmpty) {
-                  return const Text('No items in cart');
-                }
+                  if (cartItems.isEmpty) {
+                    return const Text('No items in cart');
+                  }
 
-                int totalPrice = 0;
-                for (var item in cartItems) {
-                  int quantity = item['quantity'];
-                  int productPrice = item['productPrice'];
-                  totalPrice += quantity * productPrice;
-                }
+                  int totalPrice = 0;
+                  int discount = 0;
+                  int discountPrice = 0;
+                  for (var item in cartItems) {
+                    int quantity = item['quantity'];
+                    int productPrice = item['productPrice'];
+                    totalPrice += quantity * productPrice;
+                  }
+                  if (vouchers.isNotEmpty) {
+                    discount = vouchers
+                        .map<int>((voucher) => voucher['discount'] as int)
+                        .reduce((a, b) => a + b);
+                    discountPrice = totalPrice * discount ~/ 100;
+                  }
+                  int totalPriceAfterDiscount = totalPrice - discountPrice;
 
-                return Text(
-                  'Tổng thanh toán: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
-                );
-              },
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (widget.address != null) {
-                  placeOrder();
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Lỗi'),
-                      content: const Text(
-                          'Vui lòng chọn phương thức thanh toán và có địa chỉ nhận hàng trước khi đặt hàng.'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          const Text(
+                            'Tổng tiền: ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            '${NumberFormat('#,###').format(totalPrice)} VNĐ',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Themes.gradientDeepClr),
+                          )
+                        ],
+                      ),
+                      if (discount > 0)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Giảm giá: ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            Text(
+                              '-${NumberFormat('#,###').format(discountPrice)} VNĐ',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Colors.red),
+                            )
+                          ],
                         ),
-                      ],
-                    ),
+                      if (discount > 0)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Tổng thanh toán: ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                            Text(
+                              '${NumberFormat('#,###').format(totalPriceAfterDiscount)} VNĐ',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Themes.gradientDeepClr),
+                            )
+                          ],
+                        ),
+                    ],
                   );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Themes.gradientLightClr,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Rounded corners
-                ),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 12), // Padding
+                },
               ),
-              child: const Text('Đặt hàng',
-                  style: TextStyle(fontSize: 18, color: whiteClr)),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () {
+                  if (widget.address != null) {
+                    placeOrder();
+                  } else {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Lỗi'),
+                        content: const Text(
+                            'Vui lòng chọn phương thức thanh toán và có địa chỉ nhận hàng trước khi đặt hàng.'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Themes.gradientDeepClr,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12), // Padding
+                ),
+                child: const Text('Đặt hàng',
+                    style: TextStyle(fontSize: 18, color: whiteClr)),
+              ),
+            ],
+          ),
         ),
       ),
     );

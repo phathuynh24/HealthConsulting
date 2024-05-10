@@ -111,4 +111,6 @@ flutter:
     - assets/empty-cart.png
     - assets/empty-location.png
     - assets/empty-order.png
+    - assets/coupon.png
+    - assets/bill.png
     - lib/.evn

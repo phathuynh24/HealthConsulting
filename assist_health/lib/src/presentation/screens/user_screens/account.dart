@@ -291,7 +291,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                OrderDetailsPage()));
+                                                const OrderDetailsPage()));
                                   },
                                   leading: const Icon(
                                     Icons.shopping_cart,

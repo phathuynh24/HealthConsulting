@@ -74,11 +74,20 @@ class AdminOrderManagementScreen extends StatelessWidget {
                       height: 5,
                     ),
                     ListTile(
+                      leading:
+                          Image.asset('assets/bill.png', width: 50, height: 50),
                       title: Text(
                         'Mã đơn hàng: ${document.id}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text('Tổng tiền: ${data['totalPrice']} đ'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Khách hàng: ${data['address']['name']}'),
+                          Text(
+                              'Tổng tiền: ${NumberFormat("#,###").format(data['totalPrice'])}đ'),
+                        ],
+                      ),
                       trailing: IconButton(
                         icon: const Icon(Icons.remove_red_eye),
                         onPressed: () {
