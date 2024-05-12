@@ -224,7 +224,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         imageUrls.isNotEmpty ? imageUrls[0] : '';
 
                     return SizedBox(
-                      width: double.infinity, // Chiều rộng tối đa
+                      width: double.infinity,
                       child: Card(
                         child: Column(
                           children: <Widget>[

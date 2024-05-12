@@ -23,8 +23,8 @@ class _AdminNavBarState extends State<AdminNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    // const RevenueChartScreen(),
-    AddVoucherScreen(),
+    const RevenueChartScreen(),
+    const AddVoucherScreen(),
     // Screen 2
     const ContentTopBar(),
     // Screen 3
@@ -65,6 +65,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_outlined),
               label: "Thống kê",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.card_giftcard),
+              label: "Vouchers",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.my_library_books_rounded),
