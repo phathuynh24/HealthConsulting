@@ -168,154 +168,158 @@ class _AddProductScreenState extends State<AddProductScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên sản phẩm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.shopping_bag),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Tên sản phẩm',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.shopping_bag),
+                ),
               ),
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _priceController,
-              decoration: const InputDecoration(
-                labelText: 'Giá sản phẩm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.attach_money),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _priceController,
+                decoration: const InputDecoration(
+                  labelText: 'Giá sản phẩm',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.attach_money),
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _oldPriceController,
-              decoration: const InputDecoration(
-                labelText: 'Giá cũ sản phẩm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.money),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _oldPriceController,
+                decoration: const InputDecoration(
+                  labelText: 'Giá cũ sản phẩm',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.money),
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _quantityController,
-              decoration: const InputDecoration(
-                labelText: 'Số lượng',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.format_list_numbered),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _quantityController,
+                decoration: const InputDecoration(
+                  labelText: 'Số lượng',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.format_list_numbered),
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _descriptionController,
-              maxLines: null,
-              decoration: const InputDecoration(
-                labelText: 'Mô tả sản phẩm',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.description),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _descriptionController,
+                maxLines: null,
+                decoration: const InputDecoration(
+                  labelText: 'Mô tả sản phẩm',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.description),
+                ),
               ),
-            ),
-            const SizedBox(height: 16.0),
-            //Demo
-            //         DropdownButtonFormField<String>(
-            //             decoration: InputDecoration(
-            //               prefixIcon: Icon(Icons.category_sharp),
-            //               labelText: 'Phân loại',
-            //               border: OutlineInputBorder(),
-            //               contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            //             ),
-            //             value: _selectedCategory,
-            //             onChanged: _onCategoryChanged,
-            //             items: _categories.map<DropdownMenuItem<String>>((String value) {
-            //               return DropdownMenuItem<String>(
-            //                 value: value,
-            //                 child: Padding(
-            //                   padding: EdgeInsets.symmetric(vertical: 8.0),
-            //                   child: Text(
-            //                     value,
-            //                     style: TextStyle(fontSize: 16.0),
-            //                   ),
-            //                 ),
-            //               );
-            //   }).toList(),
-            // ),
+              const SizedBox(height: 16.0),
+              //Demo
+              //         DropdownButtonFormField<String>(
+              //             decoration: InputDecoration(
+              //               prefixIcon: Icon(Icons.category_sharp),
+              //               labelText: 'Phân loại',
+              //               border: OutlineInputBorder(),
+              //               contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              //             ),
+              //             value: _selectedCategory,
+              //             onChanged: _onCategoryChanged,
+              //             items: _categories.map<DropdownMenuItem<String>>((String value) {
+              //               return DropdownMenuItem<String>(
+              //                 value: value,
+              //                 child: Padding(
+              //                   padding: EdgeInsets.symmetric(vertical: 8.0),
+              //                   child: Text(
+              //                     value,
+              //                     style: TextStyle(fontSize: 16.0),
+              //                   ),
+              //                 ),
+              //               );
+              //   }).toList(),
+              // ),
 
-            DropdownButton<String>(
-              value: _selectedCategory,
-              onChanged: _onCategoryChanged,
-              items: _categories.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              children: List.generate(
-                3,
-                (index) => Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      _pickImages(
-                          index); // Gọi hàm _pickImages khi người dùng nhấn vào ô
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8.0),
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(8.0),
-                        image:
-                            _imageUrls.isNotEmpty && index < _imageUrls.length
-                                ? DecorationImage(
-                                    image: FileImage(File(_imageUrls[index])),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
+              DropdownButton<String>(
+                value: _selectedCategory,
+                onChanged: _onCategoryChanged,
+                items:
+                    _categories.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                children: List.generate(
+                  3,
+                  (index) => Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _pickImages(
+                            index); // Gọi hàm _pickImages khi người dùng nhấn vào ô
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8.0),
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                          borderRadius: BorderRadius.circular(8.0),
+                          image:
+                              _imageUrls.isNotEmpty && index < _imageUrls.length
+                                  ? DecorationImage(
+                                      image: FileImage(File(_imageUrls[index])),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                        ),
+                        child: _imageUrls.isNotEmpty &&
+                                index < _imageUrls.length
+                            ? null // Không hiển thị Icon nếu có ảnh được chọn
+                            : const Icon(Icons.add_a_photo, size: 40.0),
                       ),
-                      child: _imageUrls.isNotEmpty && index < _imageUrls.length
-                          ? null // Không hiển thị Icon nếu có ảnh được chọn
-                          : const Icon(Icons.add_a_photo, size: 40.0),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16.0),
-            //Canh giua
-            Center(
-              child: ElevatedButton(
-                onPressed: _saveProduct,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 32.0, vertical: 12.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+              const SizedBox(height: 16.0),
+              //Canh giua
+              Center(
+                child: ElevatedButton(
+                  onPressed: _saveProduct,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32.0, vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    backgroundColor:
+                        Themes.gradientLightClr, // Đặt màu nền của nút
+                    foregroundColor: Colors.white, // Đặt màu chữ của nút
+                    // primary: Themes.gradientLightClr,
+                    // onPrimary: Colors.white,
                   ),
-                  backgroundColor:
-                      Themes.gradientLightClr, // Đặt màu nền của nút
-                  foregroundColor: Colors.white, // Đặt màu chữ của nút
-                  // primary: Themes.gradientLightClr,
-                  // onPrimary: Colors.white,
-                ),
-                child: const Text(
-                  'Lưu',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+                  child: const Text(
+                    'Lưu',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

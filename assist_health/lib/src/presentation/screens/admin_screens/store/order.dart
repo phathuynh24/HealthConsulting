@@ -4,113 +4,154 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class AdminOrderManagementScreen extends StatelessWidget {
-  const AdminOrderManagementScreen({super.key});
+  const AdminOrderManagementScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: const Text(
-          'Quản lý đơn đặt hàng',
-          style: TextStyle(fontSize: 20),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+    return DefaultTabController(
+      length: 6,
+      child: Scaffold(
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          title: const Text(
+            'Quản lý đơn đặt hàng',
+            style: TextStyle(fontSize: 20),
+          ),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
           ),
+          bottom: const TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white,
+            tabs: [
+              Tab(text: 'Chờ xác nhận'),
+              Tab(text: 'Chờ lấy hàng'),
+              Tab(text: 'Chờ giao hàng'),
+              Tab(text: 'Đã giao'),
+              Tab(text: 'Đã hủy'),
+              Tab(text: 'Trả hàng'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            buildOrderList('Chờ xác nhận'),
+            buildOrderList('Chờ lấy hàng'),
+            buildOrderList('Chờ giao hàng'),
+            buildOrderList('Đã giao'),
+            buildOrderList('Đã hủy'),
+            buildOrderList('Trả hàng'),
+          ],
         ),
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('orders').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Không có đơn đặt hàng nào.'));
-          }
-
-          return ListView(
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data =
-                  document.data() as Map<String, dynamic>;
-              String orderStatus = data['status'];
-              Color statusColor = Colors.grey; // Default color
-              switch (orderStatus) {
-                case 'Chờ lấy hàng':
-                  statusColor = Colors.blue;
-                  break;
-                case 'Chờ giao hàng':
-                  statusColor = Colors.orange;
-                  break;
-                case 'Đã giao':
-                  statusColor = Colors.green;
-                  break;
-                case 'Đã hủy':
-                  statusColor = Colors.red;
-                  break;
-                default:
-                  statusColor = Colors.grey;
-              }
-
-              return Card(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Column(
-                  children: [
-                    Container(
-                      color: statusColor,
-                      height: 5,
-                    ),
-                    ListTile(
-                      leading:
-                          Image.asset('assets/bill.png', width: 50, height: 50),
-                      title: Text(
-                        'Mã đơn hàng: ${document.id}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Khách hàng: ${data['address']['name']}'),
-                          Text(
-                              'Tổng tiền: ${NumberFormat("#,###").format(data['totalPrice'])}đ'),
-                        ],
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.remove_red_eye),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OrderDetailScreen(
-                                orderId: document.id,
-                                initialStatus: data['status'],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-          );
-        },
-      ),
     );
+  }
+
+  Widget buildOrderList(String status) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('orders')
+          .where('status', isEqualTo: status)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.data == null || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                    width: 300, child: Image.asset('assets/empty-order.png')),
+                const Text(
+                  'Không có đơn hàng nào',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+            return Card(
+              margin:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Column(
+                children: [
+                  Container(
+                    color: _getStatusColor(status),
+                    height: 5,
+                  ),
+                  ListTile(
+                    leading:
+                        Image.asset('assets/bill.png', width: 50, height: 50),
+                    title: Text(
+                      'Mã đơn hàng: ${document.id}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Khách hàng: ${data['address']['name']}'),
+                        Text(
+                            'Tổng tiền: ${NumberFormat("#,###").format(data['totalPrice'])}đ'),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.remove_red_eye),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderDetailScreen(
+                              orderId: document.id,
+                              initialStatus: data['status'],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Chờ lấy hàng':
+        return Colors.blue;
+      case 'Chờ giao hàng':
+        return Colors.orange;
+      case 'Đã giao':
+        return Colors.green;
+      case 'Đã hủy':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
 
@@ -119,7 +160,8 @@ class OrderDetailScreen extends StatefulWidget {
   final String initialStatus;
 
   const OrderDetailScreen(
-      {super.key, required this.orderId, required this.initialStatus});
+      {Key? key, required this.orderId, required this.initialStatus})
+      : super(key: key);
 
   @override
   _OrderDetailScreenState createState() => _OrderDetailScreenState();

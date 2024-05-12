@@ -101,6 +101,26 @@ class OrderDetailsPage extends StatelessWidget {
                     (cartItem['quantity'] as num).toInt(); // Ép kiểu sang int
               }
 
+              Color statusColor;
+
+              switch (document['status']) {
+                case 'Chờ lấy hàng':
+                  statusColor = Colors.blue;
+                  break;
+                case 'Chờ giao hàng':
+                  statusColor = Colors.orange;
+                  break;
+                case 'Đã giao':
+                  statusColor = Colors.green;
+                  break;
+                case 'Đã hủy':
+                  statusColor = Colors.red;
+                  break;
+                default:
+                  statusColor = Colors.grey;
+                  break;
+              }
+
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -125,7 +145,7 @@ class OrderDetailsPage extends StatelessWidget {
                     children: [
                       Container(
                         height: 5,
-                        color: Themes.gradientLightClr,
+                        color: statusColor,
                       ),
                       Column(
                         children: (document['userCart'] as List<dynamic>)

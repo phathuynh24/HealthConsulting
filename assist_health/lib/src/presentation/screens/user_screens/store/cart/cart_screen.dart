@@ -124,21 +124,24 @@ class _CartScreenState extends State<CartScreen> {
           return ListTile(
             title: Text(
               cartItems[index].productName,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             subtitle: Text(
               '${NumberFormat('#,###').format(cartItems[index].productPrice)} VNĐ',
-              style: const TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey, fontSize: 16),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   'x${cartItems[index].quantity}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.remove_shopping_cart),
+                  icon: const Icon(
+                    Icons.remove_shopping_cart,
+                  ),
                   onPressed: () => removeItem(index),
                 ),
               ],
@@ -155,7 +158,8 @@ class _CartScreenState extends State<CartScreen> {
                   children: [
                     Text(
                       'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -173,9 +177,9 @@ class _CartScreenState extends State<CartScreen> {
                       child: const Text(
                         'Thanh toán',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 18),
                       ),
                     ),
                   ],
