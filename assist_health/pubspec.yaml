@@ -96,7 +96,10 @@ flutter:
      - assets/health_care_logo.jpg
      - assets/health_care_logo_nobg.png
      - assets/no_result_search_icon.png
+     - assets/enter_medical_record.jpg
      - assets/image.png
+     - assets/doctor_ai.png
+     - assets/recommendation_get_started.png
      - assets/.evn
 
   # An image asset can refer to one or more resolution-specific "variants", see

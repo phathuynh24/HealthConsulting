@@ -18,16 +18,15 @@ class DoctorRecommendationBloc
         // Gửi yêu cầu HTTP đến API Flask để dự đoán
         final response = await http.post(
           Uri.parse('http://172.16.2.134:5000/predict_1'),
-          headers: <String, String>{
+          headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: jsonEncode(<String, String>{
+          body: jsonEncode({
             'text': symptom.toString(),
           }),
         );
 
         if (response.statusCode == 200) {
-          // Xử lý dữ liệu trả về từ API
           final data = jsonDecode(response.body);
           emit(DoctorRecommendationLoaded(data));
         } else {
