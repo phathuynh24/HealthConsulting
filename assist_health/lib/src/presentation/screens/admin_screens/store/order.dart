@@ -325,21 +325,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        minimumSize: const Size(250, 50),
+                        backgroundColor: Themes.gradientDeepClr,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Xác nhận đơn hàng'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Xử lý xóa đơn hàng
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
+                      child: const Text(
+                        'Xác nhận đơn hàng',
+                        style: TextStyle(fontSize: 20),
                       ),
-                      child: const Text('Xóa đơn hàng'),
                     ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     // Xử lý xóa đơn hàng
+                    //   },
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.red,
+                    //     foregroundColor: Colors.white,
+                    //   ),
+                    //   child: const Text('Xóa đơn hàng'),
+                    // ),
                   ],
                 ),
               ],

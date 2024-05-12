@@ -21,8 +21,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   List<String> _imageUrls = [];
   String? _selectedCategory;
-  int _selectedImageIndex = -1; // Chỉ mục của ảnh được chọn, mặc định là -1
-
+  int _selectedImageIndex = -1;
   final List<String> _categories = [
     'Hỗ trợ hô hấp',
     'Dinh dưỡng',
@@ -46,7 +45,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Future<void> _saveProduct() async {
     final String name = _nameController.text.trim();
     final int price = int.tryParse(_priceController.text.trim()) ?? 0;
-    final int oldPrice = int.tryParse(_priceController.text.trim()) ?? 0;
+    final int oldPrice = int.tryParse(_oldPriceController.text.trim()) ?? 0;
     final int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
     if (name.isNotEmpty &&
@@ -90,6 +89,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           _nameController.text = '';
           _priceController.text = '';
+          _oldPriceController.text = '';
           _quantityController.text = '';
           _descriptionController.text = '';
           _imageUrls = [];
@@ -223,29 +223,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              //Demo
-              //         DropdownButtonFormField<String>(
-              //             decoration: InputDecoration(
-              //               prefixIcon: Icon(Icons.category_sharp),
-              //               labelText: 'Phân loại',
-              //               border: OutlineInputBorder(),
-              //               contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              //             ),
-              //             value: _selectedCategory,
-              //             onChanged: _onCategoryChanged,
-              //             items: _categories.map<DropdownMenuItem<String>>((String value) {
-              //               return DropdownMenuItem<String>(
-              //                 value: value,
-              //                 child: Padding(
-              //                   padding: EdgeInsets.symmetric(vertical: 8.0),
-              //                   child: Text(
-              //                     value,
-              //                     style: TextStyle(fontSize: 16.0),
-              //                   ),
-              //                 ),
-              //               );
-              //   }).toList(),
-              // ),
 
               DropdownButton<String>(
                 value: _selectedCategory,

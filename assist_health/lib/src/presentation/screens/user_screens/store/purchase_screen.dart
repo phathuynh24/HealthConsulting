@@ -1,6 +1,7 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/address/add_address.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/address/list_addresses.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/voucher/voucher_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -668,8 +669,13 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         .collection('orders')
         .add(order.toMap())
         .then((value) {
-      // Đơn hàng đã được lưu thành công
       print('Đơn hàng đã được lưu vào Firestore');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeStoreScreen(),
+        ),
+      );
     }).catchError((error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
     });

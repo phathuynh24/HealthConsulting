@@ -28,7 +28,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
 
   String selectedCategory = '';
   double _lowerValue = 0;
-  double _upperValue = 100000;
+  double _upperValue = 1000000;
 
   @override
   void initState() {
@@ -199,7 +199,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         imageUrls.isNotEmpty ? imageUrls[0] : '';
 
                     return SizedBox(
-                      width: double.infinity, // Chiều rộng tối đa
+                      width: double.infinity,
                       child: Card(
                         child: Column(
                           children: <Widget>[
@@ -228,7 +228,8 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                   width: 10,
                                 ),
                                 Text(
-                                  '${data['old_price']}',
+                                  NumberFormat('#,###')
+                                      .format(data['old_price']),
                                   style: const TextStyle(
                                     fontSize: 15,
                                     decoration: TextDecoration.lineThrough,
@@ -344,7 +345,7 @@ class _FilterScreenState extends State<FilterScreen> {
           FlutterSlider(
             values: [_lowerValue, _upperValue],
             rangeSlider: true,
-            max: 100000,
+            max: 1000000,
             min: 0,
             onDragging: (handlerIndex, lowerValue, upperValue) {
               setState(() {

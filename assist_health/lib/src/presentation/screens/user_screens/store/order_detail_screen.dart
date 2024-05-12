@@ -12,7 +12,7 @@ class OrderDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 6, // Số lượng tab
+      length: 6,
       child: Scaffold(
         appBar: AppBar(
           foregroundColor: Colors.white,
