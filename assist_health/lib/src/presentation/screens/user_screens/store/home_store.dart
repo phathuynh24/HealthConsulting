@@ -28,7 +28,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
 
   String selectedCategory = '';
   double _lowerValue = 0;
-  double _upperValue = 100000;
+  double _upperValue = 1000000;
 
   @override
   void initState() {
@@ -81,12 +81,13 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
           children: <Widget>[
             Container(
               color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Container(
-                      height: 40,
+                      height: 35,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
@@ -100,7 +101,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 6),
                   Container(
                     decoration: const BoxDecoration(
                       color: Colors.blue,
@@ -116,14 +117,38 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              // padding: const EdgeInsets.symmetric(vertical: 10),
               child: CarouselSlider(
                 items: [
-                  Image.asset('assets/image.png', fit: BoxFit.cover),
-                  Image.asset('assets/slider2.jpg', fit: BoxFit.cover),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: AspectRatio(
+                        aspectRatio: 3 / 1,
+                        child:
+                            Image.asset('assets/image.png', fit: BoxFit.cover),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: AspectRatio(
+                        aspectRatio: 3 / 1,
+                        child: Image.asset('assets/slider2.jpg',
+                            fit: BoxFit.cover),
+                      ),
+                    ),
+                  ),
                 ],
                 options: CarouselOptions(
-                  height: 250,
+                  height: 200,
                   viewportFraction: 1.0,
                   initialPage: 0,
                   enableInfiniteScroll: true,
@@ -203,14 +228,20 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       child: Card(
                         child: Column(
                           children: <Widget>[
-                            AspectRatio(
-                              aspectRatio: 2,
-                              child: firstImageUrl.isNotEmpty
-                                  ? Image.network(
-                                      firstImageUrl,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : const Placeholder(),
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
+                              child: AspectRatio(
+                                aspectRatio: 2,
+                                child: firstImageUrl.isNotEmpty
+                                    ? Image.network(
+                                        firstImageUrl,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Placeholder(),
+                              ),
                             ),
                             Text(data['name'],
                                 style: const TextStyle(fontSize: 18)),
@@ -220,7 +251,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                 Text(
                                   '${NumberFormat('#,###').format(data['price'])} VNĐ',
                                   style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Themes.gradientLightClr),
                                 ),
@@ -228,9 +259,9 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                   width: 10,
                                 ),
                                 Text(
-                                  '${data['old_price']}',
+                                  '${NumberFormat('#,###').format(data['old_price'])} VNĐ',
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 12,
                                     decoration: TextDecoration.lineThrough,
                                   ),
                                 ),
@@ -344,7 +375,7 @@ class _FilterScreenState extends State<FilterScreen> {
           FlutterSlider(
             values: [_lowerValue, _upperValue],
             rangeSlider: true,
-            max: 100000,
+            max: 1000000,
             min: 0,
             onDragging: (handlerIndex, lowerValue, upperValue) {
               setState(() {

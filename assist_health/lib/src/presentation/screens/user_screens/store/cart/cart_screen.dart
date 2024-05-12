@@ -159,7 +159,7 @@ class _CartScreenState extends State<CartScreen> {
                     Text(
                       'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18),
+                          fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -179,7 +179,7 @@ class _CartScreenState extends State<CartScreen> {
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
-                            fontSize: 18),
+                            fontSize: 16),
                       ),
                     ),
                   ],

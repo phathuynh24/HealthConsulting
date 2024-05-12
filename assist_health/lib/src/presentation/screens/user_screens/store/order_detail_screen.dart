@@ -162,10 +162,15 @@ class OrderDetailsPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  cartItem['productName'],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    cartItem['productName'],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ),
                                 Text(
                                   '${document['status']}',
