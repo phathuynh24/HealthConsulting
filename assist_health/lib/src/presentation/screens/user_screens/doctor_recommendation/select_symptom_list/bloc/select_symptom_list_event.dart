@@ -1,15 +1,15 @@
 import 'package:equatable/equatable.dart';
 
-abstract class SymptomsEvent extends Equatable {
-  const SymptomsEvent();
+abstract class SelectSymptomListEvent extends Equatable {
+  const SelectSymptomListEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class FetchSymptoms extends SymptomsEvent {}
+class FetchSymptoms extends SelectSymptomListEvent {}
 
-class SubmitSymptoms extends SymptomsEvent {
+class SubmitSymptoms extends SelectSymptomListEvent {
   final List<String> symptoms;
 
   const SubmitSymptoms(this.symptoms);

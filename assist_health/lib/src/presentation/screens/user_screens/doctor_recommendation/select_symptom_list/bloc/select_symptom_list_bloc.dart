@@ -4,33 +4,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'bloc.dart';
 
-class SymptomsBloc extends Bloc<SymptomsEvent, SymptomsState> {
+class SelectSymptomListBloc
+    extends Bloc<SelectSymptomListEvent, SelectSymptomListState> {
   static const String baseUrl = 'http://172.16.2.134:5000';
 
-  SymptomsBloc() : super(SymptomsInitial()) {
+  SelectSymptomListBloc() : super(SelectSymptomListInitial()) {
     on<FetchSymptoms>(_onFetchSymptoms);
     on<SubmitSymptoms>(_onSubmitSymptoms);
   }
 
   void _onFetchSymptoms(
-      FetchSymptoms event, Emitter<SymptomsState> emit) async {
-    emit(SymptomsLoading());
+      FetchSymptoms event, Emitter<SelectSymptomListState> emit) async {
+    emit(SelectSymptomListLoading());
     try {
       final symptoms = await getSymptoms();
-      emit(SymptomsLoaded(symptoms));
+      emit(SelectSymptomListLoaded(symptoms));
     } catch (_) {
-      emit(SymptomsError());
+      emit(SelectSymptomListError());
     }
   }
 
   void _onSubmitSymptoms(
-      SubmitSymptoms event, Emitter<SymptomsState> emit) async {
-    emit(SymptomsLoading());
+      SubmitSymptoms event, Emitter<SelectSymptomListState> emit) async {
+    emit(SelectSymptomListLoading());
     try {
       final diagnosis = await diagnoseSymptoms(event.symptoms);
-      emit(SymptomsDiagnosed(diagnosis));
+      emit(SelectSymptomListDiagnosed(diagnosis));
     } catch (_) {
-      emit(SymptomsError());
+      emit(SelectSymptomListError());
     }
   }
 

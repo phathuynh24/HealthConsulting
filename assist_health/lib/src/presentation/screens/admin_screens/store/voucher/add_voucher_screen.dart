@@ -1,10 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/chatbot_screen/chatbot.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 class InvertedCircleClipper extends CustomClipper<Path> {
   @override

@@ -2,22 +2,23 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'bloc.dart';
+import 'bloc/bloc.dart';
 
-class SymptomsScreen extends StatefulWidget {
+class SelectSymptomListScreen extends StatefulWidget {
   @override
-  _SymptomsScreenState createState() => _SymptomsScreenState();
+  _SelectSymptomListScreenState createState() =>
+      _SelectSymptomListScreenState();
 }
 
-class _SymptomsScreenState extends State<SymptomsScreen> {
-  late SymptomsBloc _symptomsBloc;
+class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
+  late SelectSymptomListBloc _symptomsBloc;
   final _selectedSymptoms_Vi = <String>{};
   final _selectedSymptoms_En = <String>{};
 
   @override
   void initState() {
     super.initState();
-    _symptomsBloc = context.read<SymptomsBloc>();
+    _symptomsBloc = context.read<SelectSymptomListBloc>();
     _symptomsBloc.add(FetchSymptoms());
   }
 
@@ -27,13 +28,13 @@ class _SymptomsScreenState extends State<SymptomsScreen> {
       appBar: AppBar(
         title: Text('Symptoms'),
       ),
-      body: BlocBuilder<SymptomsBloc, SymptomsState>(
+      body: BlocBuilder<SelectSymptomListBloc, SelectSymptomListState>(
         builder: (context, state) {
-          if (state is SymptomsLoading) {
+          if (state is SelectSymptomListLoading) {
             return Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is SymptomsLoaded) {
+          } else if (state is SelectSymptomListLoaded) {
             return Column(
               children: [
                 Expanded(
@@ -75,7 +76,7 @@ class _SymptomsScreenState extends State<SymptomsScreen> {
                 ),
               ],
             );
-          } else if (state is SymptomsDiagnosed) {
+          } else if (state is SelectSymptomListDiagnosed) {
             final diagnosis = jsonDecode(state.diagnosis);
             return ListView.builder(
               itemCount: diagnosis['disease'].length,
@@ -86,7 +87,7 @@ class _SymptomsScreenState extends State<SymptomsScreen> {
                 );
               },
             );
-          } else if (state is SymptomsError) {
+          } else if (state is SelectSymptomListError) {
             return Center(
               child: Text('Failed to load symptoms'),
             );

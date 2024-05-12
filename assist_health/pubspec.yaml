@@ -96,18 +96,18 @@ flutter:
      - assets/health_care_logo_nobg.png
      - assets/no_result_search_icon.png
      - assets/image.png
-     - assets/enter_medical_record.jpg
      - assets/doctor_ai.png
-     - assets/recommendation_get_started.png
      - assets/.evn
-    - assets/vnpay_logo.png
-    - assets/ship_cod_logo.png
-    - assets/momo_logo.png
-    - assets/empty-cart.png
-    - assets/empty-location.png
-    - assets/empty-order.png
-    - assets/coupon.png
-    - assets/bill.png
+     - assets/vnpay_logo.png
+     - assets/ship_cod_logo.png
+     - assets/momo_logo.png
+     - assets/empty-cart.png
+     - assets/empty-location.png
+     - assets/empty-order.png
+     - assets/coupon.png
+     - assets/bill.png
+     - assets/recommendation/get_started.png
+     - assets/recommendation/medical_record.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

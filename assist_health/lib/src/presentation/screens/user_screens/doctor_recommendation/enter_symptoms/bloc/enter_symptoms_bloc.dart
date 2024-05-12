@@ -5,11 +5,10 @@ import 'package:translator/translator.dart';
 import 'package:http/http.dart' as http;
 import 'bloc.dart';
 
-class DoctorRecommendationBloc
-    extends Bloc<DoctorRecommendationEvent, DoctorRecommendationState> {
-  DoctorRecommendationBloc() : super(DoctorRecommendationInitial()) {
-    on<GetDoctorRecommendation>((event, emit) async {
-      emit(DoctorRecommendationLoading());
+class EnterSymptomsBloc extends Bloc<EnterSymptomsEvent, EnterSymptomsState> {
+  EnterSymptomsBloc() : super(EnterSymptomsInitial()) {
+    on<GetSymptoms>((event, emit) async {
+      emit(EnterSymptomsLoading());
 
       try {
         // Lấy thông tin triệu chứng từ sự kiện
@@ -28,12 +27,12 @@ class DoctorRecommendationBloc
 
         if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          emit(DoctorRecommendationLoaded(data));
+          emit(EnterSymptomsLoaded(data));
         } else {
           throw Exception('Failed to load recommendation');
         }
       } catch (e) {
-        emit(DoctorRecommendationError());
+        emit(EnterSymptomsError());
       }
     });
   }

@@ -9,6 +9,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/chatbot/chat
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/doctor_recommendation/get_started/sc_get_started.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
@@ -21,13 +22,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
-import 'disease_prediction/bloc.dart';
-import 'disease_prediction/disease_prediction_screen.dart';
-import 'doctor_recommendation/doctor_recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -485,8 +481,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (_) =>
-                                              // const ViewResultListScreen()),
-                                              DoctorRecommendationScreen()),
+                                              const ViewResultListScreen()),
                                     );
                                   }),
                                   itemDashboard(
@@ -509,12 +504,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(
-                                          builder: (_) =>
-                                              BlocProvider<SymptomsBloc>(
-                                            create: (context) => SymptomsBloc(),
-                                            child: SymptomsScreen(),
-                                          ),
-                                        ),
+                                            builder: (_) => GetStartedScreen()),
                                       );
                                     },
                                   ),
