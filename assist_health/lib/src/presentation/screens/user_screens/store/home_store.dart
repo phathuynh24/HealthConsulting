@@ -41,6 +41,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           foregroundColor: Colors.white,
           title: const Text(
@@ -122,7 +123,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                   Image.asset('assets/slider2.jpg', fit: BoxFit.cover),
                 ],
                 options: CarouselOptions(
-                  height: 250.0,
+                  height: 250,
                   viewportFraction: 1.0,
                   initialPage: 0,
                   enableInfiniteScroll: true,
@@ -198,13 +199,12 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         imageUrls.isNotEmpty ? imageUrls[0] : '';
 
                     return SizedBox(
-                      height: 200,
+                      width: double.infinity, // Chiều rộng tối đa
                       child: Card(
                         child: Column(
                           children: <Widget>[
-                            SizedBox(
-                              height: 80,
-                              width: 200,
+                            AspectRatio(
+                              aspectRatio: 2,
                               child: firstImageUrl.isNotEmpty
                                   ? Image.network(
                                       firstImageUrl,
@@ -322,7 +322,21 @@ class _FilterScreenState extends State<FilterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chọn Khoảng Giá'),
+        foregroundColor: Colors.white,
+        title: const Text(
+          'Chọn khoảng giá',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -347,17 +361,28 @@ class _FilterScreenState extends State<FilterScreen> {
                 onPressed: () {
                   setState(() {
                     _lowerValue = 0;
-                    _upperValue = 100000;
+                    _upperValue = 1000000;
                   });
                 },
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(const Size(150, 40)),
+                  backgroundColor:
+                      MaterialStateProperty.all(Themes.gradientDeepClr),
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                ),
                 child: const Text('Reset'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, [_lowerValue, _upperValue]);
-                },
-                child: const Text('OK'),
-              ),
+                  onPressed: () {
+                    Navigator.pop(context, [_lowerValue, _upperValue]);
+                  },
+                  style: ButtonStyle(
+                    minimumSize: MaterialStateProperty.all(const Size(150, 40)),
+                    backgroundColor:
+                        MaterialStateProperty.all(Themes.gradientDeepClr),
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                  ),
+                  child: const Text('OK')),
             ],
           ),
         ],

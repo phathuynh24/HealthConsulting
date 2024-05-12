@@ -60,9 +60,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
             'userId': currentUserId,
           }).then((value) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Áp dụng mã giảm giá thành công. Tổng tiền sau khi giảm giá: \$${discountedAmount.toStringAsFixed(2)}'),
+              const SnackBar(
+                content: Text('Áp dụng mã giảm giá thành công'),
               ),
             );
             Navigator.pop(context, appliedVoucher);

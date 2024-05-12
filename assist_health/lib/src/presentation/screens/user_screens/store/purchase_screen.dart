@@ -82,6 +82,20 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     return totalPrice;
   }
 
+  int calculateFinalPrice() {
+    int finalPrice = calculateTotalPrice();
+
+    if (vouchers.isNotEmpty) {
+      int totalDiscount = vouchers
+          .map<int>((voucher) => voucher['discount'] as int)
+          .reduce((a, b) => a + b);
+
+      finalPrice -= (finalPrice * totalDiscount ~/ 100);
+    }
+
+    return finalPrice;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -351,19 +365,6 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                                     );
                                   },
                                   icon: const Icon(Icons.arrow_forward_ios)),
-                              // TextButton(
-                              //   onPressed: () {
-                              //     // Xử lý khi văn bản "Áp dụng" được nhấp
-                              //   },
-                              //   child: const Text(
-                              //     'Áp dụng',
-                              //     style: TextStyle(
-                              //       fontWeight: FontWeight.bold,
-                              //       fontSize: 16,
-                              //       color: Themes.gradientLightClr,
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                           ListView.builder(
@@ -371,40 +372,45 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                               itemCount: vouchers.length,
                               itemBuilder: (context, index) {
                                 var voucher = vouchers[index];
-                                return Container(
-                                  margin: const EdgeInsets.all(5),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white, // Màu của Container
-                                    border: Border.all(
-                                      color: Colors.blue, // Màu của viền
-                                      width: 2, // Độ dày của viền
+                                return GestureDetector(
+                                  onDoubleTap: () {
+                                    _showDeleteConfirmationDialog(voucher);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white, // Màu của Container
+                                      border: Border.all(
+                                        color: Colors.blue, // Màu của viền
+                                        width: 2, // Độ dày của viền
+                                      ),
                                     ),
-                                  ),
-                                  child: CustomPaint(
-                                    painter: CustomContainerPainter(),
-                                    child: ListTile(
-                                      leading: Image.asset(
-                                        'assets/coupon.png',
-                                        width: 100,
-                                        height: 100,
+                                    child: CustomPaint(
+                                      painter: CustomContainerPainter(),
+                                      child: ListTile(
+                                        leading: Image.asset(
+                                          'assets/coupon.png',
+                                          width: 100,
+                                          height: 100,
+                                        ),
+                                        title: Text(
+                                          voucher[
+                                              'voucherCode'], // Giả sử voucherCode là trường chứa mã giảm giá
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        subtitle: Text(
+                                          'Discount : ${voucher['discount']}%',
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              color: Themes.gradientDeepClr,
+                                              fontWeight: FontWeight
+                                                  .bold), // Thêm "Discount : " trước giá trị discount
+                                        ),
+                                        onTap: () {
+                                          // Thực hiện hành động khi chọn voucher
+                                        },
                                       ),
-                                      title: Text(
-                                        voucher[
-                                            'voucherCode'], // Giả sử voucherCode là trường chứa mã giảm giá
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      subtitle: Text(
-                                        'Discount : ${voucher['discount']}%',
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            color: Themes.gradientDeepClr,
-                                            fontWeight: FontWeight
-                                                .bold), // Thêm "Discount : " trước giá trị discount
-                                      ),
-                                      onTap: () {
-                                        // Thực hiện hành động khi chọn voucher
-                                      },
                                     ),
                                   ),
                                 );
@@ -648,7 +654,8 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       orderId: const Uuid().v4(),
       userCart: cartItems,
       address: widget.address!,
-      totalPrice: calculateTotalPrice(),
+      // totalPrice: calculateTotalPrice(),
+      totalPrice: calculateFinalPrice(),
       status: "Chờ xác nhận",
     );
 
@@ -666,6 +673,44 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     }).catchError((error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
     });
+  }
+
+  void _showDeleteConfirmationDialog(QueryDocumentSnapshot voucher) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Xác nhận xóa mã giảm giá"),
+          content:
+              const Text("Bạn có chắc chắn muốn xóa mã giảm giá này không?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Hủy"),
+            ),
+            TextButton(
+              onPressed: () {
+                _firestore
+                    .collection('applied_voucher')
+                    .doc(voucher.id)
+                    .delete()
+                    .then((value) {
+                  setState(() {
+                    vouchers.remove(voucher);
+                  });
+                  Navigator.of(context).pop(); // Đóng dialog
+                }).catchError((error) {
+                  print("Lỗi khi xóa voucher: $error");
+                });
+              },
+              child: const Text("Xác nhận"),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
