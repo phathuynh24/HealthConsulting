@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,6 +16,7 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _oldPriceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   List<String> _imageUrls = [];
@@ -38,10 +38,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
     List<String> imagePaths = pickedImages.map((image) => image.path).toList();
     setState(() {
-      _imageUrls = [
-        ..._imageUrls,
-        ...imagePaths
-      ]; // Thêm ảnh mới vào danh sách hiện có
+      _imageUrls = [..._imageUrls, ...imagePaths];
       _selectedImageIndex = index;
     });
   }
@@ -49,10 +46,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Future<void> _saveProduct() async {
     final String name = _nameController.text.trim();
     final int price = int.tryParse(_priceController.text.trim()) ?? 0;
+    final int oldPrice = int.tryParse(_priceController.text.trim()) ?? 0;
     final int quantity = int.tryParse(_quantityController.text.trim()) ?? 0;
 
     if (name.isNotEmpty &&
         price > 0 &&
+        oldPrice > 0 &&
         quantity > 0 &&
         _imageUrls.length == 3 &&
         _selectedCategory != null) {
@@ -75,6 +74,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         final Product newProduct = Product(
           name: name,
           price: price,
+          oldPrice: oldPrice,
           quantity: quantity,
           imageUrls: imageUrls,
           id: '',
@@ -185,9 +185,19 @@ class _AddProductScreenState extends State<AddProductScreen> {
             TextField(
               controller: _priceController,
               decoration: const InputDecoration(
-                labelText: 'Gía sản phẩm',
+                labelText: 'Giá sản phẩm',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.attach_money),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _oldPriceController,
+              decoration: const InputDecoration(
+                labelText: 'Giá cũ sản phẩm',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.money),
               ),
               keyboardType: TextInputType.number,
             ),

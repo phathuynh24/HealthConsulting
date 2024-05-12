@@ -1,7 +1,7 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/store/cart_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/cart/cart_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -203,7 +203,8 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         child: Column(
                           children: <Widget>[
                             SizedBox(
-                              height: 100,
+                              height: 80,
+                              width: 200,
                               child: firstImageUrl.isNotEmpty
                                   ? Image.network(
                                       firstImageUrl,
@@ -211,9 +212,30 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                     )
                                   : const Placeholder(),
                             ),
-                            Text(data['name']),
-                            Text(
-                                '${NumberFormat('#,###').format(data['price'])} VNĐ'),
+                            Text(data['name'],
+                                style: const TextStyle(fontSize: 18)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${NumberFormat('#,###').format(data['price'])} VNĐ',
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Themes.gradientLightClr),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  '${data['old_price']}',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                ),
+                              ],
+                            ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Themes.gradientLightClr,
@@ -227,6 +249,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                     builder: (context) => ProductDetailScreen(
                                       productName: data['name'],
                                       productPrice: data['price'],
+                                      productOldPrice: data['old_price'],
                                       imageUrls:
                                           (data['imageUrls'] as List<dynamic>)
                                               .cast<String>(),
