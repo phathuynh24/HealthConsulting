@@ -6,7 +6,7 @@ import 'bloc.dart';
 
 class SelectSymptomListBloc
     extends Bloc<SelectSymptomListEvent, SelectSymptomListState> {
-  static const String baseUrl = 'http://172.16.2.134:5000';
+  static const String baseUrl = 'http://192.168.197.93:5000';
 
   SelectSymptomListBloc() : super(SelectSymptomListInitial()) {
     on<FetchSymptoms>(_onFetchSymptoms);
@@ -28,7 +28,7 @@ class SelectSymptomListBloc
       SubmitSymptoms event, Emitter<SelectSymptomListState> emit) async {
     emit(SelectSymptomListLoading());
     try {
-      final diagnosis = await diagnoseSymptoms(event.symptoms);
+      final diagnosis = await diagnoseSymptoms(event.text, event.symptoms);
       emit(SelectSymptomListDiagnosed(diagnosis));
     } catch (_) {
       emit(SelectSymptomListError());
@@ -47,10 +47,15 @@ class SelectSymptomListBloc
     }
   }
 
-  Future<String> diagnoseSymptoms(List<String> symptoms) async {
+  Future<String> diagnoseSymptoms(String text, List<String> symptoms) async {
+    symptoms = symptoms.map((e) => e.toLowerCase()).toList();
     final response = await http.post(
-      Uri.parse('$baseUrl/predict_2'),
-      body: jsonEncode({'symptoms': symptoms}),
+      Uri.parse('$baseUrl/predict_disease_weighted_combination'),
+      body: jsonEncode({
+        'weights': [0.3, 0.7],
+        'text': text,
+        'symptoms': symptoms
+      }),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -61,4 +66,23 @@ class SelectSymptomListBloc
       throw Exception('Failed to diagnose symptoms');
     }
   }
+
+  // Future<String> diagnoseSymptoms(List<String> symptoms) async {
+  //   final response = await http.post(
+  //     Uri.parse('$baseUrl/predict_2'),
+  //     body: jsonEncode({
+  //       'weights': [0.3, 0.7],
+  //       'text': "",
+  //       'symptoms': symptoms
+  //       }),
+  //     headers: {
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     },
+  //   );
+  //   if (response.statusCode == 200) {
+  //     return response.body;
+  //   } else {
+  //     throw Exception('Failed to diagnose symptoms');
+  //   }
+  // }
 }

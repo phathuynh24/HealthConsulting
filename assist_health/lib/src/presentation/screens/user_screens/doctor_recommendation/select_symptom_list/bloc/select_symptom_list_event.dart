@@ -10,9 +10,10 @@ abstract class SelectSymptomListEvent extends Equatable {
 class FetchSymptoms extends SelectSymptomListEvent {}
 
 class SubmitSymptoms extends SelectSymptomListEvent {
+  final String text;
   final List<String> symptoms;
 
-  const SubmitSymptoms(this.symptoms);
+  const SubmitSymptoms(this.text, this.symptoms);
 
   @override
   List<Object> get props => [symptoms];

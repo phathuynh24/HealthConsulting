@@ -28,7 +28,12 @@ df_disease_vi_en = pd.read_excel(DISEASE_EXCEL_FILE_PATH)
 def get_symptoms():
     symptoms_Vi = df_symptom_vi_en["Symptom_Vi"].tolist()
     symptoms_En = df_symptom_vi_en["Symptom_En"].tolist()
+    
+    symptoms_En = [symptom.capitalize() for symptom in symptoms_En]
+    symptoms_Vi = [symptom.capitalize() for symptom in symptoms_Vi]
+    
     return jsonify({'symptoms_Vi': symptoms_Vi, 'symptoms_En': symptoms_En})
+
 
 @app.route('/predict_1', methods=['POST'])
 def predict_1():
@@ -125,8 +130,14 @@ def predict_disease_weighted_combination():
     # Sort by score from high to low
     sorted_results = sorted(combined_results.items(), key=lambda x: x[1], reverse=True)
 
+    translate_results = []
+    for disease in sorted_results:
+        disease_vi = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'] == disease[0]]['Disease_Vi']
+        if len(disease_vi) > 0:
+            translate_results.append({'label': disease_vi.values[0], 'Score': disease[1]})
+
     # Return the predicted disease and scores
-    return jsonify({'disease': sorted_results})
+    return jsonify({"disease": translate_results})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

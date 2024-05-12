@@ -11,6 +11,8 @@ class EnterSymptoms extends StatefulWidget {
 }
 
 class _EnterSymptomsState extends State<EnterSymptoms> {
+  TextEditingController _symptomsController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -149,112 +151,109 @@ class _EnterSymptomsState extends State<EnterSymptoms> {
             ),
           ),
           body: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Themes.gradientDeepClr.withOpacity(0.8),
-                          Themes.gradientLightClr.withOpacity(0.7)
-                        ],
-                        begin: Alignment.bottomRight,
-                        end: Alignment.topLeft,
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 1,
-                        ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Themes.gradientDeepClr.withOpacity(0.9),
+                        Themes.gradientLightClr.withOpacity(0.7)
                       ],
+                      begin: Alignment.bottomRight,
+                      end: Alignment.topLeft,
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(children: [
-                        Container(
-                          height: 300,
-                          child: Image.asset(
-                            'assets/recommendation/medical_record.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 16.0,
-                        ),
-                        const Text(
-                          'Chia sẽ triệu chứng bệnh của bạn',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        const Text(
-                          'Ví dụ: Tôi thấy đau ở vùng ngực, khó thở, mệt mỏi, đau đầu, chóng mặt về đêm. Tôi đã thử dùng thuốc giảm đau nhưng không hiệu quả.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: 24,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: TextField(
-                            maxLines: 5,
-                            decoration: InputDecoration(
-                              hintText:
-                                  'Nhập chi tiết triệu chứng bệnh của bạn',
-                              hintStyle: TextStyle(
-                                color: Colors.blue.shade200,
-                                fontSize: 14,
-                              ),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8,
-                        ),
-                      ]),
-                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
-                  // BlocBuilder<DoctorRecommendationBloc,
-                  //     DoctorRecommendationState>(
-                  //   builder: (context, state) {
-                  //     if (state is DoctorRecommendationLoading)
-                  //       return CircularProgressIndicator();
-                  //     else if (state is DoctorRecommendationLoaded)
-                  //       return Text('Disease: ${state.recommendation}');
-                  //     else if (state is DoctorRecommendationError)
-                  //       return Text('Error occurred');
-                  //     else
-                  //       return Container();
-                  //   },
-                  // ),
-                ],
-              ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(children: [
+                      Container(
+                        height: 300,
+                        child: Image.asset(
+                          'assets/recommendation/medical_record.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.0,
+                      ),
+                      const Text(
+                        'Chia sẽ triệu chứng bệnh của bạn',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      const Text(
+                        'Ví dụ: Tôi thấy đau ở vùng ngực, khó thở, mệt mỏi, đau đầu, chóng mặt về đêm. Tôi đã thử dùng thuốc giảm đau nhưng không hiệu quả.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          height: 1.8,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 34,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        alignment: Alignment.center,
+                        child: TextField(
+                          controller: _symptomsController,
+                          maxLines: 5,
+                          decoration: InputDecoration(
+                            hintText: 'Nhập chi tiết triệu chứng bệnh của bạn',
+                            hintStyle: TextStyle(
+                              color: Colors.blue.shade200,
+                              fontSize: 14,
+                            ),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 14,
+                      ),
+                    ]),
+                  ),
+                ),
+                // BlocBuilder<DoctorRecommendationBloc,
+                //     DoctorRecommendationState>(
+                //   builder: (context, state) {
+                //     if (state is DoctorRecommendationLoading)
+                //       return CircularProgressIndicator();
+                //     else if (state is DoctorRecommendationLoaded)
+                //       return Text('Disease: ${state.recommendation}');
+                //     else if (state is DoctorRecommendationError)
+                //       return Text('Error occurred');
+                //     else
+                //       return Container();
+                //   },
+                // ),
+              ],
             ),
           ),
           bottomNavigationBar: Container(
@@ -274,7 +273,7 @@ class _EnterSymptomsState extends State<EnterSymptoms> {
                   MaterialPageRoute(
                     builder: (_) => BlocProvider<SelectSymptomListBloc>(
                       create: (context) => SelectSymptomListBloc(),
-                      child: SelectSymptomListScreen(),
+                      child: SelectSymptomListScreen(textSymtoms: _symptomsController.text),
                     ),
                   ),
                 );
