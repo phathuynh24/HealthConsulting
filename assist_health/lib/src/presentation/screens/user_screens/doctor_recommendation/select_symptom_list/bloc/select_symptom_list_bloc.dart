@@ -6,7 +6,7 @@ import 'bloc.dart';
 
 class SelectSymptomListBloc
     extends Bloc<SelectSymptomListEvent, SelectSymptomListState> {
-  static const String baseUrl = 'http://192.168.197.93:5000';
+  static const String baseUrl = 'http://192.168.245.93:5000';
 
   SelectSymptomListBloc() : super(SelectSymptomListInitial()) {
     on<FetchSymptoms>(_onFetchSymptoms);

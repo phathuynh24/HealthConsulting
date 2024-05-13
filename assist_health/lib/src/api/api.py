@@ -130,14 +130,14 @@ def predict_disease_weighted_combination():
     # Sort by score from high to low
     sorted_results = sorted(combined_results.items(), key=lambda x: x[1], reverse=True)
 
-    translate_results = []
-    for disease in sorted_results:
-        disease_vi = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'] == disease[0]]['Disease_Vi']
-        if len(disease_vi) > 0:
-            translate_results.append({'label': disease_vi.values[0], 'Score': disease[1]})
+    # translate_results = []
+    # for disease in sorted_results:
+    #     disease_vi = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'] == disease[0]]['Disease_Vi']
+    #     if len(disease_vi) > 0:
+    #         translate_results.append({'label': disease_vi.values[0], 'Score': disease[1]})
 
     # Return the predicted disease and scores
-    return jsonify({"disease": translate_results})
+    return jsonify({"disease": sorted_results})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
