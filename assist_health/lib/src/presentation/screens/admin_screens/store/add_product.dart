@@ -4,7 +4,27 @@ import 'package:assist_health/src/presentation/screens/admin_screens/store/produ
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+
+//Format
+class PriceInputFormatter extends TextInputFormatter {
+  static final _formatter = NumberFormat("#,###");
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final newText =
+        _formatter.format(int.parse(newValue.text.replaceAll(",", "")));
+    return TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
+  }
+}
 
 class AddProductScreen extends StatefulWidget {
   const AddProductScreen({super.key});
@@ -191,6 +211,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   prefixIcon: Icon(Icons.attach_money),
                 ),
                 keyboardType: TextInputType.number,
+                inputFormatters: [PriceInputFormatter()],
               ),
               const SizedBox(height: 16.0),
               TextField(
@@ -201,6 +222,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   prefixIcon: Icon(Icons.money),
                 ),
                 keyboardType: TextInputType.number,
+                inputFormatters: [PriceInputFormatter()],
               ),
               const SizedBox(height: 16.0),
               TextField(
@@ -242,8 +264,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   (index) => Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        _pickImages(
-                            index); // Gọi hàm _pickImages khi người dùng nhấn vào ô
+                        _pickImages(index);
                       },
                       child: Container(
                         margin: const EdgeInsets.only(right: 8.0),
