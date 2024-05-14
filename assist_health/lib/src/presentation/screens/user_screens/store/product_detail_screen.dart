@@ -64,27 +64,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
-  void addToCart() {
-    CartItem newItem = CartItem(
-      id: UniqueKey().toString(),
-      productName: widget.productName,
-      productPrice: widget.productPrice,
-      productOldPrice: widget.productOldPrice,
-      quantity: quantity,
-      imageUrls: widget.imageUrls,
-      category: widget.category,
-    );
-    cartItems.add(newItem);
-    FirebaseFirestore.instance.collection('user_carts').add({
-      'id': newItem.id,
-      'productName': widget.productName,
-      'productPrice': widget.productPrice,
-      'productOldPrice': widget.productOldPrice,
-      'quantity': quantity,
-      'userId': currentUserId,
-      'imageUrls': newItem.imageUrls,
-      'category': newItem.category,
-    });
+  void addToCart() async {
+    final cartCollection = FirebaseFirestore.instance.collection('user_carts');
+
+    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng hay chưa
+    final existingCartItem = await cartCollection
+        .where('userId', isEqualTo: currentUserId)
+        .where('productName', isEqualTo: widget.productName)
+        .get();
+
+    if (existingCartItem.docs.isNotEmpty) {
+      // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng
+      final docId = existingCartItem.docs.first.id;
+      cartCollection.doc(docId).update({
+        'quantity': FieldValue.increment(quantity),
+      });
+    } else {
+      // Nếu sản phẩm chưa tồn tại trong giỏ hàng, thêm vào
+      CartItem newItem = CartItem(
+        id: UniqueKey().toString(),
+        productName: widget.productName,
+        productPrice: widget.productPrice,
+        productOldPrice: widget.productOldPrice,
+        quantity: quantity,
+        imageUrls: widget.imageUrls,
+        category: widget.category,
+      );
+      cartItems.add(newItem);
+      cartCollection.add({
+        'id': newItem.id,
+        'productName': widget.productName,
+        'productPrice': widget.productPrice,
+        'productOldPrice': widget.productOldPrice,
+        'quantity': quantity,
+        'userId': currentUserId,
+        'imageUrls': newItem.imageUrls,
+        'category': newItem.category,
+      });
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(

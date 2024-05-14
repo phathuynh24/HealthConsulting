@@ -122,13 +122,28 @@ class _CartScreenState extends State<CartScreen> {
             );
           }
           return ListTile(
-            title: Text(
-              cartItems[index].productName,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            leading: Container(
+              width: 80,
+              child: Row(
+                children: [
+                  Text(
+                    '${index + 1}',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  SizedBox(width: 10),
+                  Image.network(
+                    cartItems[index].imageUrls[0],
+                    width: 60,
+                    height: 60,
+                  ),
+                ],
+              ),
             ),
+            title: Text(cartItems[index].productName),
             subtitle: Text(
               '${NumberFormat('#,###').format(cartItems[index].productPrice)} VNĐ',
-              style: const TextStyle(color: Colors.grey, fontSize: 16),
+              style:
+                  const TextStyle(color: Themes.gradientDeepClr, fontSize: 16),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -156,10 +171,21 @@ class _CartScreenState extends State<CartScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Tổng tiền: ${NumberFormat('#,###').format(totalPrice)} VNĐ',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        Text(
+                          'Tổng tiền:',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        Text(
+                          ' ${NumberFormat('#,###').format(totalPrice)} VNĐ',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.red),
+                        ),
+                      ],
                     ),
                     ElevatedButton(
                       onPressed: () {
@@ -172,7 +198,7 @@ class _CartScreenState extends State<CartScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Themes.gradientLightClr,
+                        backgroundColor: Themes.gradientDeepClr,
                       ),
                       child: const Text(
                         'Thanh toán',

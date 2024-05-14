@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/cart/cart_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:intl/intl.dart';
 
@@ -16,6 +17,8 @@ class HomeStoreScreen extends StatefulWidget {
 
 class _HomeStoreScreenState extends State<HomeStoreScreen> {
   late Stream<QuerySnapshot> _productStream;
+  final TextEditingController _searchController = TextEditingController();
+
   List<CartItem> cartItems = [];
   final List<String> categories = [
     'Hỗ trợ hô hấp',
@@ -92,7 +95,8 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.0),
                       ),
-                      child: const TextField(
+                      child: TextField(
+                        controller: _searchController,
                         decoration: InputDecoration(
                           hintText: 'Tìm kiếm sản phẩm...',
                           border: InputBorder.none,
@@ -108,7 +112,12 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // showSearch(
+                        //   context: context,
+                        //   delegate: ProductSearch(_searchController.text),
+                        // );
+                      },
                       icon: const Icon(Icons.search),
                       color: Colors.white,
                     ),

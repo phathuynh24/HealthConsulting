@@ -649,18 +649,26 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     );
   }
 
+  Future<void> clearUserCart() async {
+    final cartCollection = FirebaseFirestore.instance.collection('user_carts');
+
+    final userCartItems =
+        await cartCollection.where('userId', isEqualTo: currentUserId).get();
+
+    for (final item in userCartItems.docs) {
+      await cartCollection.doc(item.id).delete();
+    }
+  }
+
   void placeOrder() {
     Order order = Order(
       userId: currentUserId,
       orderId: const Uuid().v4(),
       userCart: cartItems,
       address: widget.address!,
-      // totalPrice: calculateTotalPrice(),
       totalPrice: calculateFinalPrice(),
       status: "Chờ xác nhận",
     );
-
-    // Lưu đơn hàng vào Firestore
     saveOrderToFirestore(order);
   }
 
@@ -668,8 +676,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     FirebaseFirestore.instance
         .collection('orders')
         .add(order.toMap())
-        .then((value) {
+        .then((value) async {
       print('Đơn hàng đã được lưu vào Firestore');
+      await clearUserCart();
       Navigator.push(
         context,
         MaterialPageRoute(
