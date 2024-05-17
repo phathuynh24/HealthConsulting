@@ -31,6 +31,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   List<CartItem> cartItems = [];
   late String selectedImageUrl;
   late String currentUserId;
+  double averageRating = 0.0;
+  int voteCount = 0;
 
   @override
   void initState() {
@@ -41,6 +43,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       selectedImageUrl = ProductDetailScreen.defaultImageUrl;
     }
     getCurrentUserId();
+    fetchProductRatingAndVoteCount();
   }
 
   void getCurrentUserId() {
@@ -145,6 +148,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
+  void fetchProductRatingAndVoteCount() {
+    FirebaseFirestore.instance
+        .collection('products')
+        .where('name', isEqualTo: widget.productName)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        setState(() {
+          averageRating = data['rating'];
+          voteCount = data['voteCount'];
+        });
+      }
+    }).catchError((error) {
+      print('Error fetching rating and vote count: $error');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -243,6 +264,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
+              SizedBox(
+                width: 10,
+              ),
+              Row(
+                children: [
+                  Text(
+                    '${averageRating.toStringAsFixed(1)}',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Icon(Icons.star, color: Colors.yellow),
+                  Text(
+                    '(${voteCount} đánh giá)',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               Text(
                 '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
                 style: const TextStyle(
@@ -363,6 +401,91 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     scrollDirection: Axis.horizontal, // Cuộn theo chiều ngang
                     child: Row(
                       children: productWidgets,
+                    ),
+                  );
+                },
+              ),
+              // const SizedBox(height: 10),
+              Divider(
+                // Đường kẻ ngang
+                color: Colors.grey,
+                thickness: 1,
+              ),
+              const Text(
+                'Đánh giá sản phẩm',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('product_review')
+                    .where('productName', isEqualTo: widget.productName)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final List<Widget> reviewWidgets =
+                      snapshot.data!.docs.map((DocumentSnapshot doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final DateTime reviewDate =
+                        (data['timestamp'] as Timestamp).toDate();
+                    final formattedDate =
+                        DateFormat('dd/MM/yyyy').format(reviewDate);
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.grey),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Text(
+                          //   data['reviewerName'],
+                          //   style: const TextStyle(
+                          //       fontSize: 16, fontWeight: FontWeight.bold),
+                          // ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Ngày: $formattedDate',
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.grey),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    '${data['rating']}',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  Icon(Icons.star, color: Colors.yellow),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            data['review'],
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                  return Container(
+                    height: 150,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: reviewWidgets,
+                      ),
                     ),
                   );
                 },

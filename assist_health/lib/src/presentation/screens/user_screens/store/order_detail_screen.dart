@@ -92,10 +92,11 @@ class OrderDetailsPage extends StatelessWidget {
             ),
           );
         }
-        int totalQuantity = 0;
         return SingleChildScrollView(
           child: Column(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
+              int totalQuantity = 0;
+
               for (var cartItem in (document['userCart'] as List<dynamic>)) {
                 totalQuantity +=
                     (cartItem['quantity'] as num).toInt(); // Ép kiểu sang int

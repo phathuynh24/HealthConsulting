@@ -7,6 +7,8 @@ class Product {
   final List<String> imageUrls; // Danh sách URL hình ảnh
   String? category;
   String? description;
+  double rating;
+  int voteCount;
 
   Product({
     required this.id,
@@ -17,6 +19,8 @@ class Product {
     required this.imageUrls,
     required this.category,
     this.description,
+    this.rating = 0.0,
+    this.voteCount = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -28,6 +32,8 @@ class Product {
       'imageUrls': imageUrls, // Lưu danh sách URL hình ảnh
       'category': category,
       'description': description,
+      'rating': rating, // Add this line
+      'voteCount': voteCount,
     };
   }
 }

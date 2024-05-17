@@ -1,4 +1,5 @@
 import 'package:assist_health/src/others/theme.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/cart/cart_screen.dart';
@@ -38,6 +39,36 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
     super.initState();
     _productStream =
         FirebaseFirestore.instance.collection('products').snapshots();
+    _updateProductRatings();
+  }
+
+  Future<void> _updateProductRatings() async {
+    final productSnapshot =
+        await FirebaseFirestore.instance.collection('products').get();
+    for (var productDoc in productSnapshot.docs) {
+      final productId = productDoc.id;
+      final reviewsSnapshot = await FirebaseFirestore.instance
+          .collection('product_review')
+          .where('productName', isEqualTo: productDoc['name'])
+          .get();
+
+      int totalReviews = reviewsSnapshot.docs.length;
+      double totalRating = 0;
+
+      for (var reviewDoc in reviewsSnapshot.docs) {
+        totalRating += reviewDoc['rating'];
+      }
+
+      double averageRating = totalReviews > 0 ? totalRating / totalReviews : 0;
+
+      await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productId)
+          .update({
+        'rating': averageRating,
+        'voteCount': totalReviews,
+      });
+    }
   }
 
   @override
@@ -126,7 +157,6 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
               ),
             ),
             Container(
-              // padding: const EdgeInsets.symmetric(vertical: 10),
               child: CarouselSlider(
                 items: [
                   Container(
@@ -217,97 +247,139 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  final List<Widget> productWidgets = snapshot.data!.docs
+
+                  final products = snapshot.data!.docs
                       .where((doc) =>
                           selectedCategory.isEmpty ||
                           doc['category'] == selectedCategory)
                       .where((doc) {
                     final price = doc['price'] as num;
                     return price >= _lowerValue && price <= _upperValue;
-                  }).map((DocumentSnapshot doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    final List<String> imageUrls =
-                        List<String>.from(data['imageUrls']);
-
-                    final String firstImageUrl =
-                        imageUrls.isNotEmpty ? imageUrls[0] : '';
-
-                    return SizedBox(
-                      width: double.infinity,
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                              ),
-                              child: AspectRatio(
-                                aspectRatio: 2,
-                                child: firstImageUrl.isNotEmpty
-                                    ? Image.network(
-                                        firstImageUrl,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : const Placeholder(),
-                              ),
-                            ),
-                            Text(data['name'],
-                                style: const TextStyle(fontSize: 18)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${NumberFormat('#,###').format(data['price'])} VNĐ',
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Themes.gradientLightClr),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  '${NumberFormat('#,###').format(data['old_price'])} VNĐ',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Themes.gradientLightClr,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Thêm vào giỏ hàng'),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailScreen(
-                                      productName: data['name'],
-                                      productPrice: data['price'],
-                                      productOldPrice: data['old_price'],
-                                      imageUrls:
-                                          (data['imageUrls'] as List<dynamic>)
-                                              .cast<String>(),
-                                      category: data['category'],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
                   }).toList();
 
-                  return GridView.count(
-                    crossAxisCount: 2,
-                    children: productWidgets,
+                  return GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.535,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    padding: const EdgeInsets.all(5),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      final doc = products[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final List<String> imageUrls =
+                          List<String>.from(data['imageUrls']);
+                      final String firstImageUrl =
+                          imageUrls.isNotEmpty ? imageUrls[0] : '';
+
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.grey), // Change color as needed
+                        ),
+                        child: Card(
+                          child: Column(
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                ),
+                                child: AspectRatio(
+                                  aspectRatio: 0.9,
+                                  child: firstImageUrl.isNotEmpty
+                                      ? Image.network(
+                                          firstImageUrl,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Placeholder(),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      data['name'],
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '${NumberFormat('#,###').format(data['price'])} VNĐ',
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Themes.gradientLightClr),
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.star,
+                                                color: Colors.amber, size: 22),
+                                            Text(
+                                              '${data['rating'] ?? 0.0} (${data['voteCount'] ?? 0})',
+                                              style:
+                                                  const TextStyle(fontSize: 12),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${NumberFormat('#,###').format(data['old_price'])} VNĐ',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Themes.gradientLightClr,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      child: const Text('Thêm vào giỏ hàng'),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailScreen(
+                                              productName: data['name'],
+                                              productPrice: data['price'],
+                                              productOldPrice:
+                                                  data['old_price'],
+                                              imageUrls: (data['imageUrls']
+                                                      as List<dynamic>)
+                                                  .cast<String>(),
+                                              category: data['category'],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

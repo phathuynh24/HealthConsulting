@@ -4,6 +4,7 @@ import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/favorite_doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/evaluate_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/order_detail_screen.dart';
 import 'package:assist_health/src/widgets/health_metrics_topnavbar.dart';
 import 'package:assist_health/src/widgets/user_navbar.dart';
@@ -300,6 +301,43 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                   title: const Text(
                                     "Đơn mua",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 10,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EvaluatePage()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.rate_review,
+                                    color: Color.fromARGB(255, 192, 192, 10),
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Đánh giá",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15,
