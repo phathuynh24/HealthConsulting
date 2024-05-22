@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
@@ -75,6 +74,21 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
     return DateTime(year, month);
   }
 
+  List<Color> barColors = [
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+    Colors.pink,
+    Colors.teal,
+    Colors.cyan,
+    Colors.lime,
+    Colors.amber,
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +123,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
 
                 if (appointmentSchedules.isEmpty) {
                   return const SizedBox(
-                    height: 600,
+                    height: 400,
                     child: Center(child: Text('No appointments available')),
                   );
                 }
@@ -126,7 +140,7 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                         (monthlyRevenue[monthYear] ?? 0.0) + serviceFee;
                   }
                 }
-                //Sắp xếp lại tháng
+                // Sắp xếp lại tháng
                 monthlyRevenue = Map.fromEntries(monthlyRevenue.entries.toList()
                   ..sort((a, b) =>
                       _getDateTime(a.key).compareTo(_getDateTime(b.key))));
@@ -135,50 +149,58 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            showDataDialog(monthlyRevenue);
-                          },
-                          child: const Text('Doanh thu theo tháng'),
-                        ),
-                        const SizedBox(width: 16),
-                        DropdownButton<int>(
-                          value: _selectedYear,
-                          items: List.generate(10, (index) {
-                            int year = DateTime.now().year - index + 2;
-                            return DropdownMenuItem<int>(
-                              value: year,
-                              child: Text(year.toString()),
-                            );
-                          }),
-                          onChanged: (year) {
-                            setState(() {
-                              _selectedYear = year!;
-                            });
-                          },
-                        ),
-                      ],
+                    const SizedBox(width: 16),
+                    Center(
+                      child: DropdownButton<int>(
+                        value: _selectedYear,
+                        items: List.generate(10, (index) {
+                          int year = DateTime.now().year - index + 2;
+                          return DropdownMenuItem<int>(
+                            value: year,
+                            child: Text(year.toString()),
+                          );
+                        }),
+                        onChanged: (year) {
+                          setState(() {
+                            _selectedYear = year!;
+                          });
+                        },
+                      ),
                     ),
                     const SizedBox(height: 18),
                     Container(
                       padding: const EdgeInsets.all(8),
                       width: double.infinity,
-                      height: 600,
-                      child: LineChart(
-                        LineChartData(
-                          minX: 1,
-                          maxX: 12,
-                          minY: 0,
+                      height: 400,
+                      child: BarChart(
+                        BarChartData(
+                          alignment: BarChartAlignment.spaceAround,
                           maxY: monthlyRevenue.values.isNotEmpty
                               ? monthlyRevenue.values
                                   .reduce((a, b) => a > b ? a : b)
                               : 0,
-                          titlesData: const FlTitlesData(
+                          barGroups: monthlyRevenue.entries
+                              .where((entry) =>
+                                  _getDateTime(entry.key).year == _selectedYear)
+                              .map(
+                                (entry) => BarChartGroupData(
+                                  x: _getDateTime(entry.key).month,
+                                  barRods: [
+                                    BarChartRodData(
+                                      toY: entry.value.toDouble(),
+                                      color: barColors[
+                                          (_getDateTime(entry.key).month - 1) %
+                                              barColors.length],
+                                      width: 16,
+                                    ),
+                                  ],
+                                ),
+                              )
+                              .toList(),
+                          titlesData: FlTitlesData(
                             show: true,
                             bottomTitles: AxisTitles(
-                              axisNameWidget: Text(
+                              axisNameWidget: const Text(
                                 'Tháng',
                                 style: TextStyle(fontSize: 15, height: 1.5),
                               ),
@@ -187,18 +209,22 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                                 showTitles: true,
                                 reservedSize: 25,
                                 interval: 1,
+                                getTitlesWidget: (value, meta) {
+                                  return Text(
+                                    value.toInt().toString(),
+                                    style: const TextStyle(fontSize: 12),
+                                  );
+                                },
                               ),
                             ),
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 50,
+                                showTitles: false,
                               ),
                             ),
                             rightTitles: AxisTitles(
                               sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 50,
+                                showTitles: false,
                               ),
                             ),
                           ),
@@ -208,31 +234,37 @@ class _RevenueChartScreenState extends State<RevenueChartScreen> {
                           borderData: FlBorderData(
                             border: Border.all(color: Colors.black),
                           ),
-                          lineBarsData: [
-                            LineChartBarData(
-                              spots: monthlyRevenue.entries
-                                  .where((entry) =>
-                                      _getDateTime(entry.key).year ==
-                                      _selectedYear)
-                                  .map((entry) => FlSpot(
-                                        _getDateTime(entry.key)
-                                            .month
-                                            .toDouble(),
-                                        entry.value.toDouble(),
-                                      ))
-                                  .toList(),
-                              isCurved: true,
-                              color: Colors.blue,
-                              barWidth: 4,
-                              belowBarData: BarAreaData(
-                                  show: true,
-                                  color: Colors.blue.withOpacity(0.3)),
-                              dotData: const FlDotData(show: true),
+                          barTouchData: BarTouchData(
+                            touchTooltipData: BarTouchTooltipData(
+                              tooltipBgColor: Colors.blueAccent,
+                              getTooltipItem:
+                                  (group, groupIndex, rod, rodIndex) {
+                                return BarTooltipItem(
+                                  rod.toY.toString(),
+                                  TextStyle(color: Colors.white),
+                                );
+                              },
                             ),
-                          ],
+                            touchCallback: (event, response) {},
+                          ),
                         ),
                       ),
-                    )
+                    ),
+                    Center(
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Themes.gradientDeepClr),
+                        ),
+                        onPressed: () {
+                          showDataDialog(monthlyRevenue);
+                        },
+                        child: const Text('Doanh thu theo tháng',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ),
                   ],
                 );
               }

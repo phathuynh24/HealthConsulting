@@ -1,8 +1,10 @@
+import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/evaluation_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 
 class EvaluatePage extends StatefulWidget {
   @override
@@ -44,9 +46,27 @@ class _EvaluatePageState extends State<EvaluatePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Đánh giá'),
+        title: const Text(
+          'Đánh giá',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          labelStyle: TextStyle(fontSize: 18),
+          unselectedLabelColor: Colors.white,
           tabs: [
             Tab(text: 'Chưa đánh giá'),
             Tab(text: 'Đã đánh giá'),
@@ -115,18 +135,33 @@ class _EvaluatePageState extends State<EvaluatePage>
                             margin: EdgeInsets.all(10),
                             child: ListTile(
                               leading: Image.network(product['imageUrls'][0],
-                                  width: 60, height: 60),
-                              title: Text(product['productName']),
+                                  width: 90, height: 80),
+                              title: Text(product['productName'],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18)),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Giá mới: ${product['productPrice']}'),
+                                  Row(
+                                    children: [
+                                      Text('Giá mới: '),
+                                      Text(
+                                        '${NumberFormat('#,###').format(product['productPrice'])}',
+                                        style: TextStyle(
+                                            color: Themes.gradientLightClr,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                                   Row(
                                     children: [
                                       Text('Giá cũ:'),
                                       Text(
-                                        '${product['productOldPrice']}',
+                                        '${NumberFormat('#,###').format(product['productOldPrice'])}',
                                         style: TextStyle(
+                                          color: Themes.gradientLightClr,
+                                          fontWeight: FontWeight.bold,
                                           decoration:
                                               TextDecoration.lineThrough,
                                         ),
@@ -173,8 +208,11 @@ class _EvaluatePageState extends State<EvaluatePage>
                       final review = snapshot.data!.docs[index];
                       return ListTile(
                         leading: Image.network(review['imageUrls'][0],
-                            width: 60, height: 60),
-                        title: Text(review['productName']),
+                            width: 80, height: 80),
+                        title: Text(
+                          review['productName'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -182,16 +220,42 @@ class _EvaluatePageState extends State<EvaluatePage>
                               children: [
                                 Row(
                                   children: [
-                                    Text('${review['productPrice']}'),
+                                    Text('Giá:',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16)),
+                                    SizedBox(width: 10),
+                                    Text(
+                                        '${NumberFormat('#,###').format(review['productPrice'])}',
+                                        style: TextStyle(
+                                            color: Themes.gradientLightClr,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18)),
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    Text('${review['productOldPrice']}'),
+                                    Text(
+                                      '${NumberFormat('#,###').format(review['productOldPrice'])}',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
-                            Text(review['review']),
+                            Row(
+                              children: [
+                                Text(
+                                  'Đánh giá: ',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(review['review']),
+                              ],
+                            ),
                           ],
                         ),
                         trailing: Row(

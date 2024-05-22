@@ -2,9 +2,9 @@ import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_account.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/content_topbar.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/message_admin.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/store/product.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/voucher/add_voucher_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +24,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
   final _screens = [
     // Screen 1
     const RevenueChartScreen(),
+    ReviewManagementPage(),
     const AddVoucherScreen(),
     // Screen 2
     const ContentTopBar(),
@@ -64,6 +65,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_outlined),
+              label: "Thống kê",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.reviews_rounded),
               label: "Thống kê",
             ),
             BottomNavigationBarItem(

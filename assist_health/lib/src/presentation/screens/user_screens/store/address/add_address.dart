@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/store/address/list_addresses.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/purchase_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -33,6 +33,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late String currentUserId;
   double averageRating = 0.0;
   int voteCount = 0;
+  Future<String> getUserName(String userId) async {
+    DocumentSnapshot userDoc =
+        await FirebaseFirestore.instance.collection('users').doc(userId).get();
+    if (userDoc.exists) {
+      return userDoc['name'];
+    } else {
+      return 'Unknown User';
+    }
+  }
 
   @override
   void initState() {
@@ -77,13 +86,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         .get();
 
     if (existingCartItem.docs.isNotEmpty) {
-      // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng
       final docId = existingCartItem.docs.first.id;
       cartCollection.doc(docId).update({
         'quantity': FieldValue.increment(quantity),
       });
     } else {
-      // Nếu sản phẩm chưa tồn tại trong giỏ hàng, thêm vào
       CartItem newItem = CartItem(
         id: UniqueKey().toString(),
         productName: widget.productName,
@@ -258,6 +265,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
               Text(
                 widget.productName,
@@ -436,6 +444,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         (data['timestamp'] as Timestamp).toDate();
                     final formattedDate =
                         DateFormat('dd/MM/yyyy').format(reviewDate);
+
                     return Container(
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(10),
