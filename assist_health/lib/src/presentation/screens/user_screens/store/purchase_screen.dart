@@ -2,6 +2,8 @@ import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/address/add_address.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/address/list_addresses.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/online_payment.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/store/payment_method.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/voucher/voucher_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,6 +72,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   late String currentUserId;
   List<QueryDocumentSnapshot> cartItems = [];
   List<QueryDocumentSnapshot> vouchers = [];
+  // String? _selectedPaymentMethod;
+  final ValueNotifier<int> _selectedPaymentMethodNotifier =
+      ValueNotifier<int>(0);
 
   int calculateTotalPrice() {
     int totalPrice = 0;
@@ -123,6 +128,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         vouchers = snapshot.docs;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _selectedPaymentMethodNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -443,54 +454,76 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Nút cho VNPay
-                              ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: Image.asset(
-                                  'assets/vnpay_logo.png',
-                                  width: 24,
-                                  height: 24,
-                                ),
-                                label: const Text(
-                                  'VNPay',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                // style: Sty
-                              ),
-                              // Nút cho Ship COD
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  // Xử lý sự kiện cho Ship COD
-                                },
-                                icon: Image.asset('assets/ship_cod_logo.png',
-                                    width: 24, height: 24),
-                                label: const Text(
-                                  'Ship COD',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              // Nút cho Momo
-                              ElevatedButton.icon(
-                                onPressed: () {},
-                                icon: Image.asset('assets/momo_logo.png',
-                                    width: 24, height: 24),
-                                label: const Text(
-                                  'Momo',
-                                  style: TextStyle(
-                                    color: Colors
-                                        .black, // Add this line to change the text color
-                                  ),
-                                ),
-                              ),
-                            ],
+                          PaymentMethodSelection(
+                            selectedPaymentMethodNotifier:
+                                _selectedPaymentMethodNotifier,
                           ),
+
+                          // Column(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   children: [
+                          //     Row(
+                          //       mainAxisAlignment:
+                          //           MainAxisAlignment.spaceBetween,
+                          //       children: [
+                          //         Row(
+                          //           children: [
+                          //             Image.asset(
+                          //               'assets/vnpay_logo.png',
+                          //               width: 40,
+                          //               height: 40,
+                          //             ),
+                          //             SizedBox(width: 20),
+                          //             Text(
+                          //               'VNPay',
+                          //               style: TextStyle(fontSize: 16),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //         Radio(
+                          //           value: 'VNPay',
+                          //           groupValue: _selectedPaymentMethod,
+                          //           onChanged: (value) {
+                          //             setState(() {
+                          //               _selectedPaymentMethod =
+                          //                   value.toString();
+                          //             });
+                          //           },
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     Row(
+                          //       mainAxisAlignment:
+                          //           MainAxisAlignment.spaceBetween,
+                          //       children: [
+                          //         Row(
+                          //           children: [
+                          //             Image.asset(
+                          //               'assets/ship_cod_logo.png',
+                          //               width: 40,
+                          //               height: 40,
+                          //             ),
+                          //             SizedBox(width: 20),
+                          //             Text(
+                          //               'Ship COD',
+                          //               style: TextStyle(fontSize: 16),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //         Radio(
+                          //           value: 'Ship COD',
+                          //           groupValue: _selectedPaymentMethod,
+                          //           onChanged: (value) {
+                          //             setState(() {
+                          //               _selectedPaymentMethod =
+                          //                   value.toString();
+                          //             });
+                          //           },
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ],
+                          // ),
                         ],
                       ),
                     ),
@@ -610,8 +643,26 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (widget.address != null) {
-                    placeOrder();
+                  if (widget.address != null &&
+                      _selectedPaymentMethodNotifier.value != 0) {
+                    if (_selectedPaymentMethodNotifier.value == 1) {
+                      // placeOrder();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OnLinePaymentScreen(
+                            totalPriceAfterDiscount:
+                                calculateFinalPrice(), // Pass the appropriate value
+                          ),
+                        ),
+                      );
+                    } else if (_selectedPaymentMethodNotifier.value == 2) {
+                      // Handle COD payment logic here
+                      // Navigator.pop(context);
+                      placeOrder();
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    }
+                    // placeOrder();
                   } else {
                     showDialog(
                       context: context,
@@ -678,15 +729,26 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         .add(order.toMap())
         .then((value) async {
       print('Đơn hàng đã được lưu vào Firestore');
-      await clearUserCart();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeStoreScreen(),
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Đơn hàng của bạn đã được đặt thành công!'),
+          duration: const Duration(seconds: 2), // Show Snackbar for 2 seconds
+          backgroundColor: Colors.green,
         ),
       );
+      await Future.delayed(Duration(seconds: 3));
+      await clearUserCart();
     }).catchError((error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text('Đã xảy ra lỗi khi lưu đơn hàng. Vui lòng thử lại.'),
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red,
+        ),
+      );
     });
   }
 

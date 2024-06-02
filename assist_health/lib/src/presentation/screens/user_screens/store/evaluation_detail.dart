@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 
 class ProductEvaluationPage extends StatefulWidget {
   final dynamic product;
@@ -95,7 +96,7 @@ class _ProductEvaluationPageState extends State<ProductEvaluationPage> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Text(
-                    '${widget.product['productPrice']}',
+                    '${NumberFormat('#,###').format(widget.product['productPrice'])}',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -107,7 +108,7 @@ class _ProductEvaluationPageState extends State<ProductEvaluationPage> {
                 children: [
                   Text('Giá mới: '),
                   Text(
-                    '${widget.product['productOldPrice']}',
+                    '${NumberFormat('#,###').format(widget.product['productOldPrice'])}',
                     style: TextStyle(
                         decoration: TextDecoration.lineThrough,
                         color: Themes.gradientLightClr,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -213,13 +214,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       ],
                     ),
+                    // child: ClipRRect(
+                    //   borderRadius: BorderRadius.circular(10),
+                    //   child: Image.network(
+                    //     selectedImageUrl.isNotEmpty
+                    //         ? selectedImageUrl
+                    //         : ProductDetailScreen.defaultImageUrl,
+                    //     fit: BoxFit.cover,
+                    //   ),
+                    // ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        selectedImageUrl.isNotEmpty
+                      child: CachedNetworkImage(
+                        imageUrl: selectedImageUrl.isNotEmpty
                             ? selectedImageUrl
                             : ProductDetailScreen.defaultImageUrl,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child:
+                              CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                        ),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
                   ),
@@ -252,9 +268,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               width: 80,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.network(
-                                  widget.imageUrls[index],
+                                child: CachedNetworkImage(
+                                  imageUrl: widget.imageUrls[index],
                                   fit: BoxFit.cover,
+                                  placeholder: (context, url) => Center(
+                                    child:
+                                        CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
                                 ),
                               ),
                             ),
@@ -377,11 +399,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Image.network(
-                                firstImageUrl, // Sử dụng hình ảnh đầu tiên trong danh sách
+                              CachedNetworkImage(
+                                imageUrl:
+                                    firstImageUrl, // Sử dụng hình ảnh đầu tiên trong danh sách
                                 height: 100,
                                 width: 100, // Đảm bảo kích thước của ảnh
                                 fit: BoxFit.cover,
+                                placeholder: (context, url) => Center(
+                                  child:
+                                      CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
                               ),
                               const SizedBox(height: 10),
                               Text(
@@ -456,11 +485,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Text(
-                          //   data['reviewerName'],
-                          //   style: const TextStyle(
-                          //       fontSize: 16, fontWeight: FontWeight.bold),
-                          // ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

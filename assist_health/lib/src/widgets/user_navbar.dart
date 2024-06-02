@@ -1,4 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/blog_detail.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/message.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
@@ -25,7 +27,7 @@ class _UserNavBarState extends State<UserNavBar> {
     const PublicQuestionsScreen(),
     // Messages Screen
     const MessageScreen(),
-    //Account Screen
+    BlogListPage(),
     const AccountScreen(),
   ];
 
@@ -67,6 +69,10 @@ class _UserNavBarState extends State<UserNavBar> {
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chat_bubble_text_fill),
               label: "Tin nhắn",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
+              label: "Bài viết",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

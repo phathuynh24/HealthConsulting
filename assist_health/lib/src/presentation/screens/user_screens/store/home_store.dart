@@ -1,4 +1,5 @@
 import 'package:assist_health/src/others/theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -283,6 +284,21 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         child: Card(
                           child: Column(
                             children: <Widget>[
+                              // ClipRRect(
+                              //   borderRadius: const BorderRadius.only(
+                              //     topLeft: Radius.circular(10),
+                              //     topRight: Radius.circular(10),
+                              //   ),
+                              //   child: AspectRatio(
+                              //     aspectRatio: 0.9,
+                              //     child: firstImageUrl.isNotEmpty
+                              //         ? Image.network(
+                              //             firstImageUrl,
+                              //             fit: BoxFit.cover,
+                              //           )
+                              //         : const Placeholder(),
+                              //   ),
+                              // ),
                               ClipRRect(
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(10),
@@ -290,14 +306,19 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                 ),
                                 child: AspectRatio(
                                   aspectRatio: 0.9,
-                                  child: firstImageUrl.isNotEmpty
-                                      ? Image.network(
-                                          firstImageUrl,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Placeholder(),
+                                  child: CachedNetworkImage(
+                                    imageUrl: firstImageUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Center(
+                                      child:
+                                          CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
                                 ),
                               ),
+
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(

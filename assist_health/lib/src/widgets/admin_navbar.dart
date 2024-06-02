@@ -1,5 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_account.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/admin_blog_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/content_topbar.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
@@ -25,6 +26,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 1
     const RevenueChartScreen(),
     ReviewManagementPage(),
+    AdminBlog(),
     const AddVoucherScreen(),
     // Screen 2
     const ContentTopBar(),
@@ -69,6 +71,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.reviews_rounded),
+              label: "Thống kê",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
               label: "Thống kê",
             ),
             BottomNavigationBarItem(

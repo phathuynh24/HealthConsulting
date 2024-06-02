@@ -1,6 +1,7 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/purchase_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -131,10 +132,17 @@ class _CartScreenState extends State<CartScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   SizedBox(width: 10),
-                  Image.network(
-                    cartItems[index].imageUrls[0],
+                  CachedNetworkImage(
+                    imageUrl: cartItems[index].imageUrls[0],
                     width: 60,
                     height: 60,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Center(
+                      child:
+                          CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
                   ),
                 ],
               ),

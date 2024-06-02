@@ -1,6 +1,7 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_account.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/advise_topbar.dart';
+import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_blog.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/home_doctor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
     const HomeDoctor(),
     // Screen 2
     const AdviseTopBar(),
+    Doctor_Blog(),
     //Screen 3
     const DoctorAccountScreen(),
   ];
@@ -54,6 +56,10 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.phone_fill),
               label: "Tư vấn",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.article_outlined),
+              label: "Bài viết",
             ),
             BottomNavigationBarItem(
               icon: Icon(FontAwesomeIcons.userDoctor),

@@ -67,7 +67,8 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF00A5CF), Color(0xFF00FFC6)],
+              // colors: [Color(0xFF00A5CF), Color(0xFF00FFC6)],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

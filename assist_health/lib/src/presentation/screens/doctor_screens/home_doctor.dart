@@ -36,7 +36,6 @@ class _HomeDoctorState extends State<HomeDoctor> {
   final items = [
     Image.asset('assets/slider1.jpg', fit: BoxFit.cover),
     Image.asset('assets/slider2.jpg', fit: BoxFit.cover),
-    //Image.asset('assets/slider3.jpeg', fit: BoxFit.cover),
   ];
 
   @override

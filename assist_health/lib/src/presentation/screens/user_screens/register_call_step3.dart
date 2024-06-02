@@ -77,7 +77,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     _transferContent = _generateTransferContent();
 
     _linkQRCode =
-        'https://img.vietqr.io/image/sacombank-070119955066-compact.jpg?amount=${_doctorInfo!.serviceFee * 1.0083}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
+        'https://img.vietqr.io/image/vietcombank-1017904862-compact.jpg?amount=${_doctorInfo!.serviceFee * 1.0083}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
 
     _appointmentCode = _generateAppointmentCode();
 

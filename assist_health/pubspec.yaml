@@ -60,7 +60,8 @@ dependencies:
   flutter_xlider: ^3.5.0
   shared_preferences: ^2.2.2
   translator: ^1.0.0
-  
+  cached_network_image: ^3.3.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,39 +80,38 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/doctor1.jpg
-     - assets/doctor2.jpg
-     - assets/doctor3.jpg
-     - assets/doctor4.jpg
-     - assets/doctors.png
-     - assets/slider1.jpg
-     - assets/slider2.jpg
-     - assets/slider3.jpeg
-     - assets/empty-box.png
-     - assets/lined heart.png
-     - assets/sample_image.png
-     - assets/sample_image.jpeg
-     - assets/guidanceVietQR.png
-     - assets/health_care_logo.jpg
-     - assets/health_care_logo_nobg.png
-     - assets/no_result_search_icon.png
-     - assets/image.png
-     - assets/doctor_ai.png
-     - assets/.evn
-     - assets/vnpay_logo.png
-     - assets/ship_cod_logo.png
-     - assets/momo_logo.png
-     - assets/empty-cart.png
-     - assets/empty-location.png
-     - assets/empty-order.png
-     - assets/coupon.png
-     - assets/bill.png
-     - assets/recommendation/get_started.png
-     - assets/recommendation/medical_record.png
+    - assets/doctor1.jpg
+    - assets/doctor2.jpg
+    - assets/doctor3.jpg
+    - assets/doctor4.jpg
+    - assets/doctors.png
+    - assets/slider1.jpg
+    - assets/slider2.jpg
+    - assets/slider3.jpeg
+    - assets/empty-box.png
+    - assets/lined heart.png
+    - assets/sample_image.png
+    - assets/sample_image.jpeg
+    - assets/guidanceVietQR.png
+    - assets/health_care_logo.jpg
+    - assets/health_care_logo_nobg.png
+    - assets/no_result_search_icon.png
+    - assets/image.png
+    - assets/doctor_ai.png
+    - assets/.evn
+    - assets/vnpay_logo.png
+    - assets/ship_cod_logo.png
+    - assets/momo_logo.png
+    - assets/empty-cart.png
+    - assets/empty-location.png
+    - assets/empty-order.png
+    - assets/coupon.png
+    - assets/bill.png
+    - assets/recommendation/get_started.png
+    - assets/recommendation/medical_record.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
-
