@@ -62,7 +62,8 @@ class _AdminBlogState extends State<AdminBlog> {
       ),
       body: _buildBlogList(),
     );
-  }
+  } 
+    
 
   Widget _buildBlogList() {
     Query<Map<String, dynamic>> query = _firestore.collection('blog');

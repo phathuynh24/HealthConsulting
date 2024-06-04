@@ -5,6 +5,7 @@ import 'package:assist_health/src/presentation/screens/admin_screens/content_top
 import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/message_admin.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/shop_chart.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/voucher/add_voucher_screen.dart';
@@ -26,6 +27,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 1
     const RevenueChartScreen(),
     ReviewManagementPage(),
+    ShopChart(),
     AdminBlog(),
     const AddVoucherScreen(),
     // Screen 2
@@ -71,11 +73,15 @@ class _AdminNavBarState extends State<AdminNavBar> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.reviews_rounded),
-              label: "Thống kê",
+              label: "Đánh giá",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat_rounded),
+              label: "Doanh thu",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined),
-              label: "Thống kê",
+              label: "Bài viết",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.card_giftcard),

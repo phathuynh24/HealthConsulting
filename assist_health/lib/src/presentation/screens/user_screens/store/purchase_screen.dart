@@ -719,6 +719,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       address: widget.address!,
       totalPrice: calculateFinalPrice(),
       status: "Chờ xác nhận",
+      time: Timestamp.now(),
     );
     saveOrderToFirestore(order);
   }
@@ -798,6 +799,7 @@ class Order {
   final DocumentSnapshot<Object?> address;
   final int totalPrice;
   final String userId;
+  final Timestamp time;
 
   Order({
     required this.orderId,
@@ -806,6 +808,7 @@ class Order {
     required this.address,
     required this.totalPrice,
     required this.status,
+    required this.time,
   });
 
   Map<String, dynamic> toMap() {
@@ -816,6 +819,7 @@ class Order {
       'address': address.data(),
       'totalPrice': totalPrice,
       'status': status,
+      'time': time,
     };
   }
 }
