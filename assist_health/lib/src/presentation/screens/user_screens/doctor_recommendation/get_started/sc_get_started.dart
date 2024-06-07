@@ -43,7 +43,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: const Text(
-                'Hãy chia sẽ triệu chứng bệnh của bạn!',
+                'Hãy chia sẻ triệu chứng bệnh của bạn!',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w500,
@@ -125,7 +125,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'Bắt đầu chia sẽ',
+                        'Bắt đầu chia sẻ',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,

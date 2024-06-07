@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/doctor_recommendation/disease_results/sc_disease_results.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/bloc.dart';
@@ -32,32 +33,6 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
     _symptomsBloc = context.read<SelectSymptomListBloc>();
     _symptomsBloc.add(FetchSymptoms());
   }
-
-  // void _searchSymptoms(
-  //     Map<String, List<String>> symptoms, String searchSymptom) {
-  //   if (searchSymptom == "") {
-  //     setState(() {
-  //       symptomsTemp = symptoms;
-  //     });
-  //   } else {
-  //     symptomsTemp = {
-  //       'symptoms_Vi': [],
-  //       'symptoms_En': [],
-  //     };
-
-  //     symptoms['symptoms_Vi']!.forEach((symptom) {
-  //       if (symptom.toLowerCase().contains(searchSymptom.toLowerCase())) {
-  //         setState(() {
-  //           symptomsTemp['symptoms_Vi']!.add(symptom);
-  //           symptomsTemp['symptoms_En']!.add(symptoms['symptoms_En']![
-  //               symptoms['symptoms_Vi']!.indexOf(symptom)]);
-  //         });
-  //       }
-  //     });
-  //   }
-  //   setState(() {});
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,9 +317,20 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
               itemCount: diagnosis['disease'].length,
               itemBuilder: (context, index) {
                 final disease = diagnosis['disease'][index][0];
-                final score = diagnosis['disease'][index][1].toStringAsFixed(2);
-                return ListTile(
-                  title: Text('$disease - $score'),
+                final vietnamese = diagnosis['disease'][index][1];
+                final percentage = diagnosis['disease'][index][2];
+
+                // Determine the background color based on whether the index is even or odd
+                final color = index % 2 == 0 ? Colors.white : Colors.grey[200];
+
+                return Container(
+                  color: color,
+                  child: ListTile(
+                    title: Text(
+                      '$disease - $vietnamese - $percentage',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
                 );
               },
             );
@@ -372,8 +358,14 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
         ),
         child: GestureDetector(
           onTap: () {
-            _symptomsBloc.add(
-                SubmitSymptoms(textSymtoms, _selectedSymptoms_En.toList()));
+            // _symptomsBloc.add(
+            //     SubmitSymptoms(textSymtoms, _selectedSymptoms_En.toList()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => DiseaseResultsScreen(),
+              ),
+            );
           },
           child: Container(
             padding: const EdgeInsets.all(13),

@@ -16,7 +16,7 @@ class EnterSymptomsBloc extends Bloc<EnterSymptomsEvent, EnterSymptomsState> {
 
         // Gửi yêu cầu HTTP đến API Flask để dự đoán
         final response = await http.post(
-          Uri.parse('http://172.16.2.134:5000/predict_1'),
+          Uri.parse('http://192.168.130.93:5000/predict_1'),
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },

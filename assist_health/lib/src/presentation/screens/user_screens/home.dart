@@ -452,7 +452,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
-                                      'Chỉ số sứ khỏe',
+                                      'Chỉ số sức khỏe',
                                       FontAwesomeIcons.chartColumn,
                                       const Color(0xFFFFDF3F),
                                       const Color(0xFFFA7516), () {

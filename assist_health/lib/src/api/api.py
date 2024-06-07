@@ -130,14 +130,21 @@ def predict_disease_weighted_combination():
     # Sort by score from high to low
     sorted_results = sorted(combined_results.items(), key=lambda x: x[1], reverse=True)
 
-    # translate_results = []
-    # for disease in sorted_results:
-    #     disease_vi = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'] == disease[0]]['Disease_Vi']
-    #     if len(disease_vi) > 0:
-    #         translate_results.append({'label': disease_vi.values[0], 'Score': disease[1]})
+    # Process sorted_results to include Vietnamese translation and percentages
+    processed_results = []
+    for disease, score in sorted_results:
+        disease_en = disease.capitalize()
+        disease_vi_entry = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'].str.lower() == disease]
+        if not disease_vi_entry.empty:
+            disease_vi = disease_vi_entry['Disease_Vi'].values[0].capitalize()
+        else:
+            disease_vi = "N/A"  # or handle it in some other way if needed
+        percentage = f"{score * 100:.2f}%"
+        processed_results.append([disease_en, disease_vi, percentage])
 
-    # Return the predicted disease and scores
-    return jsonify({"disease": sorted_results})
+    # Return the processed results
+    return jsonify({"disease": processed_results})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
