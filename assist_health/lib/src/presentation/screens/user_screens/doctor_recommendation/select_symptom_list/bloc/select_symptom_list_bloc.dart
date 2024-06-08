@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
+import '../../utils/config.dart';
 import 'bloc.dart';
 
 class SelectSymptomListBloc
     extends Bloc<SelectSymptomListEvent, SelectSymptomListState> {
-  static const String baseUrl = 'http://192.168.130.93:5000';
 
   SelectSymptomListBloc() : super(SelectSymptomListInitial()) {
     on<FetchSymptoms>(_onFetchSymptoms);
@@ -36,7 +36,8 @@ class SelectSymptomListBloc
   }
 
   Future<Map<String, List<String>>> getSymptoms() async {
-    final response = await http.get(Uri.parse('$baseUrl/get_symptoms'));
+    final response =
+        await http.get(Uri.parse('${Config.baseUrl}/get_symptoms'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       List<String> symptomsVi = List<String>.from(data['symptoms_Vi']);
@@ -50,7 +51,7 @@ class SelectSymptomListBloc
   Future<String> diagnoseSymptoms(String text, List<String> symptoms) async {
     symptoms = symptoms.map((e) => e.toLowerCase()).toList();
     final response = await http.post(
-      Uri.parse('$baseUrl/predict_disease_weighted_combination'),
+      Uri.parse('${Config.baseUrl}/predict_disease_weighted_combination'),
       body: jsonEncode({
         'weights': [0.3, 0.7],
         'text': text,
@@ -69,7 +70,7 @@ class SelectSymptomListBloc
 
   // Future<String> diagnoseSymptoms(List<String> symptoms) async {
   //   final response = await http.post(
-  //     Uri.parse('$baseUrl/predict_2'),
+  //     Uri.parse('${Config.baseUrl}/predict_2'),
   //     body: jsonEncode({
   //       'weights': [0.3, 0.7],
   //       'text': "",

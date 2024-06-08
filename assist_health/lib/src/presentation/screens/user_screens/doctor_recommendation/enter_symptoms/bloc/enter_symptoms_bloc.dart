@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:translator/translator.dart';
 import 'package:http/http.dart' as http;
+import '../../utils/config.dart';
 import 'bloc.dart';
 
 class EnterSymptomsBloc extends Bloc<EnterSymptomsEvent, EnterSymptomsState> {
@@ -16,7 +17,7 @@ class EnterSymptomsBloc extends Bloc<EnterSymptomsEvent, EnterSymptomsState> {
 
         // Gửi yêu cầu HTTP đến API Flask để dự đoán
         final response = await http.post(
-          Uri.parse('http://192.168.130.93:5000/predict_1'),
+          Uri.parse(Config.baseUrl + '/predict_1'),
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },

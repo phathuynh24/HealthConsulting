@@ -112,6 +112,7 @@ flutter:
     - assets/recommendation/tip_sleep.png
     - assets/recommendation/doctor_3D.png
     - assets/recommendation/bg_gradient.png
+    - assets/recommendation/avt_test.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
