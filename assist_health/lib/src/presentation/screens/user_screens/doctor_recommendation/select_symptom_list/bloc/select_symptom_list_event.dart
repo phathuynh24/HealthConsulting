@@ -18,3 +18,18 @@ class SubmitSymptoms extends SelectSymptomListEvent {
   @override
   List<Object> get props => [symptoms];
 }
+
+class QueryChanged extends SelectSymptomListEvent {
+  final String query;
+
+  QueryChanged(this.query);
+}
+
+class GetSelectedSymptom extends SelectSymptomListEvent {
+  final Map<String, List<String>> symptoms;
+
+  const GetSelectedSymptom(this.symptoms);
+
+  @override
+  List<Object> get props => [symptoms];
+}

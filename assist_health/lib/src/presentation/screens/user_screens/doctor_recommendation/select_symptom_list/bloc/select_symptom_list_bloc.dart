@@ -7,10 +7,11 @@ import 'bloc.dart';
 
 class SelectSymptomListBloc
     extends Bloc<SelectSymptomListEvent, SelectSymptomListState> {
-
   SelectSymptomListBloc() : super(SelectSymptomListInitial()) {
     on<FetchSymptoms>(_onFetchSymptoms);
     on<SubmitSymptoms>(_onSubmitSymptoms);
+    on<QueryChanged>(_onQueryChanged);
+    on<GetSelectedSymptom>(_onGetSelectedSymptom);
   }
 
   void _onFetchSymptoms(
@@ -33,6 +34,27 @@ class SelectSymptomListBloc
     } catch (_) {
       emit(SelectSymptomListError());
     }
+  }
+
+  void _onQueryChanged(
+      QueryChanged event, Emitter<SelectSymptomListState> emit) async {
+    emit(SelectSymptomListLoading());
+    try {
+      final symptoms = await getSymptoms();
+      final symptomsFilter = symptoms.map((key, value) => MapEntry(
+          key,
+          value
+              .where((element) => element.toLowerCase().contains(event.query))
+              .toList()));
+      emit(SelectSymptomListLoaded(symptomsFilter));
+    } catch (_) {
+      emit(SelectSymptomListError());
+    }
+  }
+
+  void _onGetSelectedSymptom(
+      GetSelectedSymptom event, Emitter<SelectSymptomListState> emit) async {
+    emit(SelectSymptomListLoaded(event.symptoms));
   }
 
   Future<Map<String, List<String>>> getSymptoms() async {

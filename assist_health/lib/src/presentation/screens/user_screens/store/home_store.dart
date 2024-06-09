@@ -1,12 +1,10 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/cart/cart_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/product_detail_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:intl/intl.dart';
 

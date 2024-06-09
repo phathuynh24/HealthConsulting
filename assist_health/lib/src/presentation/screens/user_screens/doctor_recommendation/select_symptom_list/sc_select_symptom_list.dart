@@ -20,11 +20,19 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
   late SelectSymptomListBloc _symptomsBloc;
   final _selectedSymptoms_Vi = <String>{};
   final _selectedSymptoms_En = <String>{};
-  Map<String, List<String>> symptomsTemp = {
+  Map<String, List<String>> symptomsList = {
+    'symptoms_Vi': [],
+    'symptoms_En': [],
+  };
+  Map<String, List<String>> symptomsSelected = {
     'symptoms_Vi': [],
     'symptoms_En': [],
   };
   String textSymtoms = "";
+  bool isSymptomsList = true;
+  dynamic diagnosis = {};
+  bool isDiagnosed = false;
+  String query = "";
 
   @override
   void initState() {
@@ -33,6 +41,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
     _symptomsBloc = context.read<SelectSymptomListBloc>();
     _symptomsBloc.add(FetchSymptoms());
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,183 +176,351 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
           ),
         ),
       ),
-      body: BlocBuilder<SelectSymptomListBloc, SelectSymptomListState>(
-        builder: (context, state) {
-          if (state is SelectSymptomListLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is SelectSymptomListLoaded) {
-            symptomsTemp = state.symptoms;
+      body: SingleChildScrollView(
+        child: BlocBuilder<SelectSymptomListBloc, SelectSymptomListState>(
+          builder: (context, state) {
             return Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        color: Colors.blueAccent.withOpacity(0.1),
-                        child: Text(
-                          'Danh sách triệu chứng',
-                          style: TextStyle(
-                            color: Colors.blueAccent.shade700,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        color: Colors.blueAccent.withOpacity(0.1),
-                        child: Text(
-                          'Triệu chứng của bạn',
-                          style: TextStyle(
-                            color: Colors.blueAccent.shade700,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.blueAccent.withOpacity(0.2),
-                        width: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Row(
+                  height: 320,
+                  child: Stack(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 10,
-                          right: 5,
-                        ),
-                        child: Icon(Icons.search,
-                            color: Colors.blueAccent.shade700),
-                      ),
-                      Expanded(
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
                         child: Container(
+                          height: 260,
+                          padding: EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            border: Border(
-                              right: BorderSide(
-                                color: Colors.blueAccent.withOpacity(0.2),
-                                width: 0.5,
-                              ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(40),
+                              bottomRight: Radius.circular(40),
                             ),
+                            image: DecorationImage(
+                              image: AssetImage(
+                                  'assets/recommendation/bg_gradient1.png'),
+                              fit: BoxFit.cover,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                              ),
+                            ],
                           ),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Tìm kiếm triệu chứng...',
-                              hintStyle: TextStyle(
-                                color: Colors.blueAccent.shade700,
-                                fontSize: 14,
+                          child: Column(
+                            children: [
+                              SizedBox(height: 26),
+                              Container(
+                                height: 90,
+                                margin: EdgeInsets.symmetric(horizontal: 12),
+                                padding: EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(50),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 2,
+                                      blurRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isSymptomsList = true;
+                                            _symptomsBloc.add(FetchSymptoms());
+                                          });
+                                        },
+                                        child: Center(
+                                          child: Container(
+                                            height: 70,
+                                            width: 170,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: isSymptomsList
+                                                  ? Colors.pinkAccent
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                            ),
+                                            padding: EdgeInsets.all(14),
+                                            child: Text(
+                                              'Danh sách',
+                                              style: TextStyle(
+                                                color: isSymptomsList
+                                                    ? Colors.white
+                                                    : Colors.blueGrey.shade400,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          print(symptomsSelected);
+                                          setState(() {
+                                            isSymptomsList = false;
+                                            _symptomsBloc.add(
+                                                GetSelectedSymptom(
+                                                    symptomsSelected));
+                                          });
+                                        },
+                                        child: Center(
+                                          child: Container(
+                                            height: 70,
+                                            width: 170,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: !isSymptomsList
+                                                  ? Colors.pinkAccent
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                            ),
+                                            padding: EdgeInsets.all(14),
+                                            child: Text(
+                                              'Đã chọn',
+                                              style: TextStyle(
+                                                color: !isSymptomsList
+                                                    ? Colors.white
+                                                    : Colors.blueGrey.shade400,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              border: InputBorder.none,
-                            ),
-                            style: TextStyle(
-                              color: Colors.blueAccent.shade700,
-                              fontSize: 14,
-                            ),
-                            onChanged: (value) {
-                              // _searchSymptoms(state.symptoms, value);
-                            },
+                              SizedBox(height: 20),
+                            ],
                           ),
                         ),
                       ),
-                      IconButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        onPressed: () {
-                          _selectedSymptoms_Vi.clear();
-                          _selectedSymptoms_En.clear();
-                          setState(() {});
-                        },
-                        icon: Icon(Icons.refresh),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 30),
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.greenAccent.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        // _symptomsBloc.add(
+                                        //     QueryChanged(query.toLowerCase()));
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 10,
+                                          right: 5,
+                                        ),
+                                        child: Icon(Icons.search,
+                                            color: Colors.blueAccent.shade700),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        child: TextField(
+                                          decoration: InputDecoration(
+                                            hintText: 'Tìm kiếm triệu chứng...',
+                                            hintStyle: TextStyle(
+                                              color: Colors.blueAccent.shade700,
+                                              fontSize: 14,
+                                            ),
+                                            border: InputBorder.none,
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors.blueAccent.shade700,
+                                            fontSize: 14,
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              query = value;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      onPressed: () {
+                                        _selectedSymptoms_Vi.clear();
+                                        _selectedSymptoms_En.clear();
+                                        symptomsSelected['symptoms_Vi']
+                                            ?.clear();
+                                        symptomsSelected['symptoms_En']
+                                            ?.clear();
+                                        setState(() {});
+                                      },
+                                      icon: Icon(Icons.refresh),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Container(
+                                width: double.infinity,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                  'Lưu ý: Chọn từ 5 đến 17 biểu hiện bệnh để đảm bảo kết quả chính xác nhất.',
+                                  style: TextStyle(
+                                    color: Colors.amber.shade900,
+                                    fontSize: 13,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  color: Colors.greenAccent.withOpacity(0.2),
-                  child: Text(
-                    'Lưu ý: Chọn từ 5 đến 17 biểu hiện bệnh để đảm bảo kết quả chính xác nhất.',
-                    style: TextStyle(
-                      color: Colors.amber.shade900,
-                      fontSize: 13,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: symptomsTemp['symptoms_Vi']?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      final symptom = symptomsTemp['symptoms_Vi']?[index] ?? "";
-                      return CheckboxListTile(
-                        title: Text('${index + 1}. $symptom'),
-                        value: _selectedSymptoms_Vi.contains(symptom),
-                        onChanged: (bool? value) {
-                          String symptom_En =
-                              state.symptoms['symptoms_En']?[index] ?? "";
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: BlocBuilder<SelectSymptomListBloc,
+                      SelectSymptomListState>(
+                    builder: (context, state) {
+                      if (state is SelectSymptomListLoading) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (state is SelectSymptomListLoaded) {
+                        if (state.symptoms['symptoms_Vi']?.length == 0) {
+                          return Center(
+                            child: Text('No symptoms found'),
+                          );
+                        }
+                        print(state.symptoms['symptoms_Vi']?.length ?? 0);
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: state.symptoms['symptoms_Vi']?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final symptom_Vi =
+                                state.symptoms['symptoms_Vi']?[index] ?? "";
+                            final symptom_En =
+                                state.symptoms['symptoms_En']?[index] ?? "";
+                            bool isSelected =
+                                _selectedSymptoms_Vi.contains(symptom_Vi);
+                            return CheckboxListTile(
+                              title: Text('${index + 1}. ${symptom_Vi}'),
+                              value: isSelected,
+                              onChanged: (bool? value) {
+                                if (_selectedSymptoms_Vi.length == 17) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Không thể chọn quá 17 biểu hiện bệnh.',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.red.shade400,
+                                      action: SnackBarAction(
+                                        label: 'Đóng',
+                                        textColor: Colors.white,
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context)
+                                              .hideCurrentSnackBar();
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                }
+                                setState(() {
+                                  if (value == true) {
+                                    if (_selectedSymptoms_Vi.length < 17) {
+                                      _selectedSymptoms_Vi.add(symptom_Vi);
+                                      _selectedSymptoms_En.add(symptom_En);
+                                      symptomsSelected['symptoms_Vi']
+                                          ?.add(symptom_Vi);
+                                      symptomsSelected['symptoms_En']
+                                          ?.add(symptom_En);
+                                    }
+                                  } else {
+                                    _selectedSymptoms_Vi.remove(symptom_Vi);
+                                    _selectedSymptoms_En.remove(symptom_En);
+                                    symptomsSelected['symptoms_Vi']
+                                        ?.remove(symptom_Vi);
+                                    symptomsSelected['symptoms_En']
+                                        ?.remove(symptom_En);
+                                  }
+                                });
+                              },
+                            );
+                          },
+                        );
+                      } else if (state is SelectSymptomListDiagnosed) {
+                        Future.delayed(Duration(milliseconds: 500), () {
                           setState(() {
-                            if (value == true) {
-                              if (_selectedSymptoms_Vi.length < 17) {
-                                _selectedSymptoms_Vi.add(symptom);
-                                _selectedSymptoms_En.add(symptom_En);
-                              }
-                            } else {
-                              _selectedSymptoms_Vi.remove(symptom);
-                              _selectedSymptoms_En.remove(symptom_En);
-                            }
+                            isDiagnosed = true;
                           });
-                        },
-                      );
+                        });
+                        diagnosis = jsonDecode(state.diagnosis);
+                        return Center(
+                          child: Text('Diagnosed Successfully'),
+                        );
+                      } else if (state is SelectSymptomListError) {
+                        return Center(
+                          child: Text('Failed to load symptoms'),
+                        );
+                      } else {
+                        return Center(
+                          child: Text('Unknown state'),
+                        );
+                      }
                     },
                   ),
                 ),
               ],
             );
-          } else if (state is SelectSymptomListDiagnosed) {
-            final diagnosis = jsonDecode(state.diagnosis);
-            return ListView.builder(
-              itemCount: diagnosis['disease'].length,
-              itemBuilder: (context, index) {
-                final disease = diagnosis['disease'][index][0];
-                final vietnamese = diagnosis['disease'][index][1];
-                final percentage = diagnosis['disease'][index][2];
-
-                // Determine the background color based on whether the index is even or odd
-                final color = index % 2 == 0 ? Colors.white : Colors.grey[200];
-
-                return Container(
-                  color: color,
-                  child: ListTile(
-                    title: Text(
-                      '$disease - $vietnamese - $percentage',
-                      style: TextStyle(fontSize: 16.0),
-                    ),
-                  ),
-                );
-              },
-            );
-          } else if (state is SelectSymptomListError) {
-            return Center(
-              child: Text('Failed to load symptoms'),
-            );
-          } else {
-            return Center(
-              child: Text('Unknown state'),
-            );
-          }
-        },
+          },
+        ),
       ),
       bottomNavigationBar: Container(
         height: 65,
@@ -358,20 +535,38 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
         ),
         child: GestureDetector(
           onTap: () {
-            // _symptomsBloc.add(
-            //     SubmitSymptoms(textSymtoms, _selectedSymptoms_En.toList()));
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-              builder: (context) => DiseaseResultsScreen(),
-              ),
-            );
+            if (_selectedSymptoms_Vi.length < 5) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Vui lòng chọn ít nhất 5 biểu hiện bệnh.',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  backgroundColor: Colors.red.shade400,
+                ),
+              );
+              return;
+            }
+            _symptomsBloc.add(
+                SubmitSymptoms(textSymtoms, _selectedSymptoms_En.toList()));
+
+            if (isDiagnosed) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DiseaseResultsScreen(
+                    diagnosis: diagnosis,
+                  ),
+                ),
+              );
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(13),
             margin: const EdgeInsets.symmetric(horizontal: 5),
             decoration: BoxDecoration(
-              color: Themes.gradientDeepClr,
+              color: isDiagnosed ? Colors.green : Themes.gradientDeepClr,
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,

@@ -1,10 +1,31 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
 import '../recommended_results/sc_recommended_results.dart';
 
-class DiseaseResultsScreen extends StatelessWidget {
+class DiseaseResultsScreen extends StatefulWidget {
+  final dynamic diagnosis;
+  const DiseaseResultsScreen({Key? key, required this.diagnosis})
+      : super(key: key);
+
+  @override
+  _DiseaseResultsScreenState createState() => _DiseaseResultsScreenState();
+}
+
+class _DiseaseResultsScreenState extends State<DiseaseResultsScreen> {
+  dynamic diagnosis;
+  String tipTitle = 'Ngủ đủ giấc';
+  String tipContent =
+      'Hãy ngủ đủ giấc để cơ thể có thể phục hồi sau một ngày làm việc mệt mỏi.';
+  String urlImage = 'assets/recommendation/tip_sleep.png';
+  int tipIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    diagnosis = widget.diagnosis;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,7 +167,7 @@ class DiseaseResultsScreen extends StatelessWidget {
             SizedBox(height: 18),
             Container(
               height: 170,
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Stack(
                 children: [
                   Positioned(
@@ -235,7 +256,7 @@ class DiseaseResultsScreen extends StatelessWidget {
             ),
             SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -252,8 +273,7 @@ class DiseaseResultsScreen extends StatelessWidget {
                     height: 200,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image:
-                            AssetImage('assets/recommendation/tip_sleep.png'),
+                        image: AssetImage(urlImage),
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.circular(32),
@@ -282,7 +302,7 @@ class DiseaseResultsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Ngủ đủ giấc',
+                                tipTitle,
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,
@@ -291,35 +311,64 @@ class DiseaseResultsScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 6),
                               Text(
-                                'Hãy cố gắng ngủ đủ giấc để cơ thể có thể phục hồi sau một ngày làm việc mệt mỏi.',
+                                tipContent,
                                 style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
+                                    fontSize: 14,
+                                    color: Colors.white.withOpacity(0.9),
+                                    overflow: TextOverflow.ellipsis),
+                                maxLines: 2,
                               ),
                               SizedBox(height: 20),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 64, 80, 184),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12.withOpacity(0.3),
-                                      spreadRadius: 4,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 14, vertical: 12),
-                                  child: Text(
-                                    'Tiếp theo',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                              GestureDetector(
+                                onTap: () {
+                                  if (tipIndex == 3) tipIndex = 0;
+                                  if (tipIndex == 0) {
+                                    tipTitle = 'Tập thể dục';
+                                    tipContent =
+                                        'Hãy tập thể dục để cơ thể luôn khỏe mạnh và sẵn sàng cho mọi thách thức.';
+                                    urlImage =
+                                        'assets/recommendation/tip_exercise.png';
+                                  }
+                                  if (tipIndex == 1) {
+                                    tipTitle = 'Ăn uống cân đối';
+                                    tipContent =
+                                        'Hãy ăn uống cân đối để cơ thể có đủ dưỡng chất cần thiết cho một ngày làm việc mệt mỏi.';
+                                    urlImage =
+                                        'assets/recommendation/tip_healthy_food.png';
+                                  }
+                                  if (tipIndex == 2) {
+                                    tipTitle = 'Uống nước đủ';
+                                    tipContent =
+                                        'Hãy uống nước đủ mỗi ngày để cơ thể luôn khỏe mạnh và tươi trẻ hơn.';
+                                    urlImage =
+                                        'assets/recommendation/tip_water.png';
+                                  }
+                                  setState(() {});
+                                  tipIndex++;
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Color.fromARGB(255, 64, 80, 184),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black12.withOpacity(0.3),
+                                        spreadRadius: 4,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 12),
+                                    child: Text(
+                                      'Tiếp theo',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -335,7 +384,7 @@ class DiseaseResultsScreen extends StatelessWidget {
             ),
             SizedBox(height: 28),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -350,15 +399,20 @@ class DiseaseResultsScreen extends StatelessWidget {
                   ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: 10,
+                      itemCount: 20,
                       itemBuilder: (context, index) {
+                        final disease_En = diagnosis['disease'][index][0];
+                        final disease_Vi = diagnosis['disease'][index][1];
+                        final percent = double.parse(
+                            diagnosis['disease'][index][2].replaceAll('%', ''));
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    RecommendedResultsScreen(),
+                                builder: (context) => RecommendedResultsScreen(
+                                  diagnosis: diagnosis['disease'][index],
+                                ),
                               ),
                             );
                           },
@@ -384,12 +438,12 @@ class DiseaseResultsScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              title: Text('Bệnh nấm da',
+                              title: Text(disease_Vi.toString(),
                                   style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.black87,
                                       fontWeight: FontWeight.bold)),
-                              subtitle: Text('Fungal skin disease',
+                              subtitle: Text(disease_En.toString(),
                                   style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.blueGrey.withOpacity(0.8))),
@@ -400,23 +454,11 @@ class DiseaseResultsScreen extends StatelessWidget {
                                 child: CircularPercentIndicator(
                                   radius: 28,
                                   lineWidth: 7,
-                                  percent: index == 0
-                                      ? 0.68
-                                      : index == 1
-                                          ? 0.21
-                                          : index == 2
-                                              ? 0.08
-                                              : 0.03,
+                                  percent: percent / 100,
                                   center: Text(
-                                    index == 0
-                                        ? '68%'
-                                        : index == 1
-                                            ? '21%'
-                                            : index == 2
-                                                ? '8%'
-                                                : '3%',
+                                    percent.toString() + '%',
                                     style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 10,
                                         fontWeight: FontWeight.bold),
                                   ),
                                   animation: true,

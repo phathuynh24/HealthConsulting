@@ -24,6 +24,7 @@ class DoctorInfo {
   List<String> specialty;
   List<String> educations;
   List<String> experiences;
+  List<String> groupDisease;
 
   DoctorInfo(
     this.uid,
@@ -47,6 +48,7 @@ class DoctorInfo {
     this.specialty,
     this.educations,
     this.experiences,
+    this.groupDisease,
   );
 
   Map<String, dynamic> toMap() {
@@ -72,6 +74,7 @@ class DoctorInfo {
       'specialty': specialty,
       'educations': educations,
       'experiences': experiences,
+      'groupdisease': groupDisease,
     };
   }
 
@@ -79,10 +82,12 @@ class DoctorInfo {
     final List<dynamic>? specialtyData = map['specialty'];
     final List<dynamic>? educationsData = map['educations'];
     final List<dynamic>? experiencesData = map['experiences'];
+    final List<dynamic>? groupDiseaseData = map['groupdisease'];
 
     final List<String> specialty = specialtyData?.cast<String>() ?? [];
     final List<String> educations = educationsData?.cast<String>() ?? [];
     final List<String> experiences = experiencesData?.cast<String>() ?? [];
+    final List<String> groupDisease = groupDiseaseData?.cast<String>() ?? [];
 
     return DoctorInfo(
       map['uid'] ?? '',
@@ -106,6 +111,7 @@ class DoctorInfo {
       specialty,
       educations,
       experiences,
+      groupDisease,
     );
   }
 
@@ -113,10 +119,12 @@ class DoctorInfo {
     final List<dynamic>? specialtyData = json['specialty'];
     final List<dynamic>? educationsData = json['educations'];
     final List<dynamic>? experiencesData = json['experiences'];
+    final List<dynamic>? groupDiseaseData = json['groupdisease'];
 
     final List<String> specialty = specialtyData?.cast<String>() ?? [];
     final List<String> educations = educationsData?.cast<String>() ?? [];
     final List<String> experiences = experiencesData?.cast<String>() ?? [];
+    final List<String> groupDisease = groupDiseaseData?.cast<String>() ?? [];
 
     return DoctorInfo(
       json['uid'] ?? '',
@@ -140,6 +148,7 @@ class DoctorInfo {
       specialty,
       educations,
       experiences,
+      groupDisease,
     );
   }
 }

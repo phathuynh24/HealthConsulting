@@ -151,147 +151,155 @@ class _EnterSymptomsState extends State<EnterSymptoms> {
             ),
           ),
           body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Themes.gradientDeepClr.withOpacity(0.9),
-                        Themes.gradientLightClr.withOpacity(0.7)
-                      ],
-                      begin: Alignment.bottomRight,
-                      end: Alignment.topLeft,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 1,
-                      ),
-                    ],
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Themes.gradientDeepClr.withOpacity(0.9),
+                    Themes.gradientLightClr.withOpacity(0.7)
+                  ],
+                  begin: Alignment.bottomRight,
+                  end: Alignment.topLeft,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 1,
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Column(children: [
-                      Container(
-                        height: 300,
-                        child: Image.asset(
-                          'assets/recommendation/medical_record.png',
-                          fit: BoxFit.contain,
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 260,
+                      child: Image.asset(
+                        'assets/recommendation/medical_record.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16.0,
+                    ),
+                    const Text(
+                      'Chia sẻ triệu chứng bệnh của bạn',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 16,
+                    ),
+                    const Text(
+                      'Ví dụ: Tôi thấy đau ở vùng ngực, khó thở, mệt mỏi, đau đầu, chóng mặt về đêm. Tôi đã thử dùng thuốc giảm đau nhưng không hiệu quả.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        height: 1.8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 34,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      alignment: Alignment.center,
+                      child: TextField(
+                        controller: _symptomsController,
+                        maxLines: 6,
+                        decoration: InputDecoration(
+                          hintText: 'Nhập chi tiết triệu chứng bệnh của bạn',
+                          hintStyle: TextStyle(
+                            color: Colors.blue.shade200,
+                            fontSize: 14,
+                          ),
+                          border: InputBorder.none,
                         ),
                       ),
-                      SizedBox(
-                        height: 16.0,
-                      ),
-                      const Text(
-                        'Chia sẽ triệu chứng bệnh của bạn',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      const Text(
-                        'Ví dụ: Tôi thấy đau ở vùng ngực, khó thở, mệt mỏi, đau đầu, chóng mặt về đêm. Tôi đã thử dùng thuốc giảm đau nhưng không hiệu quả.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          height: 1.8,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: 34,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
+                    ),
+                    SizedBox(
+                      height: 40,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (_symptomsController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: const Text(
+                                'Vui lòng nhập triệu chứng bệnh của bạn',
+                              ),
+                              backgroundColor: Colors.red.shade400,
+                              behavior: SnackBarBehavior.floating,
+                              action: SnackBarAction(
+                                label: 'Đóng',
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context)
+                                      .hideCurrentSnackBar();
+                                },
+                              )));
+                          return;
+                        }
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider<SelectSymptomListBloc>(
+                              create: (context) => SelectSymptomListBloc(),
+                              child: SelectSymptomListScreen(
+                                  textSymtoms: _symptomsController.text),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromARGB(255, 112, 107, 250),
+                              Color.fromARGB(255, 83, 6, 206).withOpacity(0.8),
+                            ],
+                            begin: Alignment.topRight,
+                            end: Alignment.bottomLeft,
+                          ),
+                          borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 1,
-                            ),
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 4,
+                                blurRadius: 8,
+                                offset: Offset(0, 4)),
                           ],
                         ),
                         alignment: Alignment.center,
-                        child: TextField(
-                          controller: _symptomsController,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            hintText: 'Nhập chi tiết triệu chứng bệnh của bạn',
-                            hintStyle: TextStyle(
-                              color: Colors.blue.shade200,
-                              fontSize: 14,
-                            ),
-                            border: InputBorder.none,
+                        child: const Text(
+                          'Tiếp tục',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 14,
-                      ),
-                    ]),
-                  ),
-                ),
-                // BlocBuilder<DoctorRecommendationBloc,
-                //     DoctorRecommendationState>(
-                //   builder: (context, state) {
-                //     if (state is DoctorRecommendationLoading)
-                //       return CircularProgressIndicator();
-                //     else if (state is DoctorRecommendationLoaded)
-                //       return Text('Disease: ${state.recommendation}');
-                //     else if (state is DoctorRecommendationError)
-                //       return Text('Error occurred');
-                //     else
-                //       return Container();
-                //   },
-                // ),
-              ],
-            ),
-          ),
-          bottomNavigationBar: Container(
-            height: 65,
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: Colors.blueGrey,
-                  width: 0.2,
-                ),
-              ),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider<SelectSymptomListBloc>(
-                      create: (context) => SelectSymptomListBloc(),
-                      child: SelectSymptomListScreen(textSymtoms: _symptomsController.text),
                     ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(13),
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  color: Themes.gradientDeepClr,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                alignment: Alignment.center,
-                child: const Text(
-                  'Tiếp tục',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  ],
                 ),
               ),
             ),

@@ -1,8 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 
-class RecommendedResultsScreen extends StatelessWidget {
+import '../../../../../models/doctor/doctor_info.dart';
+import '../../../../../others/methods.dart';
+import '../../doctor_detail.dart';
+import '../utils/disease_classifier.dart';
+
+class RecommendedResultsScreen extends StatefulWidget {
+  final List<dynamic> diagnosis;
+  const RecommendedResultsScreen({Key? key, required this.diagnosis})
+      : super(key: key);
+
+  @override
+  _RecommendedResultsScreenState createState() =>
+      _RecommendedResultsScreenState();
+}
+
+class _RecommendedResultsScreenState extends State<RecommendedResultsScreen> {
+  List<dynamic> diagnosis = [];
+  List<DoctorInfo> filterDoctorWithGroupDisease = [];
+  final classifier = DiseaseClassifier();
+
+  @override
+  void initState() {
+    super.initState();
+    diagnosis = widget.diagnosis;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +47,7 @@ class RecommendedResultsScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage('assets/slider2.jpg'),
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
@@ -89,7 +113,11 @@ class RecommendedResultsScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      'Tỉ lệ dự đoán 40%',
+                                      'Tỉ lệ dự đoán ' +
+                                          double.parse(diagnosis[2]
+                                                  .replaceAll('%', ''))
+                                              .toString() +
+                                          '%',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -99,7 +127,7 @@ class RecommendedResultsScreen extends StatelessWidget {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    'Có khả năng mắc bệnh viêm gan C',
+                                    diagnosis[1],
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
@@ -159,17 +187,22 @@ class RecommendedResultsScreen extends StatelessWidget {
                   Positioned(
                     top: 50,
                     left: 20,
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: Colors.black.withOpacity(0.8),
-                        size: 26,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          color: Colors.black.withOpacity(0.8),
+                          size: 26,
+                        ),
                       ),
                     ),
                   ),
@@ -201,82 +234,97 @@ class RecommendedResultsScreen extends StatelessWidget {
                     ],
                   ),
                   // ListView
-                  ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          // Điều hướng đến màn hình chi tiết bác sĩ
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => RecommendedResultsScreen(),
-                          //   ),
-                          // );
-                        },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(vertical: 4),
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(vertical: 4),
-                            leading: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 211, 231, 248)
-                                    .withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(22),
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      'assets/recommendation/avt_test.png'),
-                                  fit: BoxFit.cover,
+                  StreamBuilder<List<DoctorInfo>>(
+                    stream: getInfoDoctors(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        filterDoctorWithGroupDisease = snapshot.data!
+                            .where((doctor) => classifier.isDiseaseInGroup(
+                                diagnosis[0].toLowerCase(),
+                                doctor.groupDisease))
+                            .toList();
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: filterDoctorWithGroupDisease.length,
+                        itemBuilder: (context, index) {
+                          DoctorInfo doctor =
+                              filterDoctorWithGroupDisease[index];
+                          return GestureDetector(
+                            onTap: () {
+                              // Điều hướng đến màn hình chi tiết bác sĩ
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DoctorDetailScreen(doctorInfo: doctor),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 4),
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 211, 231, 248)
+                                          .withOpacity(0.3),
+                                    ),
+                                    child: Image.network(doctor.imageURL,
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                                title: Text(
+                                  'BS ${doctor.name}',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  classifier.classifyDisease(diagnosis[0]),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.blueGrey.withOpacity(0.8),
+                                  ),
+                                ),
+                                trailing: Padding(
+                                  padding: const EdgeInsets.only(right: 12),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      RatingBarIndicator(
+                                        rating: doctor.rating.toDouble(),
+                                        itemBuilder: (context, index) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        itemCount: 1,
+                                        itemSize: 20.0,
+                                        direction: Axis.horizontal,
+                                      ),
+                                      Text(
+                                        '${doctor.rating}/5',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                            title: Text(
-                              'BS Nguyễn Minh Anh',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Khoa Nội tổng quát',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.blueGrey.withOpacity(0.8),
-                              ),
-                            ),
-                            trailing: Padding(
-                              padding: const EdgeInsets.only(right: 12),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  RatingBarIndicator(
-                                    rating: 4.5,
-                                    itemBuilder: (context, index) => Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    itemCount: 1,
-                                    itemSize: 20.0,
-                                    direction: Axis.horizontal,
-                                  ),
-                                  Text(
-                                    '4.5/5',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                          );
+                        },
                       );
                     },
                   ),

@@ -109,10 +109,14 @@ flutter:
     - assets/bill.png
     - assets/recommendation/get_started.png
     - assets/recommendation/medical_record.png
-    - assets/recommendation/tip_sleep.png
     - assets/recommendation/doctor_3D.png
     - assets/recommendation/bg_gradient.png
+    - assets/recommendation/bg_gradient1.png
     - assets/recommendation/avt_test.png
+    - assets/recommendation/tip_sleep.png
+    - assets/recommendation/tip_healthy_food.png
+    - assets/recommendation/tip_exercise.png
+    - assets/recommendation/tip_water.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

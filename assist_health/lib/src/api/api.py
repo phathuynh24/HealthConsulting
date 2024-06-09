@@ -34,7 +34,6 @@ def get_symptoms():
     
     return jsonify({'symptoms_Vi': symptoms_Vi, 'symptoms_En': symptoms_En})
 
-
 @app.route('/predict_1', methods=['POST'])
 def predict_1():
     text = request.json['text']
@@ -144,7 +143,6 @@ def predict_disease_weighted_combination():
 
     # Return the processed results
     return jsonify({"disease": processed_results})
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

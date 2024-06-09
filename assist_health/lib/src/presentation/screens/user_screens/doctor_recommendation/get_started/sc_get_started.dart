@@ -86,8 +86,9 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   borderRadius: BorderRadius.circular(50),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 14,
+                        spreadRadius: 8,
                         offset: Offset(0, 3)),
                   ],
                   gradient: LinearGradient(
@@ -115,7 +116,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                             blurRadius: 5,
                           ),
                         ],
-                        color: const Color.fromARGB(255, 50, 109, 235),
+                        color: Color.fromARGB(255, 91, 62, 221),
                       ),
                       child: Icon(
                         Icons.arrow_forward_rounded,
