@@ -61,6 +61,7 @@ dependencies:
   shared_preferences: ^2.2.2
   translator: ^1.0.0
   cached_network_image: ^3.3.1
+  google_generative_ai: ^0.4.3
 
 dev_dependencies:
   flutter_test:
@@ -107,6 +108,7 @@ flutter:
     - assets/empty-order.png
     - assets/coupon.png
     - assets/bill.png
+    - assets/payment_online.png
     - assets/recommendation/get_started.png
     - assets/recommendation/medical_record.png
 

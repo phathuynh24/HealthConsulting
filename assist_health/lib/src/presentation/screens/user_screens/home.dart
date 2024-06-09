@@ -10,6 +10,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_recommendation/get_started/sc_get_started.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/g_chatbot/germini_chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
@@ -797,7 +798,7 @@ class _MyHomeScreen extends State<HomeScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ChatScreen()),
+              MaterialPageRoute(builder: (_) => GeminiChatBot()),
             );
           },
           child: Icon(Icons.comment),

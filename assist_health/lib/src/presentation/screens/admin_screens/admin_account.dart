@@ -1,9 +1,16 @@
 import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/others/methods.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/add_blog.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
 import 'package:assist_health/src/widgets/admin_navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AdminAccountScreen extends StatefulWidget {
   const AdminAccountScreen({super.key});
@@ -139,6 +146,204 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                   ),
                                   title: const Text(
                                     "Tham gia cộng đồng",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const RevenueChartScreen()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.bar_chart_outlined,
+                                    color: Colors.indigoAccent,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Thống kê và báo cáo",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AdminOrderManagementScreen()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.shopping_bag,
+                                    color: Colors.deepOrange,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Đơn hàng",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ReviewManagementPage()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.reviews_sharp,
+                                    color: Colors.deepPurpleAccent,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Đánh giá sản phẩm",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductListScreen()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.store,
+                                    color: Colors.teal,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Sản phẩm",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DoctorProfileList()));
+                                  },
+                                  leading: const Icon(
+                                    FontAwesomeIcons.userDoctor,
+                                    color: Colors.brown,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Danh sách bác sĩ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CreateBlogPostPage()));
+                                  },
+                                  leading: const Icon(
+                                    FontAwesomeIcons.blog,
+                                    color: Colors.cyan,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Tạo bài viết",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15,

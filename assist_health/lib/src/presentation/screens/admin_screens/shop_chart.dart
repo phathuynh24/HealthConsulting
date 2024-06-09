@@ -41,7 +41,7 @@ class _ShopChartState extends State<ShopChart> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -139,6 +139,7 @@ class OrderList extends StatelessWidget {
 
         int totalQuantity = 0;
         double totalPrice = 0.0;
+        double totalPriceFinal = 0.0;
 
         snapshot.data!.docs.forEach((DocumentSnapshot document) {
           for (var cartItem in (document['userCart'] as List<dynamic>)) {
@@ -146,6 +147,7 @@ class OrderList extends StatelessWidget {
             totalPrice += (cartItem['quantity'] as num) *
                 (cartItem['productPrice'] as num);
           }
+          totalPriceFinal += document['totalPrice'] as num;
         });
 
         return SingleChildScrollView(
@@ -167,29 +169,73 @@ class OrderList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        title: const Text(
-                          'Thống kê theo tháng',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                        title: Center(
+                          child: const Text(
+                            'Thống kê theo tháng',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.red),
                           ),
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Tổng số lượng: $totalQuantity',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Tổng số lượng: ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  '$totalQuantity',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Themes.gradientDeepClr),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Thành tiền: đ${NumberFormat('#,###').format(totalPrice)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Tổng giá: ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  '${NumberFormat('#,###').format(totalPrice)}đ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Themes.gradientDeepClr,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  'Thành tiền:',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Text(
+                                  '${NumberFormat('#,###').format(totalPriceFinal)}đ',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                      // color: Themes.gradientDeepClr,
+                                      color: Colors.red),
+                                ),
+                              ],
                             ),
                           ],
                         ),

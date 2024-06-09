@@ -304,8 +304,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     backgroundColor:
                         Themes.gradientLightClr, // Đặt màu nền của nút
                     foregroundColor: Colors.white, // Đặt màu chữ của nút
-                    // primary: Themes.gradientLightClr,
-                    // onPrimary: Colors.white,
                   ),
                   child: const Text(
                     'Lưu',
