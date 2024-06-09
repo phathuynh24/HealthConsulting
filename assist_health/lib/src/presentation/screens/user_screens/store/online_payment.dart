@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart'; // Make sure to import intl package for NumberFormat
 
 class OnLinePaymentScreen extends StatefulWidget {
   final int totalPriceAfterDiscount;
@@ -80,13 +83,144 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
-                'Thông tin thanh toán',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'TÀI KHOẢN NHẬN CHUYỂN KHOẢN 24/7',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Divider(
+                color: Colors.blueGrey.shade100,
+                thickness: 0.3,
+                height: 30,
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: 100, child: Text('Ngân hàng:')),
+                  Expanded(
+                      child: Text(
+                    'NH TMCP Ngoại Thương Việt Nam (Vietcombank)',
+                    textAlign: TextAlign.right,
+                  ))
+                ],
+              ),
+              Divider(
+                color: Colors.blueGrey.shade100,
+                thickness: 0.3,
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 100, child: Text('Số tài khoản:')),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        // Xử lý sự kiện sao chép số tài khoản
+                        const data = ClipboardData(text: '1017904862');
+                        Clipboard.setData(data);
+                        showToastMessage(
+                            context, 'Số tài khoản đã được sao chép');
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '1017904862',
+                            style: TextStyle(
+                              color: Themes.gradientDeepClr,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.content_copy,
+                            color: Themes.gradientDeepClr,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Divider(
+                color: Colors.blueGrey.shade100,
+                thickness: 0.3,
+                height: 30,
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: 100, child: Text('Chủ tài khoản:')),
+                  Expanded(
+                      child: Text(
+                    'NGUYEN TRUONG BAO DUY',
+                    textAlign: TextAlign.right,
+                  ))
+                ],
+              ),
+              Divider(
+                color: Colors.blueGrey.shade100,
+                thickness: 0.3,
+                height: 30,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 100, child: Text('Số tài khoản:')),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        final data = ClipboardData(
+                            text: '${widget.totalPriceAfterDiscount}');
+                        Clipboard.setData(data);
+                        showToastMessage(context, 'Số tiền đã được sao chép');
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${NumberFormat("#,##0", "en_US").format(int.parse((widget.totalPriceAfterDiscount).toString()))} VNĐ',
+                            style: const TextStyle(
+                              color: Themes.gradientDeepClr,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          const Icon(
+                            Icons.content_copy,
+                            color: Themes.gradientDeepClr,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
-              Text(
-                'Thời gian còn lại: ${formatTime(_secondsRemaining)}',
-                style: const TextStyle(fontSize: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Thời gian còn lại: ',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    '${formatTime(_secondsRemaining)}',
+                    style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               CachedNetworkImage(
@@ -110,8 +244,27 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _savePaymentData,
-                child: const Text('Xác nhận thanh toán'),
+                child: const Text(
+                  'Xác nhận thanh toán',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18),
+                ),
+                style: ButtonStyle(
+                  padding:
+                      MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Thay đổi bán kính
+                    ),
+                  ),
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Themes.gradientDeepClr),
+                ),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -148,6 +301,6 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
 }
 
 String _generateTransferContent() {
-  String randomString = 'cam on vi da den';
+  String randomString = 'Xin cam on ban da su dung dich vu cua chung toi.';
   return randomString;
 }

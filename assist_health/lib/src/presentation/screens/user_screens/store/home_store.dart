@@ -32,6 +32,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
   String selectedCategory = '';
   double _lowerValue = 0;
   double _upperValue = 1000000;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -39,6 +40,12 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
     _productStream =
         FirebaseFirestore.instance.collection('products').snapshots();
     _updateProductRatings();
+
+    _searchController.addListener(() {
+      setState(() {
+        searchQuery = _searchController.text;
+      });
+    });
   }
 
   Future<void> _updateProductRatings() async {
@@ -143,10 +150,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                     ),
                     child: IconButton(
                       onPressed: () {
-                        // showSearch(
-                        //   context: context,
-                        //   delegate: ProductSearch(_searchController.text),
-                        // );
+                        // Trigger search manually if needed
                       },
                       icon: const Icon(Icons.search),
                       color: Colors.white,
@@ -249,8 +253,12 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
 
                   final products = snapshot.data!.docs
                       .where((doc) =>
-                          selectedCategory.isEmpty ||
-                          doc['category'] == selectedCategory)
+                          (selectedCategory.isEmpty ||
+                              doc['category'] == selectedCategory) &&
+                          (searchQuery.isEmpty ||
+                              (doc['name'] as String)
+                                  .toLowerCase()
+                                  .contains(searchQuery.toLowerCase())))
                       .where((doc) {
                     final price = doc['price'] as num;
                     return price >= _lowerValue && price <= _upperValue;
@@ -282,21 +290,6 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                         child: Card(
                           child: Column(
                             children: <Widget>[
-                              // ClipRRect(
-                              //   borderRadius: const BorderRadius.only(
-                              //     topLeft: Radius.circular(10),
-                              //     topRight: Radius.circular(10),
-                              //   ),
-                              //   child: AspectRatio(
-                              //     aspectRatio: 0.9,
-                              //     child: firstImageUrl.isNotEmpty
-                              //         ? Image.network(
-                              //             firstImageUrl,
-                              //             fit: BoxFit.cover,
-                              //           )
-                              //         : const Placeholder(),
-                              //   ),
-                              // ),
                               ClipRRect(
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(10),
@@ -316,7 +309,6 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                   ),
                                 ),
                               ),
-
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(

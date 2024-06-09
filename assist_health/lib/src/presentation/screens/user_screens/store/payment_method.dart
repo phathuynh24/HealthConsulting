@@ -22,13 +22,13 @@ class PaymentMethodSelection extends StatelessWidget {
               Row(
                 children: [
                   Image.asset(
-                    'assets/vnpay_logo.png',
+                    'assets/payment_online.png',
                     width: 40,
                     height: 40,
                   ),
                   SizedBox(width: 20),
                   Text(
-                    'VNPay',
+                    'Thanh toán trực tuyến',
                     style: TextStyle(fontSize: 16),
                   ),
                 ],

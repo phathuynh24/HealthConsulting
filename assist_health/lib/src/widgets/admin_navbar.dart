@@ -1,4 +1,5 @@
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/add_blog.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_account.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_blog_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/content_topbar.dart';
@@ -25,8 +26,8 @@ class _AdminNavBarState extends State<AdminNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
-    const RevenueChartScreen(),
-    ReviewManagementPage(),
+    // const RevenueChartScreen(),
+    // ReviewManagementPage(),
     ShopChart(),
     AdminBlog(),
     const AddVoucherScreen(),
@@ -35,13 +36,13 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // Screen 3
     const MessageAdminScreen(),
     // Screen 4
-    const DoctorProfileList(),
+    // const DoctorProfileList(),
     // Screen 5
     const AdminAccountScreen(),
     //Screen 6
-    const ProductListScreen(),
+    // const ProductListScreen(),
     //Screen 7
-    const AdminOrderManagementScreen(),
+    // const AdminOrderManagementScreen(),
   ];
 
   @override
@@ -67,14 +68,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
             });
           },
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_outlined),
-              label: "Thống kê",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.reviews_rounded),
-              label: "Đánh giá",
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.bar_chart_outlined),
+            //   label: "Thống kê",
+            // ),
             BottomNavigationBarItem(
               icon: Icon(Icons.chat_rounded),
               label: "Doanh thu",
@@ -95,22 +92,22 @@ class _AdminNavBarState extends State<AdminNavBar> {
               icon: Icon(CupertinoIcons.chat_bubble_text_fill),
               label: "Tin nhắn",
             ),
-            BottomNavigationBarItem(
-              icon: Icon(FontAwesomeIcons.userDoctor),
-              label: "Bác sĩ",
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(FontAwesomeIcons.userDoctor),
+            //   label: "Bác sĩ",
+            // ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: "Tài khoản",
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.store),
-              label: "Thêm sản phẩm",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag),
-              label: "Đơn hàng",
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.store),
+            //   label: "Thêm sản phẩm",
+            // ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.shopping_bag),
+            //   label: "Đơn hàng",
+            // ),
           ],
         ),
       ),
