@@ -486,7 +486,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
-                                      'Cửa hàng',
+                                      'Cửa hàng sản phẩm',
                                       FontAwesomeIcons.cartShopping,
                                       const Color.fromARGB(255, 241, 85, 0),
                                       const Color.fromARGB(255, 160, 122, 46),
@@ -498,7 +498,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
-                                    'Khuyến nghị',
+                                    'Đề xuất bác sĩ',
                                     FontAwesomeIcons.robot,
                                     const Color(0xFF2EF76F),
                                     const Color(0xFF2EA05A),

@@ -62,8 +62,7 @@ class _AdminBlogState extends State<AdminBlog> {
       ),
       body: _buildBlogList(),
     );
-  } 
-    
+  }
 
   Widget _buildBlogList() {
     Query<Map<String, dynamic>> query = _firestore.collection('blog');
@@ -170,7 +169,7 @@ class _AdminBlogState extends State<AdminBlog> {
                                 Container(width: 5),
                                 Text(
                                   status ? 'Đã duyệt' : 'Chờ duyệt',
-                                  style: TextStyle(fontSize: 14),
+                                  style: TextStyle(fontSize: 13),
                                 ),
                                 const SizedBox(width: 8),
                               ],
@@ -269,6 +268,9 @@ class _AdminBlogState extends State<AdminBlog> {
                           children: [
                             Text(
                               category,
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
                             ),
                             const SizedBox(
                               width: 5,

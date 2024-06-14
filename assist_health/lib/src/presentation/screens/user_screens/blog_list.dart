@@ -423,9 +423,9 @@ class _BlogListPageState extends State<BlogListPage>
                           children: [
                             Text(
                               category,
-                            ),
-                            const SizedBox(
-                              width: 5,
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
                             ),
                           ],
                         ),

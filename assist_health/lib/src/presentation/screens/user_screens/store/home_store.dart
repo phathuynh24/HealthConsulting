@@ -328,7 +328,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                         Text(
                                           '${NumberFormat('#,###').format(data['price'])} VNĐ',
                                           style: const TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: Themes.gradientLightClr),
                                         ),
@@ -350,7 +350,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                       child: Text(
                                         '${NumberFormat('#,###').format(data['old_price'])} VNĐ',
                                         style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           decoration:
                                               TextDecoration.lineThrough,
                                         ),
@@ -363,7 +363,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                             Themes.gradientLightClr,
                                         foregroundColor: Colors.white,
                                       ),
-                                      child: const Text('Thêm vào giỏ hàng'),
+                                      child: const Text('Mua sản phẩm'),
                                       onPressed: () {
                                         Navigator.push(
                                           context,

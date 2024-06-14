@@ -130,7 +130,7 @@ class Doctor_Blog extends StatelessWidget {
                                   Container(width: 5),
                                   Text(
                                     status ? 'Đã duyệt' : 'Chờ duyệt',
-                                    style: TextStyle(fontSize: 14),
+                                    style: TextStyle(fontSize: 13),
                                   ),
                                   const SizedBox(width: 8),
                                 ],

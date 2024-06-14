@@ -403,7 +403,7 @@ class _HomeDoctorState extends State<HomeDoctor> {
                                                 ? countAppointment.toString()
                                                 : formatNumber(total),
                                             style: TextStyle(
-                                              fontSize: (index == 1) ? 45 : 60,
+                                              fontSize: (index == 1) ? 35 : 60,
                                               color: Themes.gradientDeepClr,
                                             ),
                                             textAlign: TextAlign.center,
