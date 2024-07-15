@@ -362,7 +362,7 @@ By combining these models, the app ensures robust and comprehensive disease diag
 <table>
   <tr>
     <td>
-      <img src="https://github.com/user-attachments/assets/c55d32ed-9ee4-4089-b92b-e2aed5fcaab6" width="300"/>
+      <img src="https://github.com/user-attachments/assets/2770aa17-e73d-4093-aca7-7b5b6f43c5c0" width="300"/>
     </td>
   </tr>
 </table>
