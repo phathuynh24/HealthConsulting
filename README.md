@@ -73,6 +73,69 @@
 - 🛒 **Manage Products and Orders**: Oversee product listings and order history.
 - 📝 **Feedback Management**: Handle feedback and reviews.
 
+## AI-Powered Doctor Recommendation Feature
+
+The Health Consulting app integrates advanced AI models to provide doctor recommendations based on user-reported symptoms. This feature analyzes the symptoms to diagnose potential diseases and then suggests doctors with relevant experience in treating those conditions. Below is a detailed breakdown of the AI models used:
+
+### AI Models Overview
+
+#### Model 1: Detailed Symptom Description Analysis
+
+- **Input**: A detailed description of the user's symptoms.
+- **Output**: Predicted disease (the model can distinguish around 22 diseases).
+- **Advantages**:
+  - Provides accurate disease prediction based on detailed symptom descriptions.
+  - Utilizes advanced NLP techniques for better understanding of medical terminologies.
+- **Disadvantages**:
+  - Requires users to provide comprehensive symptom descriptions, which might be challenging for some.
+  - Limited to 22 diseases.
+- **Training Libraries**: TensorFlow, Keras
+- **Reference**: [Pretrained BERT Model](https://www.kaggle.com/code/faizalkarim/pretrained-bert-98-8)
+
+#### Model 2: Symptom List Selection Analysis
+
+- **Input**: Selection of symptoms from a predefined list of approximately 200 symptoms.
+- **Output**: Predicted disease (the model can distinguish around 42 diseases).
+- **Advantages**:
+  - Allows users to easily select symptoms from a list, making it user-friendly.
+  - Covers a broader range of diseases (42 diseases).
+- **Disadvantages**:
+  - The predefined symptom list may not cover all possible user-reported symptoms.
+  - The accuracy depends on the user's ability to correctly identify and select symptoms.
+- **Training Libraries**: scikit-learn (sklearn)
+- **Reference**: [Disease Prediction and Analytics](https://www.kaggle.com/code/kunal2350/disease-prediction-and-analytics/comments)
+
+### Combining AI Models
+
+To leverage the strengths of both models, the app combines their outputs using a weighted approach. The weights assigned are:
+- Model 1: 0.4
+- Model 2: 0.6
+
+This method ensures a balanced and accurate prediction by considering both detailed descriptions and symptom list selections.
+
+### Example Workflow
+
+1. **User Input**:
+    - Users can either provide a detailed description of their symptoms or select symptoms from a list.
+2. **Model Analysis**:
+    - **Model 1** processes detailed descriptions to predict the disease.
+    - **Model 2** processes selected symptoms to predict the disease.
+3. **Weighted Combination**:
+    - The outputs of both models are combined using the weights (Model 1: 0.4, Model 2: 0.6).
+4. **Doctor Recommendation**:
+    - Based on the final disease prediction, the app suggests doctors with relevant experience in treating the diagnosed condition.
+
+This AI-powered feature enhances the user experience by providing accurate and reliable doctor recommendations, ensuring users receive the best possible care.
+
+### Model Comparison Table
+
+| Model | Input | Output | Disease Coverage | Training Libraries | Advantages | Disadvantages |
+| --- | --- | --- | --- | --- | --- | --- |
+| Model 1 | Detailed symptom description | Predicted disease | 22 diseases | TensorFlow, Keras | Accurate with detailed inputs | Requires comprehensive descriptions |
+| Model 2 | Selected symptoms from a list | Predicted disease | 42 diseases | scikit-learn (sklearn) | User-friendly, broader disease coverage | Depends on correct symptom selection |
+
+By combining these models, the app ensures robust and comprehensive disease diagnosis and doctor recommendations.
+
 ## Installation
 
 ### Prerequisites
@@ -141,44 +204,68 @@
 
 ## Screenshots 📸
 
-### User Interface
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/ab7ec712-6ef5-4a45-b93a-22a9f1109f4c" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/254824ea-7c19-4c62-a32a-e5ab8a0264bd" width="300"/>
-    </td>
-  </tr>
-</table>
+### Authentication Screens
+- **Registration Screen**
+  ![](https://github.com/user-attachments/assets/126bbfc6-a2de-4809-bdcb-66774ac0aefe)
+  ![](https://github.com/user-attachments/assets/2ba537a2-8eac-418e-9718-77fd062934ab)
+  ![](https://github.com/user-attachments/assets/8df8a903-cdb4-4196-9f93-7823b5db6f85)
+  ![](https://github.com/user-attachments/assets/74149599-54b4-4687-ab00-59f42a807d0c)
 
-### Doctor's Interface
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/9ca0c01e-ec2f-450d-8c0f-27e91a869cb7" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/19e46217-ecc5-4009-b12c-f07d7592ee6a" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/e0f0e13e-995b-4772-8308-1e5b7dd94e79" width="300"/>
-    </td>
-  </tr>
-</table>
+### Home Screens
+- **User Home Screen**
+  ![User Home Screen](https://github.com/user-attachments/assets/a0ea6832-37a2-4112-af65-5e257e298ae6)
+- **Doctor Home Screen**
+  ![Doctor Home Screen](https://github.com/user-attachments/assets/428ee3cf-18e0-4fba-91e7-a851b58d34fe)
 
-### Admin Interface
-<table>
-  <tr>
-    <td style="text-align: center;">
-      <img src="https://github.com/user-attachments/assets/0d25285f-f2d4-4043-83f9-39be9a9fbaca" width="300"/>
-    </td>
-    <td style="text-align: center;">
-      <img src="https://github.com/user-attachments/assets/7a2341d9-ef69-47d0-afcc-f2e8da462b02" width="300"/>
-    </td>
-  </tr>
-</table>
+### Appointment Management Screens
+- **User Appointment Management Screen**
+  ![User Appointment Management Screen](https://github.com/user-attachments/assets/ccc1ff31-f106-41e8-949b-b8239ad3bfad)
+- **Doctor Appointment Management Screen**
+  ![Doctor Appointment Management Screen](https://github.com/user-attachments/assets/797e8cd7-6583-43ee-8171-5e1c81fc470a)
+- **Pending Appointment Detail Screen**
+  ![Pending Appointment Detail Screen](https://github.com/user-attachments/assets/9c477e2c-0901-4c62-8714-608aeab6ca6a)
+- **Completed Appointment Detail Screen**
+  ![Completed Appointment Detail Screen](https://github.com/user-attachments/assets/84c68f90-1ecb-40f7-b888-d3d6c8a620e1)
+- **Canceled Appointment Detail Screen**
+  ![Canceled Appointment Detail Screen](https://github.com/user-attachments/assets/d869f5e3-39d2-4767-8e61-7601848577aa)
+- **Approved Appointment Screen**
+  ![Approved Appointment Screen](https://github.com/user-attachments/assets/3baf4e34-50ea-47e5-90cb-a2870528f763)
+- **Appointment Confirmation Screen**
+  ![Appointment Confirmation Screen](https://github.com/user-attachments/assets/8e8080e5-4ec9-4211-b13c-cd15b302b4e5)
+
+### Health Record Management Screens
+- **Record List Screen**
+  ![Record List Screen](https://github.com/user-attachments/assets/c55d32ed-9ee4-4089-b92b-e2aed5fcaab6)
+- **Record Detail Screen**
+  ![Record Detail Screen](https://github.com/user-attachments/assets/0f1da13d-ef1b-4957-b5c9-3962feccd27d)
+- **Add Record Screen**
+  ![Add Record Screen](https://github.com/user-attachments/assets/7df4a710-c2d7-4f7d-9ced-7cf6c2a92c6f)
+- **Edit Record Screen**
+  ![Edit Record Screen](https://github.com/user-attachments/assets/0597988d-a164-4024-ab0d-d38fa4c2033b)
+
+### Communication and Feedback Screens
+- **Call Screen**
+  ![Call Screen](https://github.com/user-attachments/assets/5a8520f9-5da6-47a3-8fc5-00b9d7d5af56)
+- **Doctor Rating Screen**
+  ![Doctor Rating Screen](https://github.com/user-attachments/assets/0f69a73b-5b47-4bb7-8c94-c74d4ffdf5b9)
+- **Review Rating Dialog**
+  ![Review Rating Dialog](https://github.com/user-attachments/assets/76b37193-65aa-43d6-82a8-e395669c5d4a)
+
+### Examination Result Screens
+- **Examination Results Screen**
+  ![Examination Results Screen](https://github.com/user-attachments/assets/8b11476e-eae2-4653-92ee-74c5aee10921)
+- **Examination Result Detail Screen**
+  ![Examination Result Detail Screen](https://github.com/user-attachments/assets/67f4c61b-2f8b-4db8-b2b0-7b8b25a2fae7)
+
+### Nhắn tin
+
+### Shop sản phẩm y tế
+
+### Bài báo
+
+### Phân tích chỉ số sức khỏe
+
+### Gợi ý bác sĩ
 
 ## Contributing 🤝
 
