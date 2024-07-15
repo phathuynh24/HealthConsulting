@@ -205,67 +205,226 @@ By combining these models, the app ensures robust and comprehensive disease diag
 ## Screenshots 📸
 
 ### Authentication Screens
-- **Registration Screen**
-  ![](https://github.com/user-attachments/assets/126bbfc6-a2de-4809-bdcb-66774ac0aefe)
-  ![](https://github.com/user-attachments/assets/2ba537a2-8eac-418e-9718-77fd062934ab)
-  ![](https://github.com/user-attachments/assets/8df8a903-cdb4-4196-9f93-7823b5db6f85)
-  ![](https://github.com/user-attachments/assets/74149599-54b4-4687-ab00-59f42a807d0c)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/126bbfc6-a2de-4809-bdcb-66774ac0aefe" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2ba537a2-8eac-418e-9718-77fd062934ab" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/8df8a903-cdb4-4196-9f93-7823b5db6f85" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/74149599-54b4-4687-ab00-59f42a807d0c" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ### Home Screens
-- **User Home Screen**
-  ![User Home Screen](https://github.com/user-attachments/assets/a0ea6832-37a2-4112-af65-5e257e298ae6)
-- **Doctor Home Screen**
-  ![Doctor Home Screen](https://github.com/user-attachments/assets/428ee3cf-18e0-4fba-91e7-a851b58d34fe)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/a0ea6832-37a2-4112-af65-5e257e298ae6" alt="User Home Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/428ee3cf-18e0-4fba-91e7-a851b58d34fe" alt="Doctor Home Screen" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ### Appointment Management Screens
-- **User Appointment Management Screen**
-  ![User Appointment Management Screen](https://github.com/user-attachments/assets/ccc1ff31-f106-41e8-949b-b8239ad3bfad)
-- **Doctor Appointment Management Screen**
-  ![Doctor Appointment Management Screen](https://github.com/user-attachments/assets/797e8cd7-6583-43ee-8171-5e1c81fc470a)
-- **Pending Appointment Detail Screen**
-  ![Pending Appointment Detail Screen](https://github.com/user-attachments/assets/9c477e2c-0901-4c62-8714-608aeab6ca6a)
-- **Completed Appointment Detail Screen**
-  ![Completed Appointment Detail Screen](https://github.com/user-attachments/assets/84c68f90-1ecb-40f7-b888-d3d6c8a620e1)
-- **Canceled Appointment Detail Screen**
-  ![Canceled Appointment Detail Screen](https://github.com/user-attachments/assets/d869f5e3-39d2-4767-8e61-7601848577aa)
-- **Approved Appointment Screen**
-  ![Approved Appointment Screen](https://github.com/user-attachments/assets/3baf4e34-50ea-47e5-90cb-a2870528f763)
-- **Appointment Confirmation Screen**
-  ![Appointment Confirmation Screen](https://github.com/user-attachments/assets/8e8080e5-4ec9-4211-b13c-cd15b302b4e5)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/ccc1ff31-f106-41e8-949b-b8239ad3bfad" alt="User Appointment Management Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/797e8cd7-6583-43ee-8171-5e1c81fc470a" alt="Doctor Appointment Management Screen" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/9c477e2c-0901-4c62-8714-608aeab6ca6a" alt="Pending Appointment Detail Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/84c68f90-1ecb-40f7-b888-d3d6c8a620e1" alt="Completed Appointment Detail Screen" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/d869f5e3-39d2-4767-8e61-7601848577aa" alt="Canceled Appointment Detail Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/3baf4e34-50ea-47e5-90cb-a2870528f763" alt="Approved Appointment Screen" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="text-align: center;">
+      <img src="https://github.com/user-attachments/assets/8e8080e5-4ec9-4211-b13c-cd15b302b4e5" alt="Appointment Confirmation Screen" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ### Health Record Management Screens
-- **Record List Screen**
-  ![Record List Screen](https://github.com/user-attachments/assets/c55d32ed-9ee4-4089-b92b-e2aed5fcaab6)
-- **Record Detail Screen**
-  ![Record Detail Screen](https://github.com/user-attachments/assets/0f1da13d-ef1b-4957-b5c9-3962feccd27d)
-- **Add Record Screen**
-  ![Add Record Screen](https://github.com/user-attachments/assets/7df4a710-c2d7-4f7d-9ced-7cf6c2a92c6f)
-- **Edit Record Screen**
-  ![Edit Record Screen](https://github.com/user-attachments/assets/0597988d-a164-4024-ab0d-d38fa4c2033b)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/c55d32ed-9ee4-4089-b92b-e2aed5fcaab6" alt="Record List Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/0f1da13d-ef1b-4957-b5c9-3962feccd27d" alt="Record Detail Screen" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/7df4a710-c2d7-4f7d-9ced-7cf6c2a92c6f" alt="Add Record Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/0597988d-a164-4024-ab0d-d38fa4c2033b" alt="Edit Record Screen" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ### Communication and Feedback Screens
-- **Call Screen**
-  ![Call Screen](https://github.com/user-attachments/assets/5a8520f9-5da6-47a3-8fc5-00b9d7d5af56)
-- **Doctor Rating Screen**
-  ![Doctor Rating Screen](https://github.com/user-attachments/assets/0f69a73b-5b47-4bb7-8c94-c74d4ffdf5b9)
-- **Review Rating Dialog**
-  ![Review Rating Dialog](https://github.com/user-attachments/assets/76b37193-65aa-43d6-82a8-e395669c5d4a)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/5a8520f9-5da6-47a3-8fc5-00b9d7d5af56" alt="Call Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/0f69a73b-5b47-4bb7-8c94-c74d4ffdf5b9" alt="Doctor Rating Screen" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="text-align: center;">
+      <img src="https://github.com/user-attachments/assets/76b37193-65aa-43d6-82a8-e395669c5d4a" alt="Review Rating Dialog" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ### Examination Result Screens
-- **Examination Results Screen**
-  ![Examination Results Screen](https://github.com/user-attachments/assets/8b11476e-eae2-4653-92ee-74c5aee10921)
-- **Examination Result Detail Screen**
-  ![Examination Result Detail Screen](https://github.com/user-attachments/assets/67f4c61b-2f8b-4db8-b2b0-7b8b25a2fae7)
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/8b11476e-eae2-4653-92ee-74c5aee10921" alt="Examination Results Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/67f4c61b-2f8b-4db8-b2b0-7b8b25a2fae7" alt="Examination Result Detail Screen" width="300"/>
+    </td>
+  </tr>
+</table>
 
-### Nhắn tin
+### Chat with doctors/admins
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/edcae927-c8bd-4fec-9260-31ad4ffec0c1" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/831c7754-86d4-46a8-a409-44d8c120f6db" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/edc7af3d-1181-46d5-bb0d-2cae348d150d" width="300"/>
+    </td>
+  </tr>
+</table>
 
-### Shop sản phẩm y tế
+### Chatbot
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/c55d32ed-9ee4-4089-b92b-e2aed5fcaab6" width="300"/>
+    </td>
+  </tr>
+</table>
 
-### Bài báo
+### Medical Products Shop
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/648e4738-91ab-45ce-9fef-d3adcf695453" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/00eb52c3-d283-4c2d-8dcf-1729ead43704" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2c49cbe6-b336-4ad2-b4d2-56ac5a33083f" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2ebdb84b-cc79-43a3-b33d-a5d02fbe372f" width="300"/>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/c7cb235a-fa30-4416-ad3c-0b45b62daba5" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/547804e0-d25d-4f37-8bca-aaecc2db5e36" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/58a1c5cc-e157-441e-a24e-b3d9fb527eaa" width="300"/>
+    </td>
+  </tr>
+</table>
 
-### Phân tích chỉ số sức khỏe
+### Articles
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/cb67014c-1cca-4f04-a6d8-622513f7c80b" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/8448b080-cceb-42b7-a869-897353467c6d" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/9b5f235a-c72f-4e36-a1b7-ac7f236ceb00" width="300"/>
+    </td>
+  </tr>
+</table>
 
-### Gợi ý bác sĩ
+### Health Index Analysis
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/55e27557-9619-4d11-8d16-a19086c2d479" alt="Record List Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/0b116c44-a969-440b-b9ab-cd1d30b18324" alt="Record Detail Screen" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/dc2ec1f0-3051-4999-8c22-50812a815c27" alt="Add Record Screen" width="300"/>
+    </td>
+  </tr>
+</table>
+
+### Doctor Recommendations
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/78366a1e-e7d9-43df-93c5-8ab92b711a2e" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/4636cc36-75ad-4086-a432-dc4412d27bb4" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2268a699-ba6b-462b-b51f-4b0300d9b2ed" width="300"/>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/f87f86ee-cf99-42bf-b22b-5b4e1e619d23" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/79dde4fe-00e4-4ee2-b41f-83f0791ce98d" width="300"/>
+    </td>
+  </tr>
+</table>
 
 ## Contributing 🤝
 
