@@ -269,6 +269,31 @@ By combining these models, the app ensures robust and comprehensive disease diag
   </tr>
 </table>
 
+### Doctor Recommendations
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/78366a1e-e7d9-43df-93c5-8ab92b711a2e" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/4636cc36-75ad-4086-a432-dc4412d27bb4" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/2268a699-ba6b-462b-b51f-4b0300d9b2ed" width="300"/>
+    </td>
+  </tr>
+</table>
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/user-attachments/assets/f87f86ee-cf99-42bf-b22b-5b4e1e619d23" width="300"/>
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/79dde4fe-00e4-4ee2-b41f-83f0791ce98d" width="300"/>
+    </td>
+  </tr>
+</table>
+
 ### Health Record Management Screens
 <table>
   <tr>
@@ -397,31 +422,6 @@ By combining these models, the app ensures robust and comprehensive disease diag
     </td>
     <td>
       <img src="https://github.com/user-attachments/assets/dc2ec1f0-3051-4999-8c22-50812a815c27" alt="Add Record Screen" width="300"/>
-    </td>
-  </tr>
-</table>
-
-### Doctor Recommendations
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/78366a1e-e7d9-43df-93c5-8ab92b711a2e" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/4636cc36-75ad-4086-a432-dc4412d27bb4" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/2268a699-ba6b-462b-b51f-4b0300d9b2ed" width="300"/>
-    </td>
-  </tr>
-</table>
-<table>
-  <tr>
-    <td>
-      <img src="https://github.com/user-attachments/assets/f87f86ee-cf99-42bf-b22b-5b4e1e619d23" width="300"/>
-    </td>
-    <td>
-      <img src="https://github.com/user-attachments/assets/79dde4fe-00e4-4ee2-b41f-83f0791ce98d" width="300"/>
     </td>
   </tr>
 </table>
