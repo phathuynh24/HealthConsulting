@@ -62,6 +62,7 @@ dependencies:
   cached_network_image: ^3.3.1
   google_generative_ai: ^0.4.3
   percent_indicator: ^4.2.3
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

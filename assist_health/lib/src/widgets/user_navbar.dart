@@ -1,7 +1,9 @@
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/blog_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/home.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/meal.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/meal_home.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/product_scan.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/message.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/schedule.dart';
@@ -23,11 +25,15 @@ class _UserNavBarState extends State<UserNavBar> {
     const HomeScreen(),
     // Schedule Screen
     const ScheduleScreen(),
+    //Product Scan Screen
+    ProductScanScreen(),
     // Public Chat Screen
     const PublicQuestionsScreen(),
     // Messages Screen
     const MessageScreen(),
+    //
     BlogListPage(),
+    //
     const AccountScreen(),
   ];
 
@@ -61,6 +67,10 @@ class _UserNavBarState extends State<UserNavBar> {
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month),
               label: "Lịch khám",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.restaurant_menu),
+              label: "Dinh duỡng",
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.person_3_fill),
