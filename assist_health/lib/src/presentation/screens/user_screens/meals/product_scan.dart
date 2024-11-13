@@ -11,32 +11,55 @@ class ProductScanScreen extends StatefulWidget {
 class _ProductScanScreenState extends State<ProductScanScreen> {
   File? _image;
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+  Future<void> _pickImageFromCamera() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Screen2(image: _image!),
-        ),
-      );
+      _navigateToScreen2();
     }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _navigateToScreen2();
+    }
+  }
+
+  void _navigateToScreen2() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Screen2(image: _image!),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chụp ảnh")),
+      appBar: AppBar(title: Text("Select or Capture Image")),
       body: Center(
-        child: ElevatedButton(
-          onPressed: _pickImage,
-          child: Text("Chụp ảnh"),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: _pickImageFromCamera,
+              child: Text("Capture Image"),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _pickImageFromGallery,
+              child: Text("Select from Gallery"),
+            ),
+          ],
         ),
       ),
     );

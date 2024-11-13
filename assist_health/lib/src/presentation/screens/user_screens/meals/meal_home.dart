@@ -5,8 +5,9 @@ import 'meal.dart';
 
 class MealHomeScreen extends StatelessWidget {
   final Meal meal;
+  final String imageUrl;
 
-  MealHomeScreen({required this.meal});
+  MealHomeScreen({required this.meal, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class MealHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Image.network(imageUrl),
             Text(
               meal.name,
               style: TextStyle(
