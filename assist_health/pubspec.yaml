@@ -120,6 +120,7 @@ flutter:
     - assets/recommendation/tip_healthy_food.png
     - assets/recommendation/tip_exercise.png
     - assets/recommendation/tip_water.png
+    - assets/describe_food.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
