@@ -82,7 +82,7 @@ class _Screen2State extends State<Screen2> {
                   calories: calories.toInt(),
                   nutrients: nutrients,
                 ),
-                imageUrl: highresImageUrl,
+                imageUrl: widget.image.path,
               ),
             ),
           );

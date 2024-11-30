@@ -1,16 +1,60 @@
-// meal_home_screen.dart
+import 'dart:io';
+
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/health_rating_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'meal.dart';
 
-class MealHomeScreen extends StatelessWidget {
+class MealHomeScreen extends StatefulWidget {
   final Meal meal;
-  final String? imageUrl;
+  final String imageUrl;
 
-  MealHomeScreen({required this.meal, this.imageUrl});
+  MealHomeScreen({required this.meal, required this.imageUrl});
+
+  @override
+  State<MealHomeScreen> createState() => _MealHomeScreenState();
+}
+
+class _MealHomeScreenState extends State<MealHomeScreen> {
+  final List<String> _fractionValues = ['1/4', '1/3', '1/2', '3/4'];
+  double _serving = 1; // Giá trị mặc định là 1 serving
+
+  String _formatServingValue(double serving) {
+    if (serving < 1) {
+      // Với giá trị nhỏ hơn 1, hiển thị theo danh sách fraction
+      int index = ((_fractionValues.length) * serving).round() - 1;
+      return index >= 0 && index < _fractionValues.length
+          ? _fractionValues[index]
+          : serving.toStringAsFixed(2);
+    }
+    return serving.toInt().toString();
+  }
+
+  List<Nutrient> _adjustNutrients() {
+    return widget.meal.nutrients.map((nutrient) {
+      final adjustedAmount = double.tryParse(nutrient.amount) ?? 0;
+      return Nutrient(
+        name: nutrient.name,
+        amount: (adjustedAmount * _serving).toStringAsFixed(1),
+      );
+    }).toList();
+  }
+
+  void _updateServing(bool isIncrement) {
+    setState(() {
+      if (isIncrement) {
+        _serving = _serving < 1 ? _serving + 0.25 : _serving + 1;
+      } else {
+        if (_serving <= 0.25) return;
+        _serving = _serving <= 1 ? _serving - 0.25 : _serving - 1;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +78,19 @@ class MealHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            imageUrl != "" ? Image.network(imageUrl!) : SizedBox(),
+            if (widget.imageUrl.startsWith('http'))
+              Image.network(
+                widget.imageUrl,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Text('Không tải được ảnh mạng'),
+              )
+            else if (File(widget.imageUrl).existsSync())
+              Image.file(File(widget.imageUrl))
+            else
+              const SizedBox(height: 16.0),
+
             Text(
-              meal.name,
+              widget.meal.name,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -156,7 +210,7 @@ class MealHomeScreen extends StatelessWidget {
                                           Expanded(
                                             child: SingleChildScrollView(
                                               child: Column(
-                                                children: meal.nutrients
+                                                children: widget.meal.nutrients
                                                     .where((nutrient) => ![
                                                           "Calories",
                                                           "Protein",
@@ -222,19 +276,19 @@ class MealHomeScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            meal.name,
+                            widget.meal.name,
                             textAlign: TextAlign.start,
                           ),
                         ),
                         Expanded(
                           child: Text(
-                            meal.weight,
+                            widget.meal.weight,
                             textAlign: TextAlign.center,
                           ),
                         ),
                         Expanded(
                           child: Text(
-                            "${meal.calories} Cal",
+                            "${widget.meal.calories} Cal",
                             textAlign: TextAlign.end,
                           ),
                         ),
@@ -253,7 +307,7 @@ class MealHomeScreen extends StatelessWidget {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
-                        ...meal.nutrients.map(
+                        ...widget.meal.nutrients.map(
                           (nutrient) =>
                               _buildNutrientRow(nutrient.name, nutrient.amount),
                         ),
@@ -300,12 +354,15 @@ class MealHomeScreen extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(Icons.remove),
-                  onPressed: () {},
+                  onPressed: () => _updateServing(false),
                 ),
-                Text("1 Serving"),
+                Text(
+                  _formatServingValue(_serving),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed: () {},
+                  onPressed: () => _updateServing(true),
                 ),
               ],
             ),
@@ -322,7 +379,46 @@ class MealHomeScreen extends StatelessWidget {
                   child: Text("Try another"),
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    try {
+                      User? user = FirebaseAuth.instance.currentUser;
+                      if (user == null) {
+                        print("User is not logged in!");
+                        return;
+                      }
+                      String userId = user.uid;
+
+                      DateTime now = DateTime.now();
+
+                      Map<String, dynamic> mealData = {
+                        'name': widget.meal.name,
+                        'calories': widget.meal.calories,
+                        'weight': widget.meal.weight,
+                        'nutrients': widget.meal.nutrients
+                            .map((nutrient) => {
+                                  'name': nutrient.name,
+                                  'amount': nutrient.amount,
+                                })
+                            .toList(),
+                        'imageUrl': widget.imageUrl,
+                        'loggedAt': DateFormat('yyyy-MM-dd').format(now),
+                        "userId": userId,
+                      };
+
+                      await FirebaseFirestore.instance
+                          .collection('logged_meals')
+                          .add(mealData);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Meal logged successfully!')),
+                      );
+                    } catch (e) {
+                      // Xử lý lỗi
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to log meal: $e')),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.yellow[700],
@@ -351,47 +447,6 @@ class MealHomeScreen extends StatelessWidget {
   }
 }
 
-// Widget _buildFoodItem(String amount, String unit, String name,
-//     {bool isAddMore = false}) {
-//   return Padding(
-//     padding: const EdgeInsets.symmetric(vertical: 4.0),
-//     child: Row(
-//       children: [
-//         Expanded(
-//           flex: 2,
-//           child: TextField(
-//             controller: TextEditingController(text: amount),
-//             keyboardType: TextInputType.number,
-//             decoration: InputDecoration(
-//               border: OutlineInputBorder(),
-//               isDense: true,
-//               suffixText: unit,
-//             ),
-//           ),
-//         ),
-//         SizedBox(width: 8),
-//         Expanded(
-//           flex: 5,
-//           child: TextField(
-//             controller: TextEditingController(text: name),
-//             decoration: InputDecoration(
-//               border: OutlineInputBorder(),
-//               isDense: true,
-//               hintText: isAddMore ? "Add more food" : null,
-//             ),
-//           ),
-//         ),
-//         SizedBox(width: 8),
-//         IconButton(
-//           icon: Icon(isAddMore ? Icons.add : Icons.close),
-//           onPressed: () {
-//             // Handle add or remove action
-//           },
-//         ),
-//       ],
-//     ),
-//   );
-// }
 Widget _buildFoodItem(Nutrient nutrient, {bool isAddMore = false}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 4.0),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
@@ -253,15 +252,15 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
                 ),
                 style: ButtonStyle(
                   padding:
-                      MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(12)),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      WidgetStateProperty.all<EdgeInsets>(EdgeInsets.all(12)),
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(10), // Thay đổi bán kính
                     ),
                   ),
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(Themes.gradientDeepClr),
+                      WidgetStateProperty.all<Color>(Themes.gradientDeepClr),
                 ),
               ),
               const SizedBox(height: 20),
