@@ -35,12 +35,12 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     return serving.toInt().toString();
   }
 
-  List<Nutrient> _adjustNutrients() {
+  List<Nutrition> _adjustNutrients() {
     return widget.meal.nutrients.map((nutrient) {
-      final adjustedAmount = double.tryParse(nutrient.amount) ?? 0;
-      return Nutrient(
+      final adjustedAmount = nutrient.amount;
+      return Nutrition(
         name: nutrient.name,
-        amount: (adjustedAmount * _serving).toStringAsFixed(1),
+        amount: (adjustedAmount * _serving),
       );
     }).toList();
   }
@@ -94,21 +94,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "CaloScanAI provides calorie and nutritional estimates intended to be helpful for reference purposes only. They should not be taken as completely precise figures and should not replace professional healthcare advice.",
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                "Learn More",
-                style: TextStyle(color: Colors.blue),
               ),
             ),
             SizedBox(height: 16),
@@ -271,26 +256,21 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                   ),
                   Container(
                     padding: EdgeInsets.all(8),
+                    child: _buildIngredients(widget.meal.ingredients),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            widget.meal.name,
-                            textAlign: TextAlign.start,
-                          ),
+                          child: Text("Tổng cộng")
                         ),
                         Expanded(
-                          child: Text(
-                            widget.meal.weight,
-                            textAlign: TextAlign.center,
-                          ),
+                          child: Text(widget.meal.weight)
                         ),
                         Expanded(
-                          child: Text(
-                            "${widget.meal.calories} Cal",
-                            textAlign: TextAlign.end,
-                          ),
+                          child: Text("${widget.meal.calories}Cal")
                         ),
                       ],
                     ),
@@ -433,21 +413,42 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     );
   }
 
-  Widget _buildNutrientRow(String nutrient, String amount) {
+  Widget _buildNutrientRow(String nutrient, double amount) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text((nutrient)),
-          Text(amount),
+          Text(amount.toString()),
         ],
       ),
     );
   }
 }
 
-Widget _buildFoodItem(Nutrient nutrient, {bool isAddMore = false}) {
+Widget _buildIngredients(List<Ingredient> ingredients) {
+  return Column(
+    children: ingredients.map((ingredient) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(ingredient.name_vi),
+          ),
+          Expanded(
+            child: Text("${ingredient.quantity}g"),
+          ),
+          Expanded(
+            child: Text("${ingredient.colories}Cal"),
+          ),
+        ],
+      );
+    }).toList(),
+  );
+}
+
+Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 4.0),
     child: Row(
@@ -455,7 +456,7 @@ Widget _buildFoodItem(Nutrient nutrient, {bool isAddMore = false}) {
         Expanded(
           flex: 2,
           child: TextField(
-            controller: TextEditingController(text: nutrient.amount),
+            controller: TextEditingController(text: nutrient.amount.toString()),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
