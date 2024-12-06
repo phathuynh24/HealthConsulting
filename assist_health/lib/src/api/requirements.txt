@@ -1,0 +1,9 @@
+flask
+pandas
+torch
+tensorflow
+transformers
+joblib
+tf-keras
+scikit-learn
+openpyxl
