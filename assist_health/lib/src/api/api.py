@@ -7,11 +7,16 @@ import joblib
 app = Flask(__name__)
 
 # Constants
-MODEL_1_PATH = "D:/Nam_3/HK2/AI/NLP/Disease Diagnosis Model/Model_1/Model"
-MODEL_2_PATH = 'D:/Nam_3/HK2/AI/NLP/Disease Diagnosis Model/Model_2/Model/model.pkl'
-SYMPTOM_CSV_FILE_PATH = "D:/Nam_3/HK2/AI/NLP/Disease Diagnosis Model/Model_2/Dataset/Symptom-severity.csv"
-SYMPTOM_EXCEL_FILE_PATH = "D:/Nam_3/HK2/AI/NLP/Disease Diagnosis Model/Model_2/Dataset/Dataset_Vi/Symptom-severity_Vi.xlsx"
-DISEASE_EXCEL_FILE_PATH = "D:/Nam_3/HK2/AI/NLP/Disease Diagnosis Model/Model_2/Dataset/Dataset_Vi/symptom_Description_Vi.xlsx"
+# Window ACER NITRO 5
+# path = "D:/Nam_3/HK2/AI/NLP"
+# Macbook
+path = "/Users/phathuynhtien/Downloads/UIT/Model-Recommendation"
+MODEL_1_PATH = f"{path}/Disease Diagnosis Model/Model_1/Model/"
+MODEL_2_PATH = f"{path}/Disease Diagnosis Model/Model_2/Model/model.pkl"
+SYMPTOM_CSV_FILE_PATH = f"{path}/Disease Diagnosis Model/Model_2/Dataset/Symptom-severity.csv"
+SYMPTOM_EXCEL_FILE_PATH = f"{path}/Disease Diagnosis Model/Model_2/Dataset/Dataset_Vi/Symptom-severity_Vi.xlsx"
+DISEASE_EXCEL_FILE_PATH = f"{path}/Disease Diagnosis Model/Model_2/Dataset/Dataset_Vi/symptom_Description_Vi.xlsx"
+
 NUM_CLASSES = 24
 
 # Load models and tokenizer
@@ -145,4 +150,4 @@ def predict_disease_weighted_combination():
     return jsonify({"disease": processed_results})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5002)
