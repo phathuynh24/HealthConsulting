@@ -22,27 +22,18 @@ class MealHomeScreen extends StatefulWidget {
 
 class _MealHomeScreenState extends State<MealHomeScreen> {
   final List<String> _fractionValues = ['1/4', '1/3', '1/2', '3/4'];
-  double _serving = 1; // Giá trị mặc định là 1 serving
+  final List<double> _fractionValuesNumeric = [0.25, 0.33, 0.5, 0.75];
+  String selectedMealType = 'Buổi sáng';
+
+  double _serving = 1;
 
   String _formatServingValue(double serving) {
     if (serving < 1) {
-      // Với giá trị nhỏ hơn 1, hiển thị theo danh sách fraction
-      int index = ((_fractionValues.length) * serving).round() - 1;
-      return index >= 0 && index < _fractionValues.length
-          ? _fractionValues[index]
-          : serving.toStringAsFixed(2);
+      int index = _fractionValuesNumeric
+          .indexWhere((value) => (value - serving).abs() < 0.01);
+      return index != -1 ? _fractionValues[index] : serving.toStringAsFixed(2);
     }
     return serving.toInt().toString();
-  }
-
-  List<Nutrition> _adjustNutrients() {
-    return widget.meal.nutrients.map((nutrient) {
-      final adjustedAmount = nutrient.amount;
-      return Nutrition(
-        name: nutrient.name,
-        amount: (adjustedAmount * _serving),
-      );
-    }).toList();
   }
 
   void _updateServing(bool isIncrement) {
@@ -72,6 +63,27 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
             ),
           ),
         ),
+        actions: [
+          DropdownButton<String>(
+            value: selectedMealType,
+            hint: Text(
+              "Chọn buổi",
+              style: TextStyle(color: Colors.white),
+            ),
+            dropdownColor: Colors.blueGrey,
+            items: ['Buổi sáng', 'Buổi trưa', 'Buổi tối', 'Ăn vặt']
+                .map((type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedMealType = value!;
+              });
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -256,22 +268,28 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                   ),
                   Container(
                     padding: EdgeInsets.all(8),
-                    child: _buildIngredients(widget.meal.ingredients),
+                    child: _buildIngredients(widget.meal.ingredients, _serving),
                   ),
                   Container(
                     padding: EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Expanded(child: Text("Tổng cộng")),
+                        // Expanded(child: Text(widget.meal.weight)),
                         Expanded(
-                          child: Text("Tổng cộng")
-                        ),
+                            child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                              "${(widget.meal.weight * _serving).toStringAsFixed(1)} g"),
+                        )),
+
                         Expanded(
-                          child: Text(widget.meal.weight)
-                        ),
-                        Expanded(
-                          child: Text("${widget.meal.calories}Cal")
-                        ),
+                            child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                              "${(widget.meal.calories * _serving).toStringAsFixed(1)} Cal"),
+                        )),
                       ],
                     ),
                   ),
@@ -372,17 +390,26 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
 
                       Map<String, dynamic> mealData = {
                         'name': widget.meal.name,
-                        'calories': widget.meal.calories,
-                        'weight': widget.meal.weight,
+                        'calories': widget.meal.calories * _serving,
+                        'weight': widget.meal.weight * _serving,
                         'nutrients': widget.meal.nutrients
                             .map((nutrient) => {
                                   'name': nutrient.name,
-                                  'amount': nutrient.amount,
+                                  'amount': nutrient.amount * _serving,
+                                })
+                            .toList(),
+                        'ingredients': widget.meal.ingredients
+                            .map((ingredient) => {
+                                  'name_en': ingredient.name_en,
+                                  'name_vi': ingredient.name_vi,
+                                  'quantity': ingredient.quantity * _serving,
+                                  'calories': ingredient.calories * _serving,
                                 })
                             .toList(),
                         'imageUrl': widget.imageUrl,
                         'loggedAt': DateFormat('yyyy-MM-dd').format(now),
-                        "userId": userId,
+                        'userId': userId,
+                        'type': selectedMealType,
                       };
 
                       await FirebaseFirestore.instance
@@ -420,14 +447,15 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text((nutrient)),
-          Text(amount.toString()),
+          Text('${(amount * _serving).toStringAsFixed(1)} g'),
+          // Text((amount * _serving).toString()),
         ],
       ),
     );
   }
 }
 
-Widget _buildIngredients(List<Ingredient> ingredients) {
+Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
   return Column(
     children: ingredients.map((ingredient) {
       return Row(
@@ -437,10 +465,16 @@ Widget _buildIngredients(List<Ingredient> ingredients) {
             child: Text(ingredient.name_vi),
           ),
           Expanded(
-            child: Text("${ingredient.quantity}g"),
+            child: Align(
+                alignment: Alignment.center,
+                child: Text("${(ingredient.quantity * serving)} g")),
           ),
           Expanded(
-            child: Text("${ingredient.colories}Cal"),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                  "${(ingredient.calories * serving).toStringAsFixed(1)} Cal"),
+            ),
           ),
         ],
       );
@@ -461,7 +495,6 @@ Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               isDense: true,
-              // suffixText: nutrient.unit, // Sử dụng đơn vị của nutrient
             ),
           ),
         ),

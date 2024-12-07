@@ -6,18 +6,26 @@ class WaterTrackerWidget extends StatefulWidget {
 }
 
 class _WaterTrackerWidgetState extends State<WaterTrackerWidget> {
-  // Danh sách các trạng thái ly nước (true là đã uống, false là chưa uống)
   List<bool> _waterGlasses = List.generate(10, (index) => false);
-  int _currentGlass = 0; // Ly nước hiện tại có dấu cộng
-  int _oz = 0; // Tổng oz đã uống
+  int _currentGlass = 0;
+  int _oz = 0;
 
-  // Hàm cập nhật trạng thái khi nhấn vào dấu cộng
   void _drinkWater() {
     if (_currentGlass < _waterGlasses.length) {
       setState(() {
-        _waterGlasses[_currentGlass] = true; // Đánh dấu ly hiện tại đã uống
-        _currentGlass++; // Chuyển sang ly tiếp theo
-        _oz += 8; // Mỗi ly là 8 oz
+        _waterGlasses[_currentGlass] = true;
+        _currentGlass++;
+        _oz += 8;
+      });
+    }
+  }
+
+  void _removeWater(int index) {
+    if (index < _currentGlass && index >= 0) {
+      setState(() {
+        _waterGlasses[index] = false;
+        _currentGlass--;
+        _oz -= 8;
       });
     }
   }
@@ -59,7 +67,13 @@ class _WaterTrackerWidgetState extends State<WaterTrackerWidget> {
                   _waterGlasses.length,
                   (index) {
                     return GestureDetector(
-                      onTap: index == _currentGlass ? _drinkWater : null,
+                      onTap: () {
+                        if (index == _currentGlass) {
+                          _drinkWater();
+                        } else if (index < _currentGlass) {
+                          _removeWater(index);
+                        }
+                      },
                       child: Stack(
                         alignment: Alignment.center,
                         children: [

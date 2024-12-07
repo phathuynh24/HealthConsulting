@@ -1,6 +1,7 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_recommendation/enter_symptoms/sc_enter_symptoms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GetStartedScreen extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         child: Column(
           children: [
             Container(
-              height: 350,
+              height: 350.h,
               child: Image.asset(
                 'assets/recommendation/get_started.png',
                 fit: BoxFit.contain,
@@ -69,7 +70,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
               ),
             ),
             SizedBox(
-              height: 100.0,
+              height: 100.h,
             ),
             GestureDetector(
               onTap: () {
@@ -78,8 +79,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 );
               },
               child: Container(
-                width: 250,
-                height: 80,
+                width: 250.w,
+                height: 80.h,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -105,8 +106,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
-                      height: 60,
-                      width: 60,
+                      height: 60.h,
+                      width: 60.w,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [

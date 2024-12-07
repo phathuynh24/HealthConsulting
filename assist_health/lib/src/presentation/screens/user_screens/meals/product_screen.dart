@@ -82,8 +82,10 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: foodName,
-                weight: "${servingWeight}g",
-                calories: calories.toInt(),
+                // weight: "${servingWeight}g",
+
+                weight: servingWeight,
+                calories: calories,
                 nutrients: nutrients,
                 ingredients: [],
               ),
@@ -143,7 +145,7 @@ class _Screen2State extends State<Screen2> {
             name_en: nameEnglish[nameEnglish.indexOf(name)],
             name_vi: nameVietnamese[nameEnglish.indexOf(name)],
             quantity: double.tryParse(quantity.split(" ")[0]) ?? 0.0,
-            colories: ingredientCalories,
+            calories: ingredientCalories,
           );
         }).toList());
 
@@ -153,8 +155,9 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: dishName,
-                weight: "${totalWeight} g",
-                calories: calories.toInt(),
+                // weight: "${totalWeight} g",
+                weight: totalWeight,
+                calories: calories,
                 nutrients: nutrients,
                 ingredients: ingredientsList,
               ),
