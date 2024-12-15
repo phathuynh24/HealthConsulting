@@ -27,6 +27,9 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
 
   double _serving = 1;
 
+  TextEditingController _mealNameController = TextEditingController();
+  bool isFavorite = false;
+
   String _formatServingValue(double serving) {
     if (serving < 1) {
       int index = _fractionValuesNumeric
@@ -45,6 +48,12 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         _serving = _serving <= 1 ? _serving - 0.25 : _serving - 1;
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _mealNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,13 +109,24 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               Image.file(File(widget.imageUrl))
             else
               const SizedBox(height: 16.0),
-
-            Text(
-              widget.meal.name,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+            // Save to favorite
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.meal.name,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _showSaveMealDialog();
+                  },
+                  icon: isFavorite ? Icon(Icons.favorite, color: Colors.red) : Icon(Icons.favorite_border, color: Colors.red),
+                ),
+              ],
             ),
             SizedBox(height: 16),
             // Nutrition Estimate Table
@@ -276,7 +296,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(child: Text("Tổng cộng")),
-                        // Expanded(child: Text(widget.meal.weight)),
                         Expanded(
                             child: Align(
                           alignment: Alignment.center,
@@ -451,6 +470,77 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
           // Text((amount * _serving).toString()),
         ],
       ),
+    );
+  }
+
+  void _showSaveMealDialog() {
+    // Get default meal name
+    _mealNameController.text = widget.meal.name;
+
+    // Show modal bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Lưu món ăn",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _mealNameController,
+                  decoration: InputDecoration(
+                    labelText: "Đặt tên riêng cho món ăn",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_mealNameController.text.isNotEmpty) {
+                      // Save meal to database
+                      print("Món ăn đã được lưu: ${_mealNameController.text}");
+                      // Close modal
+                      Navigator.pop(context);
+                      // Update UI
+                      setState(() {
+                        isFavorite = true;
+                      });
+                      // Show snackbar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Món ăn đã được lưu thành công!"),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Vui lòng nhập tên món ăn!"),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text("Lưu món ăn"),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

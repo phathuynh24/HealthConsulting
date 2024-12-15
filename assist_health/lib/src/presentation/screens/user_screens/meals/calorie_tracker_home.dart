@@ -1,4 +1,5 @@
 import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/water_tracker_widget.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/product_scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +70,6 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
 
           return Column(
             children: [
-              _buildBanner(),
-              SizedBox(height: 16),
               _buildCalorieSummary(totalCalories),
               SizedBox(height: 16),
               Expanded(
@@ -110,25 +109,15 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
         showSelectedLabels: true,
         showUnselectedLabels: true,
       ),
-    );
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      padding: EdgeInsets.all(12),
-      color: Colors.brown.shade700,
-      child: Row(
-        children: [
-          Icon(Icons.mail, color: Colors.white),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              "Your free 7-day Premium hasn't been claimed yet. Tap to claim",
-              style: TextStyle(color: Colors.white),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ProductScanScreen(),
             ),
-          ),
-          Icon(Icons.arrow_forward, color: Colors.white),
-        ],
+          );
+        },
+        child: Icon(Icons.camera_alt),
       ),
     );
   }

@@ -35,7 +35,6 @@ class _Screen2State extends State<Screen2> {
       ..fields['description'] =
           _descriptionController.text; // Add description as form field
 
-    // try {
     var response = await request.send();
     setState(() {
       isLoading = false;
@@ -70,7 +69,6 @@ class _Screen2State extends State<Screen2> {
                 0.0;
 
         List<Nutrition> nutrients = [
-          // Nutrition(name: "Calories", amount: calories),
           Nutrition(name: "Protein", amount: protein),
           Nutrition(name: "Total Carbohydrate", amount: totalCarbs),
           Nutrition(name: "Total Fat", amount: totalFat),
@@ -82,8 +80,6 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: foodName,
-                // weight: "${servingWeight}g",
-
                 weight: servingWeight,
                 calories: calories,
                 nutrients: nutrients,
@@ -155,7 +151,6 @@ class _Screen2State extends State<Screen2> {
             builder: (context) => MealHomeScreen(
               meal: Meal(
                 name: dishName,
-                // weight: "${totalWeight} g",
                 weight: totalWeight,
                 calories: calories,
                 nutrients: nutrients,
@@ -172,34 +167,7 @@ class _Screen2State extends State<Screen2> {
       print("Failed to upload image: ${response.statusCode}");
     }
     isLoading = false;
-    // } catch (e) {
-    //   print("Error uploading image: $e");
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    //   showErrorDialog(context);
-    // }
   }
-
-  // void showErrorDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text("Error"),
-  //         content: Text("Failed to upload image. Please try again."),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //             child: Text("OK"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
