@@ -244,6 +244,9 @@ class _RecommendedResultsScreenState extends State<RecommendedResultsScreen> {
                                 doctor.groupDisease))
                             .toList();
                       }
+                      // Sort with rating
+                      filterDoctorWithGroupDisease.sort(
+                          (a, b) => b.rating.compareTo(a.rating));
                       return ListView.builder(
                         shrinkWrap: true,
                         padding: EdgeInsets.symmetric(vertical: 4),
