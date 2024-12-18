@@ -340,7 +340,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                                 fit: BoxFit.cover,
                               )
                             : Icon(Icons.fastfood),
-                        title: Text(meal['name'] ?? ''),
+                        title: Text(meal['originalName'] ?? ''),
                         subtitle: Text(
                           meal['loggedAt'] ?? '',
                         )));
