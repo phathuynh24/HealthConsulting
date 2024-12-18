@@ -27,9 +27,9 @@ class _UserNavBarState extends State<UserNavBar> {
     // Schedule Screen
     const ScheduleScreen(),
     // Product Scan Screen
-    ProductScanScreen(),
-    // // Meals Screen
-    // CalorieTrackerHome(),
+    // ProductScanScreen(),
+    // Meals Screen
+    CalorieTrackerHome(),
     // Public Chat Screen
     const PublicQuestionsScreen(),
     // Messages Screen
@@ -73,7 +73,7 @@ class _UserNavBarState extends State<UserNavBar> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.restaurant_menu),
-              label: "Dinh duỡng",
+              label: "Dinh dưỡng",
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.person_3_fill),
