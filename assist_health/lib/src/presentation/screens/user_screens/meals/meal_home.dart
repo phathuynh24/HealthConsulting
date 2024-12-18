@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/health_rating_widget.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/favorite_meals.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +14,9 @@ import 'meal.dart';
 class MealHomeScreen extends StatefulWidget {
   final Meal meal;
   final String imageUrl;
+  final bool isFavorite;
 
-  MealHomeScreen({required this.meal, required this.imageUrl});
+  MealHomeScreen({required this.meal, required this.imageUrl, this.isFavorite = false});
 
   @override
   State<MealHomeScreen> createState() => _MealHomeScreenState();
@@ -28,7 +30,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   double _serving = 1;
 
   TextEditingController _mealNameController = TextEditingController();
-  bool isFavorite = false;
+  late bool isFavorite; 
 
   String _formatServingValue(double serving) {
     if (serving < 1) {
@@ -48,6 +50,13 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         _serving = _serving <= 1 ? _serving - 0.25 : _serving - 1;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorite = widget.isFavorite;
+    _checkIfFavorite();
   }
 
   @override
@@ -120,12 +129,59 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    _showSaveMealDialog();
-                  },
-                  icon: isFavorite ? Icon(Icons.favorite, color: Colors.red) : Icon(Icons.favorite_border, color: Colors.red),
-                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlue[50],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Favorite button
+                      IconButton(
+                        onPressed: () async {
+                          if (isFavorite) {
+                            await _removeFavoriteMeal();
+                          } else {
+                            _showSaveMealDialog();
+                          }
+                        },
+                        icon: isFavorite
+                            ? Icon(Icons.favorite, color: Colors.red)
+                            : Icon(Icons.favorite_border, color: Colors.red),
+                      ),
+                      // Move to favorite meals screen
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FavoriteMealsScreen()),
+                          );
+                        },
+                        child: Text(
+                          "Danh sách yêu thích",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                            decorationColor: Colors
+                                .blue,
+                            decorationThickness: 1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
             SizedBox(height: 16),
@@ -302,7 +358,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                           child: Text(
                               "${(widget.meal.weight * _serving).toStringAsFixed(1)} g"),
                         )),
-
                         Expanded(
                             child: Align(
                           alignment: Alignment.centerRight,
@@ -393,63 +448,25 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.lightBlue[100],
                   ),
-                  child: Text("Try another"),
+                  child: Text("Thử lại"),
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    try {
-                      User? user = FirebaseAuth.instance.currentUser;
-                      if (user == null) {
-                        print("User is not logged in!");
-                        return;
-                      }
-                      String userId = user.uid;
-
-                      DateTime now = DateTime.now();
-
-                      Map<String, dynamic> mealData = {
-                        'name': widget.meal.name,
-                        'calories': widget.meal.calories * _serving,
-                        'weight': widget.meal.weight * _serving,
-                        'nutrients': widget.meal.nutrients
-                            .map((nutrient) => {
-                                  'name': nutrient.name,
-                                  'amount': nutrient.amount * _serving,
-                                })
-                            .toList(),
-                        'ingredients': widget.meal.ingredients
-                            .map((ingredient) => {
-                                  'name_en': ingredient.name_en,
-                                  'name_vi': ingredient.name_vi,
-                                  'quantity': ingredient.quantity * _serving,
-                                  'calories': ingredient.calories * _serving,
-                                })
-                            .toList(),
-                        'imageUrl': widget.imageUrl,
-                        'loggedAt': DateFormat('yyyy-MM-dd').format(now),
-                        'userId': userId,
-                        'type': selectedMealType,
-                      };
-
-                      await FirebaseFirestore.instance
-                          .collection('logged_meals')
-                          .add(mealData);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Meal logged successfully!')),
-                      );
-                    } catch (e) {
-                      // Xử lý lỗi
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to log meal: $e')),
-                      );
-                    }
+                    await saveMealData(
+                      context,
+                      widget.meal,
+                      widget.imageUrl,
+                      _serving,
+                      selectedMealType,
+                      false, // isFavorite = false -> log meal
+                      "", // Log meal without custom name
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.yellow[700],
                   ),
-                  child: Text("Log This Meal"),
+                  child: Text("Lưu vào nhật ký"),
                 ),
               ],
             ),
@@ -473,11 +490,30 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     );
   }
 
+  void _checkIfFavorite() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    String userId = user.uid;
+
+    // Check if the meal is in the favorite list
+    var snapshot = await FirebaseFirestore.instance
+        .collection('favorites')
+        .where('userId', isEqualTo: userId)
+        .where('originalName', isEqualTo: widget.meal.name)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      setState(() {
+        isFavorite = true; // Favorite meal
+      });
+    }
+  }
+
   void _showSaveMealDialog() {
-    // Get default meal name
+    // Set tên mặc định ban đầu cho món ăn
     _mealNameController.text = widget.meal.name;
 
-    // Show modal bottom sheet
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -486,20 +522,21 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
       ),
       builder: (BuildContext context) {
         return Padding(
-          padding: MediaQuery.of(context).viewInsets,
+          padding:
+              MediaQuery.of(context).viewInsets, // Đẩy lên khi bàn phím hiện ra
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Tiêu đề
                 Text(
-                  "Lưu món ăn",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  "Lưu món ăn yêu thích",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
+
+                // Ô nhập tên món ăn
                 TextField(
                   controller: _mealNameController,
                   decoration: InputDecoration(
@@ -508,31 +545,66 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
+
+                // Nút lưu món ăn
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_mealNameController.text.isNotEmpty) {
-                      // Save meal to database
-                      print("Món ăn đã được lưu: ${_mealNameController.text}");
-                      // Close modal
+                      // Gọi hàm saveMealData để lưu món yêu thích
+                      await saveMealData(
+                        context,
+                        widget.meal, // Dữ liệu món ăn
+                        widget.imageUrl, // Ảnh món ăn
+                        _serving, // Số lượng khẩu phần
+                        "favorite", // Type là favorite
+                        true, // isFavorite = true
+                        _mealNameController.text, // Tên do user đặt
+                      );
+
+                      // Đóng modal
                       Navigator.pop(context);
-                      // Update UI
+
+                      // Cập nhật trạng thái UI
                       setState(() {
                         isFavorite = true;
                       });
-                      // Show snackbar
+
+                      // Hiển thị thông báo SnackBar
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Món ăn đã được lưu thành công!"),
+                          content: Text(
+                              "Món ăn đã được thêm vào danh sách yêu thích!",
+                              style: TextStyle(color: Colors.white)),
+                          backgroundColor: Colors.green,
+                          action: SnackBarAction(
+                            label: 'Xem danh sách',
+                            textColor: Colors.white,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        FavoriteMealsScreen()),
+                              );
+                            },
+                          ),
                         ),
                       );
                     } else {
+                      // Thông báo lỗi khi không nhập tên
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Vui lòng nhập tên món ăn!"),
+                          content: Text("Vui lòng nhập tên món ăn!",
+                              style: TextStyle(color: Colors.white)),
+                          backgroundColor: Colors.red,
                         ),
                       );
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.yellow[700],
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text("Lưu món ăn"),
                 ),
                 SizedBox(height: 10),
@@ -542,6 +614,137 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         );
       },
     );
+  }
+
+  Future<void> saveMealData(
+      BuildContext context,
+      dynamic meal,
+      String imageUrl,
+      double serving,
+      String selectedMealType,
+      bool isFavorite,
+      String customName) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print("User is not logged in!");
+        return;
+      }
+
+      String userId = user.uid;
+      DateTime now = DateTime.now();
+
+      // Create data for meal
+      Map<String, dynamic> mealData = {
+        'customName': customName, // User-defined name
+        'originalName': meal.name, // Default name
+        'calories': meal.calories * serving,
+        'weight': meal.weight * serving,
+        'nutrients': meal.nutrients
+            .map((nutrient) => {
+                  'name': nutrient.name,
+                  'amount': nutrient.amount * serving,
+                })
+            .toList(),
+        'ingredients': meal.ingredients
+            .map((ingredient) => {
+                  'name_en': ingredient.name_en,
+                  'name_vi': ingredient.name_vi,
+                  'quantity': ingredient.quantity * serving,
+                  'calories': ingredient.calories * serving,
+                })
+            .toList(),
+        'imageUrl': imageUrl,
+        'userId': userId,
+        'loggedAt': isFavorite
+            ? null
+            : DateFormat('yyyy-MM-dd')
+                .format(now), // Date when the meal is logged
+        'type': isFavorite ? 'favorite' : selectedMealType, // Meal type
+        'isFavorite': isFavorite,
+        'savedAt':
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(now), // Date when saved
+      };
+
+      // Collection name
+      String collectionName = isFavorite ? 'favorite_meals' : 'logged_meals';
+
+      // Add meal data to Firestore
+      await FirebaseFirestore.instance.collection(collectionName).add(mealData);
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isFavorite
+                ? 'Món ăn đã được thêm vào danh sách yêu thích!'
+                : 'Món ăn đã được lưu vào nhật ký!',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isFavorite
+                ? 'Đã xảy ra lỗi khi thêm món ăn vào danh sách yêu thích!'
+                : 'Đã xảy ra lỗi khi lưu món ăn vào nhật ký!',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _removeFavoriteMeal() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      String userId = user.uid;
+
+      // Find the favorite meal
+      var snapshot = await FirebaseFirestore.instance
+          .collection('favorite_meals')
+          .where('userId', isEqualTo: userId)
+          .where('originalName', isEqualTo: widget.meal.name)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await FirebaseFirestore.instance
+            .collection('favorite_meals')
+            .doc(doc.id)
+            .delete();
+      }
+
+      // Update UI
+      setState(() {
+        isFavorite = false;
+      });
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Món ăn đã được xoá khỏi danh sách yêu thích!",
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Đã xảy ra lỗi khi xoá món ăn khỏi danh sách yêu thích!",
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }
 
