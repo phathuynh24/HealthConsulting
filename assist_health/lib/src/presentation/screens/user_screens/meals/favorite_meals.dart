@@ -168,6 +168,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                             weight: weight,
                             nutrients: nutrients,
                             ingredients: ingredients,
+                            warnings: meal['warnings'] ?? "",
                           ),
                           imageUrl: imageUrl,
                           isFavorite: true,

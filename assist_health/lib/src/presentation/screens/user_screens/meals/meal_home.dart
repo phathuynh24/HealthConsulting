@@ -16,7 +16,8 @@ class MealHomeScreen extends StatefulWidget {
   final String imageUrl;
   final bool isFavorite;
 
-  MealHomeScreen({required this.meal, required this.imageUrl, this.isFavorite = false});
+  MealHomeScreen(
+      {required this.meal, required this.imageUrl, this.isFavorite = false});
 
   @override
   State<MealHomeScreen> createState() => _MealHomeScreenState();
@@ -30,7 +31,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   double _serving = 1;
 
   TextEditingController _mealNameController = TextEditingController();
-  late bool isFavorite; 
+  late bool isFavorite;
 
   String _formatServingValue(double serving) {
     if (serving < 1) {
@@ -173,8 +174,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                             color: Colors.blue,
                             fontSize: 14,
                             fontStyle: FontStyle.italic,
-                            decorationColor: Colors
-                                .blue,
+                            decorationColor: Colors.blue,
                             decorationThickness: 1,
                           ),
                         ),
@@ -405,6 +405,8 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               ),
               child: Text("Refine Result"),
             ),
+            SizedBox(height: 16),
+            _buildWarningWidget(warnings: widget.meal.warnings),
             SizedBox(height: 16),
             HealthRatingWidget(
               healthRating: // Example health rating (75%)
@@ -746,71 +748,203 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
       );
     }
   }
-}
 
-Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
-  return Column(
-    children: ingredients.map((ingredient) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildIngredients(List<Ingredient> ingredients, double serving) {
+    return Column(
+      children: ingredients.map((ingredient) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(ingredient.name_vi),
+            ),
+            Expanded(
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Text("${(ingredient.quantity * serving)} g")),
+            ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                    "${(ingredient.calories * serving).toStringAsFixed(1)} Cal"),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
         children: [
           Expanded(
-            child: Text(ingredient.name_vi),
-          ),
-          Expanded(
-            child: Align(
-                alignment: Alignment.center,
-                child: Text("${(ingredient.quantity * serving)} g")),
-          ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                  "${(ingredient.calories * serving).toStringAsFixed(1)} Cal"),
+            flex: 2,
+            child: TextField(
+              controller:
+                  TextEditingController(text: nutrient.amount.toString()),
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
             ),
+          ),
+          SizedBox(width: 8),
+          Expanded(
+            flex: 5,
+            child: TextField(
+              controller: TextEditingController(text: nutrient.name),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                isDense: true,
+                hintText: isAddMore ? "Add more food" : null,
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          IconButton(
+            icon: Icon(isAddMore ? Icons.add : Icons.close),
+            onPressed: () {
+              // Handle add or remove action
+            },
           ),
         ],
-      );
-    }).toList(),
-  );
-}
+      ),
+    );
+  }
 
-Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: TextField(
-            controller: TextEditingController(text: nutrient.amount.toString()),
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              isDense: true,
-            ),
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          flex: 5,
-          child: TextField(
-            controller: TextEditingController(text: nutrient.name),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              isDense: true,
-              hintText: isAddMore ? "Add more food" : null,
-            ),
-          ),
-        ),
-        SizedBox(width: 8),
-        IconButton(
-          icon: Icon(isAddMore ? Icons.add : Icons.close),
-          onPressed: () {
-            // Handle add or remove action
-          },
-        ),
-      ],
-    ),
-  );
+  Widget _buildWarningWidget({required List<dynamic> warnings}) {
+    bool _isExpanded = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return warnings.isEmpty
+            ? Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "Món ăn này an toàn và phù hợp với sức khỏe.",
+                        style: TextStyle(
+                          color: Colors.green[800],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.red,
+                            size: 24,
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Có ${warnings.length} cảnh báo dinh dưỡng",
+                              style: TextStyle(
+                                color: Colors.red[800],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            _isExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.red,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_isExpanded)
+                      Column(
+                        children: warnings.map((warning) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Container(
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.warning,
+                                      color: Colors.red, size: 20),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      warning,
+                                      style: TextStyle(
+                                        color: Colors.red[700],
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                  ],
+                ),
+              );
+      },
+    );
+  }
 }

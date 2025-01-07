@@ -1,3 +1,7 @@
+import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/meal.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/meal_home.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/recipe_recommendation_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/water_tracker_widget.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/product_scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,19 +20,60 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   title: Text(
+      //     (selectedDate.year == DateTime.now().year &&
+      //             selectedDate.month == DateTime.now().month &&
+      //             selectedDate.day == DateTime.now().day)
+      //         ? "Today"
+      //         : DateFormat('dd-MM-yyyy').format(selectedDate),
+      //     style: TextStyle(color: Colors.black),
+      //   ),
+      //   backgroundColor: Colors.white,
+      //   elevation: 0,
+      //   leading: IconButton(
+      //     icon: Icon(Icons.arrow_back, color: Colors.green),
+      //     onPressed: () {
+      //       setState(() {
+      //         selectedDate = selectedDate.subtract(Duration(days: 1));
+      //       });
+      //     },
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.arrow_forward, color: Colors.green),
+      //       onPressed: () {
+      //         setState(() {
+      //           selectedDate = selectedDate.add(Duration(days: 1));
+      //         });
+      //       },
+      //     ),
+      //   ],
+      // ),
       appBar: AppBar(
-        title: Text(
-          (selectedDate.year == DateTime.now().year &&
-                  selectedDate.month == DateTime.now().month &&
-                  selectedDate.day == DateTime.now().day)
-              ? "Today"
-              : DateFormat('dd-MM-yyyy').format(selectedDate),
-          style: TextStyle(color: Colors.black),
+        title: Center(
+          child: Text(
+            (selectedDate.year == DateTime.now().year &&
+                    selectedDate.month == DateTime.now().month &&
+                    selectedDate.day == DateTime.now().day)
+                ? "Hôm nay"
+                : DateFormat('dd-MM-yyyy').format(selectedDate),
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.green),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             setState(() {
               selectedDate = selectedDate.subtract(Duration(days: 1));
@@ -37,7 +82,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.arrow_forward, color: Colors.green),
+            icon: Icon(Icons.arrow_forward, color: Colors.white),
             onPressed: () {
               setState(() {
                 selectedDate = selectedDate.add(Duration(days: 1));
@@ -93,22 +138,22 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: "Diary"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard), label: "Dashboard"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add, color: Colors.green), label: ""),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant_menu), label: "Recipes"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Mine"),
-        ],
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   items: [
+      //     BottomNavigationBarItem(icon: Icon(Icons.book), label: "Diary"),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.dashboard), label: "Dashboard"),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.add, color: Colors.green), label: ""),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.restaurant_menu), label: "Recipes"),
+      //     BottomNavigationBarItem(icon: Icon(Icons.person), label: "Mine"),
+      //   ],
+      //   selectedItemColor: Colors.green,
+      //   unselectedItemColor: Colors.grey,
+      //   showSelectedLabels: true,
+      //   showUnselectedLabels: true,
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -295,6 +340,13 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
     return ListTile(
       leading: Icon(icon, color: Colors.orange),
       title: Text(title, style: TextStyle(fontSize: 18)),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => RecipeRecommendationScreen(),
+          ),
+        );
+      },
     );
   }
 
@@ -340,10 +392,21 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                                 fit: BoxFit.cover,
                               )
                             : Icon(Icons.fastfood),
-                        title: Text(meal['originalName'] ?? ''),
+                        title: Text(meal['name'] ?? ''),
                         subtitle: Text(
                           meal['loggedAt'] ?? '',
-                        )));
+                        ),
+                         onTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => MealHomeScreen(
+                        //       meal: Meal.fromMap(meal),
+                        //       imageUrl: meal['imageUrl'] ?? '',
+                        //     ),
+                        //   ),
+                        // );
+                      },));
               },
             );
           },
