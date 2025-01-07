@@ -5,6 +5,7 @@ class Meal {
   final double calories;
   final List<Nutrition> nutrients;
   final List<Ingredient> ingredients;
+  final List<dynamic> warnings;
 
   Meal({
     required this.name,
@@ -12,6 +13,7 @@ class Meal {
     required this.calories,
     required this.nutrients,
     required this.ingredients,
+    required this.warnings,
   });
 }
 
@@ -37,4 +39,12 @@ class Nutrition {
     required this.name,
     required this.amount,
   });
+
+  // Phương thức fromMap
+  factory Nutrition.fromMap(Map<String, dynamic> map) {
+    return Nutrition(
+      name: map['name'] ?? '',
+      amount: (map['amount'] ?? 0).toDouble(),
+    );
+  }
 }

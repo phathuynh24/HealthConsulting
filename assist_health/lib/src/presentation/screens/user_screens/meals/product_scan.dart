@@ -21,7 +21,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
       setState(() {
         _image = File(pickedFile.path);
       });
-      _navigateToScreen2();
+      _navigateToProductScreen();
     }
   }
 
@@ -33,7 +33,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
       setState(() {
         _image = File(pickedFile.path);
       });
-      _navigateToScreen2();
+      _navigateToProductScreen();
     }
   }
 
@@ -46,11 +46,11 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
     );
   }
 
-  void _navigateToScreen2() {
+  void _navigateToProductScreen() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Screen2(image: _image!),
+        builder: (context) => ProductScreen(image: _image!),
       ),
     );
   }
