@@ -16,8 +16,11 @@ class MealHomeScreen extends StatefulWidget {
   final String imageUrl;
   final bool isFavorite;
 
-  MealHomeScreen(
-      {required this.meal, required this.imageUrl, this.isFavorite = false});
+  const MealHomeScreen(
+      {super.key,
+      required this.meal,
+      required this.imageUrl,
+      this.isFavorite = false});
 
   @override
   State<MealHomeScreen> createState() => _MealHomeScreenState();
@@ -30,7 +33,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
 
   double _serving = 1;
 
-  TextEditingController _mealNameController = TextEditingController();
+  final TextEditingController _mealNameController = TextEditingController();
   late bool isFavorite;
 
   String _formatServingValue(double serving) {
@@ -53,6 +56,148 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     });
   }
 
+  void _showEditIngredientsModal(BuildContext context) {
+    // Tạo danh sách controllers cho từng trường
+    List<TextEditingController> nameControllers = widget.meal.ingredients
+        .map((ingredient) => TextEditingController(text: ingredient.name_vi))
+        .toList();
+    List<TextEditingController> caloriesControllers = widget.meal.ingredients
+        .map((ingredient) =>
+            TextEditingController(text: ingredient.calories.toString()))
+        .toList();
+    List<TextEditingController> quantitiesControllers = widget.meal.ingredients
+        .map((ingredient) =>
+            TextEditingController(text: ingredient.quantity.toString()))
+        .toList();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 16,
+            left: 16,
+            right: 16,
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Hủy",
+                          style: TextStyle(color: Colors.grey)),
+                    ),
+                    const Text(
+                      "Chỉnh sửa",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        List<Ingredient> updatedIngredients = [];
+                        for (int i = 0; i < nameControllers.length; i++) {
+                          updatedIngredients.add(
+                            Ingredient(
+                              name_vi: nameControllers[i].text,
+                              calories: double.tryParse(
+                                      caloriesControllers[i].text) ??
+                                  0,
+                              quantity: double.tryParse(
+                                      quantitiesControllers[i].text) ??
+                                  0.0,
+                              name_en: nameControllers[i].text,
+                            ),
+                          );
+                        }
+
+                        setState(() {
+                          widget.meal.ingredients = updatedIngredients
+                              .map((ingredient) => Ingredient(
+                                    name_vi: ingredient.name_vi,
+                                    name_en: ingredient.name_en,
+                                    calories: ingredient.calories,
+                                    quantity: ingredient.quantity,
+                                  ))
+                              .toList();
+                        });
+
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Regenerate",
+                          style: TextStyle(color: Colors.green)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: nameControllers.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Cột Name
+                            Expanded(
+                              flex: 3,
+                              child: TextField(
+                                controller: nameControllers[index],
+                                decoration: const InputDecoration(
+                                  labelText: 'Name',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Cột Calories
+                            Expanded(
+                              flex: 2,
+                              child: TextField(
+                                controller: caloriesControllers[index],
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Calories',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Cột Quantity
+                            Expanded(
+                              flex: 2,
+                              child: TextField(
+                                controller: quantitiesControllers[index],
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +216,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: Text('Nutrition Detail'),
+        title: const Text('Chi tiết dinh dưỡng'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -85,11 +230,11 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         actions: [
           DropdownButton<String>(
             value: selectedMealType,
-            hint: Text(
+            hint: const Text(
               "Chọn buổi",
               style: TextStyle(color: Colors.white),
             ),
-            dropdownColor: Colors.blueGrey,
+            dropdownColor: Colors.white,
             items: ['Buổi sáng', 'Buổi trưa', 'Buổi tối', 'Ăn vặt']
                 .map((type) => DropdownMenuItem<String>(
                       value: type,
@@ -123,8 +268,9 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  widget.meal.name,
+                const Text(
+                  // widget.meal.name,
+                  'a',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -139,7 +285,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                         color: Colors.grey.withOpacity(0.2),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
@@ -156,8 +302,9 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                           }
                         },
                         icon: isFavorite
-                            ? Icon(Icons.favorite, color: Colors.red)
-                            : Icon(Icons.favorite_border, color: Colors.red),
+                            ? const Icon(Icons.favorite, color: Colors.red)
+                            : const Icon(Icons.favorite_border,
+                                color: Colors.red),
                       ),
                       // Move to favorite meals screen
                       TextButton(
@@ -168,7 +315,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                                 builder: (context) => FavoriteMealsScreen()),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           "Danh sách yêu thích",
                           style: TextStyle(
                             color: Colors.blue,
@@ -184,7 +331,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 )
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             // Nutrition Estimate Table
             Container(
               decoration: BoxDecoration(
@@ -196,8 +343,8 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 children: [
                   Container(
                     height: 50,
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
                       color: Color.fromARGB(132, 141, 185, 66),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(8),
@@ -208,7 +355,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Nutrition Estimate",
+                          "Phân tích dinh dưỡng",
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
@@ -216,117 +363,28 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                           ),
                         ),
                         IconButton(
-                            onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                      top: Radius.circular(20)),
-                                ),
-                                builder: (context) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(
-                                      bottom: MediaQuery.of(context)
-                                          .viewInsets
-                                          .bottom,
-                                      top: 16,
-                                      left: 16,
-                                      right: 16,
-                                    ),
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.5,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Cancel",
-                                                    style: TextStyle(
-                                                        color: Colors.grey)),
-                                              ),
-                                              Text(
-                                                "Edit",
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  // Code for regenerate action
-                                                },
-                                                child: Text("Regenerate",
-                                                    style: TextStyle(
-                                                        color: Colors.green)),
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Text(
-                                              "Updating the content will use 1 daily use",
-                                              style:
-                                                  TextStyle(color: Colors.grey),
-                                            ),
-                                          ),
-                                          SizedBox(height: 16),
-                                          Expanded(
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                children: widget.meal.nutrients
-                                                    .where((nutrient) => ![
-                                                          "Calories",
-                                                          "Protein",
-                                                          "Total Carbohydrate",
-                                                          "Total Fat"
-                                                        ].contains(
-                                                            nutrient.name))
-                                                    .map((nutrient) =>
-                                                        _buildFoodItem(
-                                                            nutrient))
-                                                    .toList(),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 16),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            icon: SizedBox(child: Icon(Icons.edit))),
+                            onPressed: () => _showEditIngredientsModal(context),
+                            icon: const SizedBox(child: Icon(Icons.edit))),
                       ],
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
                       color: Colors.green,
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Food item",
+                          "Thành phần",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "Weight/Volume",
+                          "Trọng lượng",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -343,15 +401,15 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     child: _buildIngredients(widget.meal.ingredients, _serving),
                   ),
                   Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(child: Text("Tổng cộng")),
+                        const Expanded(child: Text("Tổng cộng")),
                         Expanded(
                             child: Align(
                           alignment: Alignment.center,
@@ -367,18 +425,18 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                       ],
                     ),
                   ),
-                  Divider(height: 1, color: Colors.grey),
+                  const Divider(height: 1, color: Colors.grey),
                   Container(
                     color: Colors.yellow[100],
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           "Nutrient",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         ...widget.meal.nutrients.map(
                           (nutrient) =>
                               _buildNutrientRow(nutrient.name, nutrient.amount),
@@ -389,11 +447,11 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return CalorieTrackerHome();
+                  return const CalorieTrackerHome();
                 }));
               },
               style: ElevatedButton.styleFrom(
@@ -403,44 +461,45 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text("Refine Result"),
+              child: const Text("Tra kết quả"),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildWarningWidget(warnings: widget.meal.warnings),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             HealthRatingWidget(
               healthRating: // Example health rating (75%)
                   (0.3 +
                       (0.7 - 0.3) *
-                          (new DateTime.now().millisecondsSinceEpoch % 1000) /
+                          (DateTime.now().millisecondsSinceEpoch % 1000) /
                           1000),
             ),
-            SizedBox(height: 16),
-            Text(
-              "The Amount Eaten (Serving)",
+            const SizedBox(height: 16),
+            const Text(
+              "Số lượng (Serving)",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
-                  icon: Icon(Icons.remove),
+                  icon: const Icon(Icons.remove),
                   onPressed: () => _updateServing(false),
                 ),
                 Text(
                   _formatServingValue(_serving),
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: Icon(Icons.add),
+                  icon: const Icon(Icons.add),
                   onPressed: () => _updateServing(true),
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -450,7 +509,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.lightBlue[100],
                   ),
-                  child: Text("Thử lại"),
+                  child: const Text("Thử lại"),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -468,7 +527,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.yellow[700],
                   ),
-                  child: Text("Lưu vào nhật ký"),
+                  child: const Text("Lưu vào nhật ký"),
                 ),
               ],
             ),
@@ -486,7 +545,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         children: [
           Text((nutrient)),
           Text('${(amount * _serving).toStringAsFixed(1)} g'),
-          // Text((amount * _serving).toString()),
         ],
       ),
     );
@@ -519,7 +577,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
@@ -532,21 +590,21 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Tiêu đề
-                Text(
+                const Text(
                   "Lưu món ăn yêu thích",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 // Ô nhập tên món ăn
                 TextField(
                   controller: _mealNameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: "Đặt tên riêng cho món ăn",
                     border: OutlineInputBorder(),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // Nút lưu món ăn
                 ElevatedButton(
@@ -574,7 +632,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                       // Hiển thị thông báo SnackBar
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
+                          content: const Text(
                               "Món ăn đã được thêm vào danh sách yêu thích!",
                               style: TextStyle(color: Colors.white)),
                           backgroundColor: Colors.green,
@@ -595,7 +653,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     } else {
                       // Thông báo lỗi khi không nhập tên
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text("Vui lòng nhập tên món ăn!",
                               style: TextStyle(color: Colors.white)),
                           backgroundColor: Colors.red,
@@ -607,9 +665,9 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     backgroundColor: Colors.yellow[700],
                     foregroundColor: Colors.white,
                   ),
-                  child: Text("Lưu món ăn"),
+                  child: const Text("Lưu món ăn"),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -681,7 +739,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
             isFavorite
                 ? 'Món ăn đã được thêm vào danh sách yêu thích!'
                 : 'Món ăn đã được lưu vào nhật ký!',
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.green,
         ),
@@ -694,7 +752,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
             isFavorite
                 ? 'Đã xảy ra lỗi khi thêm món ăn vào danh sách yêu thích!'
                 : 'Đã xảy ra lỗi khi lưu món ăn vào nhật ký!',
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
         ),
@@ -730,7 +788,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Món ăn đã được xoá khỏi danh sách yêu thích!",
               style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.green,
@@ -739,7 +797,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
     } catch (e) {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text(
               "Đã xảy ra lỗi khi xoá món ăn khỏi danh sách yêu thích!",
               style: TextStyle(color: Colors.white)),
@@ -787,25 +845,25 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
               controller:
                   TextEditingController(text: nutrient.amount.toString()),
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             flex: 5,
             child: TextField(
               controller: TextEditingController(text: nutrient.name),
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 isDense: true,
                 hintText: isAddMore ? "Add more food" : null,
               ),
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           IconButton(
             icon: Icon(isAddMore ? Icons.add : Icons.close),
             onPressed: () {
@@ -818,13 +876,13 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   }
 
   Widget _buildWarningWidget({required List<dynamic> warnings}) {
-    bool _isExpanded = false;
+    bool isExpanded = false;
 
     return StatefulBuilder(
       builder: (context, setState) {
         return warnings.isEmpty
             ? Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -832,14 +890,14 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     BoxShadow(
                       color: Colors.green.withOpacity(0.2),
                       blurRadius: 8,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 8),
+                    const Icon(Icons.check_circle, color: Colors.green),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         "Món ăn này an toàn và phù hợp với sức khỏe.",
@@ -854,7 +912,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 ),
               )
             : Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -862,7 +920,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     BoxShadow(
                       color: Colors.red.withOpacity(0.3),
                       blurRadius: 8,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -872,17 +930,17 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _isExpanded = !_isExpanded;
+                          isExpanded = !isExpanded;
                         });
                       },
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.warning_amber_rounded,
                             color: Colors.red,
                             size: 24,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               "Có ${warnings.length} cảnh báo dinh dưỡng",
@@ -894,7 +952,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                             ),
                           ),
                           Icon(
-                            _isExpanded
+                            isExpanded
                                 ? Icons.keyboard_arrow_up
                                 : Icons.keyboard_arrow_down,
                             color: Colors.red,
@@ -902,13 +960,13 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                         ],
                       ),
                     ),
-                    if (_isExpanded)
+                    if (isExpanded)
                       Column(
                         children: warnings.map((warning) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Container(
-                              padding: EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
@@ -916,15 +974,15 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                                   BoxShadow(
                                     color: Colors.grey.withOpacity(0.2),
                                     blurRadius: 4,
-                                    offset: Offset(0, 2),
+                                    offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
                               child: Row(
                                 children: [
-                                  Icon(Icons.warning,
+                                  const Icon(Icons.warning,
                                       color: Colors.red, size: 20),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       warning,

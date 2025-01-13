@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class ProductScanScreen extends StatefulWidget {
+  const ProductScanScreen({super.key});
+
   @override
   _ProductScanScreenState createState() => _ProductScanScreenState();
 }
@@ -41,7 +43,7 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TextEntryScreen(),
+        builder: (context) => const TextEntryScreen(),
       ),
     );
   }
@@ -102,17 +104,17 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Chọn một cách để bắt đầu",
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             IconButton(
               iconSize: 80,
-              icon: Icon(Icons.camera_alt, color: Themes.gradientDeepClr),
+              icon: const Icon(Icons.camera_alt, color: Themes.gradientDeepClr),
               onPressed: _pickImageFromCamera,
             ),
-            Text(
+            const Text(
               "Chụp ảnh",
               style: TextStyle(fontSize: 16, color: Themes.gradientLightClr),
             ),
@@ -150,6 +152,8 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
 }
 
 class TextEntryScreen extends StatelessWidget {
+  const TextEntryScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,7 +176,7 @@ class TextEntryScreen extends StatelessWidget {
         child: Column(
           children: [
             Image.asset('assets/describe_food.jpg'),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             TextField(
               // controller: ,
               style: TextStyle(color: Colors.grey[600]),

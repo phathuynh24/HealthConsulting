@@ -1,6 +1,7 @@
 import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/others/methods.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/favorite_doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
@@ -338,6 +339,44 @@ class _AccountScreenState extends State<AccountScreen> {
                                   ),
                                   title: const Text(
                                     "Đánh giá",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  trailing: const Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 10,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              DailyWorkoutScreen(), // Schedule Screen
+                                        ));
+                                  },
+                                  leading: const Icon(
+                                    Icons.fitness_center,
+                                    color: Colors.blueAccent,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Tập luyện",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15,

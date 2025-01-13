@@ -1,5 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/message.dart';
@@ -21,7 +22,6 @@ class _UserNavBarState extends State<UserNavBar> {
   final _screens = [
     // Home Screen
     const HomeScreen(),
-    // Schedule Screen
     const ScheduleScreen(),
     // Product Scan Screen
     // ProductScanScreen(),

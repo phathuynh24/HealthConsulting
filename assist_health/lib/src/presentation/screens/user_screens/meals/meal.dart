@@ -1,10 +1,9 @@
-// meal.dart
 class Meal {
   final String name;
   final double weight;
   final double calories;
   final List<Nutrition> nutrients;
-  final List<Ingredient> ingredients;
+  late final List<Ingredient> ingredients;
   final List<dynamic> warnings;
 
   Meal({
@@ -15,6 +14,24 @@ class Meal {
     required this.ingredients,
     required this.warnings,
   });
+
+  // Phương thức fromMap
+  factory Meal.fromMap(Map<String, dynamic> map) {
+    return Meal(
+      name: map['name'] ?? '',
+      weight: (map['weight'] ?? 0).toDouble(),
+      calories: (map['calories'] ?? 0).toDouble(),
+      nutrients: (map['nutrients'] as List<dynamic>?)
+              ?.map((item) => Nutrition.fromMap(item))
+              .toList() ??
+          [],
+      ingredients: (map['ingredients'] as List<dynamic>?)
+              ?.map((item) => Ingredient.fromMap(item))
+              .toList() ??
+          [],
+      warnings: map['warnings'] ?? [],
+    );
+  }
 }
 
 class Ingredient {
@@ -29,6 +46,16 @@ class Ingredient {
     required this.quantity,
     required this.calories,
   });
+
+  // Phương thức fromMap
+  factory Ingredient.fromMap(Map<String, dynamic> map) {
+    return Ingredient(
+      name_en: map['name_en'] ?? '',
+      name_vi: map['name_vi'] ?? '',
+      quantity: (map['quantity'] ?? 0).toDouble(),
+      calories: (map['calories'] ?? 0).toDouble(),
+    );
+  }
 }
 
 class Nutrition {

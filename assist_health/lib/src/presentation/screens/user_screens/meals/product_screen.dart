@@ -10,7 +10,7 @@ import 'dart:convert';
 class ProductScreen extends StatefulWidget {
   final File image;
 
-  ProductScreen({required this.image});
+  const ProductScreen({super.key, required this.image});
 
   @override
   _ProductScreenState createState() => _ProductScreenState();
@@ -360,7 +360,7 @@ class _ProductScreenState extends State<ProductScreen> {
                       ),
                     ),
                     if (isLoading)
-                      CircularProgressIndicator(
+                      const CircularProgressIndicator(
                         valueColor:
                             AlwaysStoppedAnimation<Color>(Color(0xFF1565C0)),
                       ),
@@ -387,7 +387,7 @@ class _ProductScreenState extends State<ProductScreen> {
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.blue),
+                      side: const BorderSide(color: Colors.blue),
                     ),
                   ),
                 ),
@@ -447,11 +447,11 @@ class _ProductScreenState extends State<ProductScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: const Color(0xFF64B5F6)),
+            borderSide: const BorderSide(color: Color(0xFF64B5F6)),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: const Color(0xFF1565C0), width: 2),
+            borderSide: const BorderSide(color: Color(0xFF1565C0), width: 2),
           ),
         ),
       ),
