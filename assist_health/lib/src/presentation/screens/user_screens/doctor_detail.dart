@@ -586,7 +586,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                       DateTime(_currentYear, _currentMonth,
                                           initDate!),
                                       height: 85,
-                                      width: 70,
+                                      width: 85,
                                       daysCount:
                                           _countTheRestDayOfSelectedMonth(),
                                       initialSelectedDate: _initialSelectedDate,

@@ -20,20 +20,10 @@ class UserNavBar extends StatefulWidget {
 class _UserNavBarState extends State<UserNavBar> {
   int _selectedIndex = 0;
   final _screens = [
-    // Home Screen
     const HomeScreen(),
     const ScheduleScreen(),
-    // Product Scan Screen
-    // ProductScanScreen(),
-    // Meals Screen
-    CalorieTrackerHome(),
-    // Public Chat Screen
     const PublicQuestionsScreen(),
-    // Messages Screen
     const MessageScreen(),
-    // Blog Screen
-    BlogListPage(),
-    // Account Screen
     const AccountScreen(),
   ];
 
@@ -69,20 +59,12 @@ class _UserNavBarState extends State<UserNavBar> {
               label: "Lịch khám",
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.restaurant_menu),
-              label: "Dinh dưỡng",
-            ),
-            BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.person_3_fill),
               label: "Cộng đồng",
             ),
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.chat_bubble_text_fill),
               label: "Tin nhắn",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.article_outlined),
-              label: "Bài viết",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

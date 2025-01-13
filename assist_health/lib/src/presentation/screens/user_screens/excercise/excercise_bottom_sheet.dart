@@ -9,7 +9,7 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
     builder: (context) {
@@ -36,48 +36,36 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                     ),
                     // Content container based on selection
                     Container(
-                      alignment: Alignment.topCenter,
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: selectedOption == 0
-                          ? Center(
-                              child: Image.asset(
-                                exercise.imageUrl, // First image URL
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Text('Unable to load image 1');
-                                },
-                              ),
-                            )
-                          : selectedOption == 1
-                              ? Center(
-                                  child: YoutubePlayer(
-                                    controller: YoutubePlayerController(
-                                      initialVideoId:
-                                          YoutubePlayer.convertUrlToId(
-                                              exercise.youtubeUrl)!,
-                                      flags: const YoutubePlayerFlags(
-                                        autoPlay: false,
-                                        mute: false,
-                                      ),
-                                    ),
-                                    showVideoProgressIndicator: true,
-                                  ),
-                                )
-                              : Center(
-                                  child: Image.network(
-                                    exercise.imageUrl, // Second image URL
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Text(
-                                          'Unable to load image 2');
-                                    },
-                                  ),
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: selectedOption == 0
+                            ? Center(
+                                child: Image.asset(
+                                  exercise.imageUrl, // First image URL
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Text('Unable to load image 1');
+                                  },
                                 ),
-                    ),
+                              )
+                            : Center(
+                                child: YoutubePlayer(
+                                  controller: YoutubePlayerController(
+                                    initialVideoId:
+                                        YoutubePlayer.convertUrlToId(
+                                            exercise.youtubeUrl)!,
+                                    flags: const YoutubePlayerFlags(
+                                      autoPlay: false,
+                                      mute: false,
+                                    ),
+                                  ),
+                                  showVideoProgressIndicator: true,
+                                ),
+                              )),
                     // Toggle buttons for options
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 16.0),
@@ -85,7 +73,6 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                         isSelected: [
                           selectedOption == 0,
                           selectedOption == 1,
-                          selectedOption == 2,
                         ],
                         onPressed: (int index) {
                           setState(() {
@@ -105,7 +92,6 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                         children: const [
                           Text('Hình ảnh'),
                           Text('Hướng dẫn'),
-                          Text('Nhóm cơ'),
                         ],
                       ),
                     ),
@@ -157,7 +143,7 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'MÔ TẢ',
                             style: TextStyle(
                                 fontSize: 20,

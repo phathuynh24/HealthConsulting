@@ -195,10 +195,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                                 );
                               },
                               style: ButtonStyle(
-                                fixedSize: MaterialStateProperty.all(const Size(
+                                fixedSize: WidgetStateProperty.all(const Size(
                                     300,
                                     0)), // Adjust the width and height here
-                                backgroundColor: MaterialStateProperty.all(
+                                backgroundColor: WidgetStateProperty.all(
                                     Themes.gradientLightClr),
                               ),
                             ),
@@ -471,7 +471,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           color: Colors.grey[200],
           // margin: const EdgeInsets.all(10),
           // padding: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -663,21 +663,20 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       print('Đơn hàng đã được lưu vào Firestore');
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Đơn hàng của bạn đã được đặt thành công!'),
-          duration: const Duration(seconds: 2), // Show Snackbar for 2 seconds
+        const SnackBar(
+          content: Text('Đơn hàng của bạn đã được đặt thành công!'),
+          duration: Duration(seconds: 2), // Show Snackbar for 2 seconds
           backgroundColor: Colors.green,
         ),
       );
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
       await clearUserCart();
     }).catchError((error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              const Text('Đã xảy ra lỗi khi lưu đơn hàng. Vui lòng thử lại.'),
-          duration: const Duration(seconds: 3),
+        const SnackBar(
+          content: Text('Đã xảy ra lỗi khi lưu đơn hàng. Vui lòng thử lại.'),
+          duration: Duration(seconds: 3),
           backgroundColor: Colors.red,
         ),
       );

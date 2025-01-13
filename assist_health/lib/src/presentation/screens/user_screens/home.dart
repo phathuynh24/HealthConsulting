@@ -5,13 +5,17 @@ import 'dart:async';
 import 'package:assist_health/src/models/doctor/doctor_info.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/chatbot/chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_recommendation/get_started/sc_get_started.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/favorite_doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/g_chatbot/germini_chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/view_result_list.dart';
@@ -387,7 +391,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: Container(
-                        height: 225,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                         ),
@@ -509,6 +512,57 @@ class _MyHomeScreen extends State<HomeScreen> {
                                       );
                                     },
                                   ),
+                                  itemDashboard(
+                                    'Dinh dưỡng',
+                                    Icons.restaurant_menu,
+                                    const Color(0xFFFFA726), // Màu cam sáng
+                                    const Color(0xFFFF7043), // Màu cam đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const CalorieTrackerHome()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
+                                    'Bài tập',
+                                    Icons.fitness_center,
+                                    const Color(0xFF42A5F5), // Màu xanh nhạt
+                                    const Color(0xFF1E88E5), // Màu xanh đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                DailyWorkoutScreen()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
+                                    'Bài viết',
+                                    Icons.article_outlined,
+                                    const Color(0xFF66BB6A), // Màu xanh lá nhạt
+                                    const Color(0xFF388E3C), // Màu xanh lá đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) => BlogListPage()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
+                                    'Danh sách quan tâm',
+                                    Icons.favorite,
+                                    const Color(0xFFE57373), // Màu đỏ nhạt
+                                    const Color(0xFFD32F2F), // Màu đỏ đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const FavoriteDoctorList()),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
@@ -519,7 +573,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                   ],
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 Container(
                   color: Colors.white,
@@ -760,14 +814,14 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 25, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFE5FDFF),
+                                  color: const Color(0xFFE5FDFF),
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.grey.withOpacity(0.5),
                                       spreadRadius: 2,
                                       blurRadius: 5,
-                                      offset: Offset(0, 3),
+                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
@@ -798,11 +852,11 @@ class _MyHomeScreen extends State<HomeScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => GeminiChatBot()),
+              MaterialPageRoute(builder: (_) => const GeminiChatBot()),
             );
           },
-          child: Icon(Icons.comment),
           backgroundColor: Colors.blue,
+          child: const Icon(Icons.comment),
         ),
       ),
     );
