@@ -1,3 +1,4 @@
+import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -341,7 +342,7 @@ class ExerciseListScreen extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue, Colors.lightBlue],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),

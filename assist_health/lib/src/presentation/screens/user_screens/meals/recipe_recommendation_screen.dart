@@ -1,12 +1,15 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/utils/base_url.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/recipe_detail_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class RecipeRecommendationScreen extends StatefulWidget {
-  const RecipeRecommendationScreen({super.key});
+  final double defaultCalories;
+  const RecipeRecommendationScreen({super.key, required this.defaultCalories});
 
   @override
   _RecipeRecommendationScreenState createState() =>
@@ -70,12 +73,76 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
     super.initState();
     _calculateRecommendedNutrition();
     _tabController = TabController(length: 2, vsync: this);
+    fetchSavedRecipes();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> fetchSavedRecipes() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("Người dùng chưa đăng nhập!");
+      }
+
+      String userId = user.uid;
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('saved_recipes')
+          .doc(userId)
+          .collection('recipes')
+          .get();
+
+      setState(() {
+        savedRecipes = snapshot.docs
+            .map((doc) => doc.data() as Map<String, dynamic>)
+            .toList();
+      });
+    } catch (e) {
+      print("Lỗi khi tải danh sách món ăn đã lưu: $e");
+    }
+  }
+
+  Future<void> _deleteSavedRecipe(int recipeId) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception("Người dùng chưa đăng nhập!");
+      }
+
+      String userId = user.uid;
+
+      await FirebaseFirestore.instance
+          .collection('saved_recipes')
+          .doc(userId)
+          .collection('recipes')
+          .doc(recipeId.toString())
+          .delete();
+
+      // Cập nhật danh sách
+      setState(() {
+        savedRecipes.removeWhere((recipe) => recipe['id'] == recipeId);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Món ăn đã được xóa!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print("Lỗi khi xóa món ăn: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lỗi khi xóa món ăn!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _calculateRecommendedNutrition() {
@@ -546,7 +613,6 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
   }
 
   Widget _buildSavedRecipesTab() {
-    // Tab Món đã lưu
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: savedRecipes.isEmpty
@@ -556,30 +622,89 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             )
-          : ListView.builder(
-              itemCount: savedRecipes.length,
-              itemBuilder: (context, index) {
-                final recipe = savedRecipes[index];
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 5,
-                  child: ListTile(
-                    leading: recipe['image'] != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(10.0),
-                            child: Image.network(recipe['image'],
-                                width: 60, height: 60, fit: BoxFit.cover),
-                          )
-                        : const Icon(Icons.bookmark, color: Colors.pinkAccent),
-                    title: Text(
-                      recipe['title_translated'] ?? 'Không có tiêu đề',
-                      style: const TextStyle(fontSize: 16),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    'Danh sách món ăn đã lưu:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
                     ),
                   ),
-                );
-              },
+                ),
+                ...savedRecipes.map((recipe) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 5,
+                    color: Colors.white,
+                    child: ListTile(
+                      leading: recipe['image'] != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Image.network(
+                                recipe['image'],
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : const Icon(Icons.fastfood,
+                              color: Colors.deepPurple),
+                      title: Text(
+                        recipe['title_translated'] ??
+                            'N/A',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                      subtitle: (recipe['nutrition'] != null &&
+                              recipe['nutrition']['nutrients'] != null)
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ...List.generate(
+                                  recipe['nutrition']['nutrients'].length,
+                                  (index) {
+                                    final nutrient =
+                                        recipe['nutrition']['nutrients'][index];
+                                    return Text(
+                                      '${nutrient['name']}: ${nutrient['amount']} ${nutrient['unit']}',
+                                      style: const TextStyle(fontSize: 14),
+                                    );
+                                  },
+                                ),
+                              ],
+                            )
+                          : const Text(
+                              'Không có thông tin dinh dưỡng.',
+                              style: TextStyle(fontSize: 14),
+                            ),
+                      onTap: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RecipeDetails(recipe: recipe),
+                          ),
+                        ),
+                      },
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await _deleteSavedRecipe(recipe['id']);
+                        },
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ],
             ),
     );
   }

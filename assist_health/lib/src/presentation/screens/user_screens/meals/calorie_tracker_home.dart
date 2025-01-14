@@ -19,6 +19,7 @@ class CalorieTrackerHome extends StatefulWidget {
 
 class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
   DateTime selectedDate = DateTime.now();
+  final remainingCalories = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +239,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                       },
                     ),
                     _buildMealEntry(
-                        "Báo cáo dinh dưỡng hàng ngày", Icons.fastfood),
+                        "Đề xuất món ăn", Icons.fastfood),
                     _buildMealTypeSection('Buổi sáng', Icons.breakfast_dining),
                     _buildMealTypeSection('Buổi trưa', Icons.lunch_dining),
                     _buildMealTypeSection('Buổi tối', Icons.dinner_dining),
@@ -608,7 +609,9 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const RecipeRecommendationScreen(),
+            builder: (context) => const RecipeRecommendationScreen(
+              defaultCalories: 2502,
+            ),
           ),
         );
       },
@@ -657,7 +660,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                               fit: BoxFit.cover,
                             )
                           : const Icon(Icons.fastfood),
-                      title: Text(meal['name'] ?? ''),
+                      title: Text(meal['customName'] ?? meal['originalName']),
                       subtitle: Text(
                         meal['loggedAt'] ?? '',
                       ),

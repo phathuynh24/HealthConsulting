@@ -200,197 +200,213 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: Text('Tập luyện tại nhà'),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(16),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => HistoryExercise()));
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Mục tiêu hàng tuần',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(7, (index) {
-                        int day = 22 + index;
-                        return Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: day == 25 ? Colors.blue : Colors.transparent,
-                            borderRadius: BorderRadius.circular(90),
-                          ),
-                          child: Text(
-                            '$day',
-                            style: TextStyle(
-                              color: day == 25 ? Colors.white : Colors.black,
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
+          appBar: AppBar(
+            foregroundColor: Colors.white,
+            title: Text('Tập luyện tại nhà'),
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
               ),
             ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'THỬ THÁCH 7x4',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+          ),
+          body: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HistoryExercise()));
+                    },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'TOÀN THÂN THỬ THÁCH 7x4',
-                          style: TextStyle(
+                          'Mục tiêu hàng tuần: ${DateTime.now().month}/${DateTime.now().year}',
+                          style: const TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn trong 4 tuần!',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                          ),
-                          child: Text(
-                            'KHỞI ĐẦU',
-                            style: TextStyle(color: Colors.blue),
-                          ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(7, (index) {
+                            DateTime today = DateTime.now(); // Lấy ngày hôm nay
+                            DateTime day = today.add(Duration(
+                                days: index -
+                                    3)); // Tính toán các ngày để hôm nay ở giữa
+                            bool isToday = day.day == today.day &&
+                                day.month == today.month &&
+                                day.year ==
+                                    today.year; // Kiểm tra nếu là ngày hôm nay
+
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color:
+                                    isToday ? Colors.blue : Colors.transparent,
+                                borderRadius: BorderRadius.circular(90),
+                              ),
+                              child: Text(
+                                '${day.day}', // Hiển thị ngày
+                                style: TextStyle(
+                                  color: isToday ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            );
+                          }),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'THỬ THÁCH 7x4',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'TOÀN THÂN THỬ THÁCH 7x4',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn trong 4 tuần!',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                              ),
+                              child: Text(
+                                'KHỞI ĐẦU',
+                                style: TextStyle(color: Colors.blue),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(),
+                // Beginner Section
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () => scrollToSection(beginnerKey),
+                            child: Expanded(
+                              child: Text(
+                                'Người bắt đầu',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => scrollToSection(intermediateKey),
+                            child: Expanded(
+                              child: Text(
+                                'Trung bình',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => scrollToSection(advancedKey),
+                            child: Expanded(
+                              child: Text(
+                                'Nâng cao',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      Column(
+                        key: beginnerKey,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildWorkoutSection(
+                              'Người Bắt Đầu', beginnerWorkouts),
+                        ],
+                      ),
+                      // Intermediate Section
+                      Column(
+                        key: intermediateKey,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildWorkoutSection(
+                              'Trung Bình', intermediateWorkouts),
+                        ],
+                      ),
+                      // Advanced Section
+                      Column(
+                        key: advancedKey,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildWorkoutSection('Nâng Cao', advancedWorkouts),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Divider(),
-            // Beginner Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GestureDetector(
-                        onTap: () => scrollToSection(beginnerKey),
-                        child: Expanded(
-                          child: Text(
-                            'Người bắt đầu',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => scrollToSection(intermediateKey),
-                        child: Expanded(
-                          child: Text(
-                            'Trung bình',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () => scrollToSection(advancedKey),
-                        child: Expanded(
-                          child: Text(
-                            'Nâng cao',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Column(
-                    key: beginnerKey,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildWorkoutSection('Người Bắt Đầu', beginnerWorkouts),
-                    ],
-                  ),
-                  // Intermediate Section
-                  Column(
-                    key: intermediateKey,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildWorkoutSection('Trung Bình', intermediateWorkouts),
-                    ],
-                  ),
-                  // Advanced Section
-                  Column(
-                    key: advancedKey,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildWorkoutSection('Nâng Cao', advancedWorkouts),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 }

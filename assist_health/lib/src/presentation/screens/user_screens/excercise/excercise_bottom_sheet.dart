@@ -91,7 +91,7 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                         ),
                         children: const [
                           Text('Hình ảnh'),
-                          Text('Hướng dẫn'),
+                          Text('Video'),
                         ],
                       ),
                     ),

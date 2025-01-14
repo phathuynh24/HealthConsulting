@@ -3,6 +3,7 @@
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:assist_health/src/config/videocall_settings.dart';
 import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
@@ -19,7 +20,7 @@ import 'package:permission_handler/permission_handler.dart';
 class ScheduleCard extends StatelessWidget {
   AppointmentSchedule appointmentSchedule;
   ScheduleCard({required this.appointmentSchedule, super.key});
-  final String _channel = 'video_call';
+  final String _channel = channelName;
   final ClientRole _role = ClientRole.Broadcaster;
 
   @override

@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:assist_health/src/config/videocall_settings.dart';
 import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/methods.dart';
@@ -42,7 +43,7 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
 
   String? _buttonContext;
 
-  final String _channel = 'video_call';
+  final String _channel = channelName;
   final ClientRole _role = ClientRole.Broadcaster;
 
   @override

@@ -35,7 +35,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         child: Column(
           children: [
             Container(
-              height: 350.h,
+              height: 320.h,
               child: Image.asset(
                 'assets/recommendation/get_started.png',
                 fit: BoxFit.contain,

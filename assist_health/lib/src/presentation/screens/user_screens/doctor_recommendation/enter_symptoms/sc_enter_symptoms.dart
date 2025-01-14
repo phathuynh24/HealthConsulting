@@ -234,8 +234,8 @@ class _EnterSymptomsState extends State<EnterSymptoms> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 40,
+                    const SizedBox(
+                      height: 48,
                     ),
                     GestureDetector(
                       onTap: () {

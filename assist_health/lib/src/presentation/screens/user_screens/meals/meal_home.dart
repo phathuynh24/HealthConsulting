@@ -6,6 +6,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/meals/widget
 import 'package:assist_health/src/presentation/screens/user_screens/meals/favorite_meals.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -228,24 +229,51 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
           ),
         ),
         actions: [
-          DropdownButton<String>(
-            value: selectedMealType,
-            hint: const Text(
-              "Chọn buổi",
-              style: TextStyle(color: Colors.white),
+          Container(
+            margin: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            decoration: BoxDecoration(
+              color: Colors.white, // Màu nền tươi sáng hơn
+              borderRadius: BorderRadius.circular(8.0), // Bo góc nhẹ
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: 4,
+                  offset: Offset(0, 2), // Bóng nhẹ
+                ),
+              ],
             ),
-            dropdownColor: Colors.white,
-            items: ['Buổi sáng', 'Buổi trưa', 'Buổi tối', 'Ăn vặt']
-                .map((type) => DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(type),
-                    ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedMealType = value!;
-              });
-            },
+            child: DropdownButton<String>(
+              value: selectedMealType,
+              hint: Text(
+                "Chọn buổi",
+                style:
+                    TextStyle(color: Colors.white, fontSize: 14.0), // Chữ trắng
+              ),
+              dropdownColor: Colors.white, // Màu nền menu sáng hơn
+              items: ['Buổi sáng', 'Buổi trưa', 'Buổi tối', 'Ăn vặt']
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(
+                          type,
+                          style: TextStyle(
+                            color: Colors.black87, // Chữ trắng trong menu
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedMealType = value!;
+                });
+              },
+              style: TextStyle(
+                  color: Colors.white), // Chữ trắng trên dropdown button
+              iconEnabledColor: Colors.black87, // Mũi tên trắng
+              underline: SizedBox(), // Ẩn gạch chân mặc định
+              isDense: true, // Giảm chiều cao dropdown button
+            ),
           ),
         ],
       ),
@@ -254,29 +282,73 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Image
             if (widget.imageUrl.startsWith('http'))
-              Image.network(
-                widget.imageUrl,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Text('Không tải được ảnh mạng'),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: Image.network(
+                    widget.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Center(child: Text('Không tải được ảnh mạng')),
+                  ),
+                ),
               )
             else if (File(widget.imageUrl).existsSync())
-              Image.file(File(widget.imageUrl))
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: Image.file(
+                    File(widget.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              )
             else
-              const SizedBox(height: 16.0),
+              const SizedBox(
+                height: 150,
+                child: Center(
+                  child: Text('Không có ảnh'),
+                ),
+              ),
+            const SizedBox(height: 16),
             // Save to favorite
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  // widget.meal.name,
-                  'a',
-                  style: TextStyle(
+                Text(
+                  widget.meal.name ?? 'Không có dữ liệu',
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 8),
                 Container(
+                  width: 230,
                   decoration: BoxDecoration(
                     color: Colors.lightBlue[50],
                     borderRadius: BorderRadius.circular(12),
@@ -290,7 +362,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                     ],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       // Favorite button
                       IconButton(
@@ -513,15 +585,25 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await saveMealData(
-                      context,
-                      widget.meal,
-                      widget.imageUrl,
-                      _serving,
-                      selectedMealType,
-                      false, // isFavorite = false -> log meal
-                      "", // Log meal without custom name
-                    );
+                    try {
+                      // Gọi hàm saveMealData
+                      await saveMealData(
+                        context,
+                        widget.meal,
+                        widget.imageUrl,
+                        _serving,
+                        selectedMealType,
+                        false, // isFavorite = false -> log meal
+                        "", // Log meal without custom name
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Lỗi khi lưu món ăn: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -610,16 +692,25 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_mealNameController.text.isNotEmpty) {
-                      // Gọi hàm saveMealData để lưu món yêu thích
-                      await saveMealData(
-                        context,
-                        widget.meal, // Dữ liệu món ăn
-                        widget.imageUrl, // Ảnh món ăn
-                        _serving, // Số lượng khẩu phần
-                        "favorite", // Type là favorite
-                        true, // isFavorite = true
-                        _mealNameController.text, // Tên do user đặt
-                      );
+                      try {
+                        // Gọi hàm saveMealData
+                        await saveMealData(
+                          context,
+                          widget.meal, // Dữ liệu món ăn
+                          widget.imageUrl, // Ảnh món ăn
+                          _serving, // Số lượng khẩu phần
+                          "favorite", // Type là favorite
+                          true, // isFavorite = true
+                          _mealNameController.text, // Tên do user đặt
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Lỗi khi lưu món ăn: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
 
                       // Đóng modal
                       Navigator.pop(context);
@@ -677,13 +768,14 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
   }
 
   Future<void> saveMealData(
-      BuildContext context,
-      dynamic meal,
-      String imageUrl,
-      double serving,
-      String selectedMealType,
-      bool isFavorite,
-      String customName) async {
+    BuildContext context,
+    dynamic meal,
+    String imageUrl,
+    double serving,
+    String selectedMealType,
+    bool isFavorite,
+    String customName,
+  ) async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -694,9 +786,32 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
       String userId = user.uid;
       DateTime now = DateTime.now();
 
+      // Tạo ID tài liệu từ thời gian
+      String docId = now.millisecondsSinceEpoch.toString();
+
+      // Nếu món ăn đã được thêm vào danh sách yêu thích, không cần tải ảnh lên
+      var imageUrl = "";
+      if (widget.isFavorite) {
+        imageUrl = widget.imageUrl;
+      } else {
+        // Upload image to Firebase Storage
+        String fileName = '${userId}_$docId.jpeg';
+        final storageRef =
+            FirebaseStorage.instance.ref().child('meal_images/$fileName');
+        final metadata = SettableMetadata(
+          contentType: 'image/jpeg', // Đảm bảo loại MIME chính xác
+        );
+        File imageFile = File(widget.imageUrl);
+        final uploadTask = storageRef.putFile(imageFile, metadata);
+
+        // Wait for upload to complete and get download URL
+        final snapshot = await uploadTask.whenComplete(() => {});
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
+
       // Create data for meal
       Map<String, dynamic> mealData = {
-        'customName': customName, // User-defined name
+        'customName': isFavorite ? customName : meal.name, // User-defined name
         'originalName': meal.name, // Default name
         'calories': meal.calories * serving,
         'weight': meal.weight * serving,
@@ -714,7 +829,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                   'calories': ingredient.calories * serving,
                 })
             .toList(),
-        'imageUrl': imageUrl,
+        'imageUrl': imageUrl, // URL tải xuống từ Firebase Storage
         'userId': userId,
         'loggedAt': isFavorite
             ? null
@@ -722,6 +837,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
                 .format(now), // Date when the meal is logged
         'type': isFavorite ? 'favorite' : selectedMealType, // Meal type
         'isFavorite': isFavorite,
+        'warnings': meal.warnings,
         'savedAt':
             DateFormat('yyyy-MM-dd HH:mm:ss').format(now), // Date when saved
       };
@@ -729,8 +845,11 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
       // Collection name
       String collectionName = isFavorite ? 'favorite_meals' : 'logged_meals';
 
-      // Add meal data to Firestore
-      await FirebaseFirestore.instance.collection(collectionName).add(mealData);
+      // Add meal data to Firestore with docId
+      await FirebaseFirestore.instance
+          .collection(collectionName)
+          .doc(docId)
+          .set(mealData);
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -757,6 +876,7 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
           backgroundColor: Colors.red,
         ),
       );
+      print('Error: $e');
     }
   }
 
@@ -831,47 +951,6 @@ class _MealHomeScreenState extends State<MealHomeScreen> {
           ],
         );
       }).toList(),
-    );
-  }
-
-  Widget _buildFoodItem(Nutrition nutrient, {bool isAddMore = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: TextField(
-              controller:
-                  TextEditingController(text: nutrient.amount.toString()),
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 5,
-            child: TextField(
-              controller: TextEditingController(text: nutrient.name),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                isDense: true,
-                hintText: isAddMore ? "Add more food" : null,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: Icon(isAddMore ? Icons.add : Icons.close),
-            onPressed: () {
-              // Handle add or remove action
-            },
-          ),
-        ],
-      ),
     );
   }
 

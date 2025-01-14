@@ -1,3 +1,4 @@
+import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_bottom_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -204,7 +205,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blue, Colors.lightBlue],
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
@@ -212,7 +213,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.camera_alt),
+            icon: const Icon(Icons.video_library_rounded),
             onPressed: () {
               showExerciseDetailBottomSheet(
                 context,
@@ -227,154 +228,117 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Image.asset(
                   widget.exercise.imageUrl,
                   width: 400,
                   fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  isResting ? 'Thời gian nghỉ' : widget.exercise.name,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
+                Divider(
+                  color: Colors.grey.shade300,
+                  thickness: 1,
+                  height: 4,
                 ),
                 const SizedBox(height: 16),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      height: 80,
-                      width: 80,
-                      child: CircularProgressIndicator(
-                        value: remainingTime / widget.exercise.duration,
-                        backgroundColor: Colors.grey.shade300,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          isResting ? Colors.orange : Colors.blue,
-                        ),
-                        strokeWidth: 10,
-                      ),
-                    ),
-                    Text(
-                      '${remainingTime}s',
-                      style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (!isResting)
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 12),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isPaused = !isPaused;
-                      });
-                      if (!isPaused) {
-                        startTimer();
-                      }
-                    },
-                    child: Text(isPaused ? 'Tiếp tục' : 'Tạm dừng'),
-                  ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
                     children: [
-                      if (!isResting) ...[
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.blueAccent.withOpacity(0.5),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ).copyWith(
-                              elevation: WidgetStateProperty.all(8),
-                              backgroundColor: WidgetStateProperty.resolveWith(
-                                (states) => states.contains(WidgetState.pressed)
-                                    ? Colors.blue.shade700
-                                    : Colors.blue,
-                              ),
-                            ),
-                            onPressed: goToPreviousExercise,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.arrow_back_ios,
-                                    color: Colors.white, size: 18),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Trước đó',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.orangeAccent.withOpacity(0.5),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ).copyWith(
-                            elevation: WidgetStateProperty.all(8),
-                            backgroundColor: WidgetStateProperty.resolveWith(
-                              (states) => states.contains(WidgetState.pressed)
-                                  ? Colors.orange.shade700
-                                  : Colors.orange,
-                            ),
-                          ),
-                          onPressed: skipExercise,
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                      Text(
+                        isResting ? 'Thời gian nghỉ' : widget.exercise.name,
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
+                      ),
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Stack(
+                            alignment: Alignment.center,
                             children: [
-                              Icon(Icons.skip_next,
-                                  color: Colors.white, size: 18),
-                              SizedBox(width: 8),
-                              Text('Bỏ qua',
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.white)),
+                              SizedBox(
+                                height: 90,
+                                width: 90,
+                                child: CircularProgressIndicator(
+                                  value:
+                                      remainingTime / widget.exercise.duration,
+                                  backgroundColor: Colors.grey.shade300,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    isResting
+                                        ? Colors.orange
+                                        : Themes.gradientDeepClr,
+                                  ),
+                                  strokeWidth: 10,
+                                ),
+                              ),
+                              Text(
+                                '${remainingTime}s',
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                ),
+                              ),
                             ],
                           ),
-                        ),
+                          if (!isResting) const SizedBox(width: 16),
+                          if (!isResting)
+                            // Nút Pause/Play
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isPaused
+                                    ? Colors.orange
+                                    : Colors.blue, // Màu nút
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withOpacity(0.2), // Bóng của nút
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  isPaused
+                                      ? Icons.play_arrow
+                                      : Icons.pause, // Icon thay đổi
+                                  color: Colors.white,
+                                  size: 32, // Kích thước lớn hơn
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    isPaused = !isPaused;
+                                  });
+                                  if (!isPaused) {
+                                    startTimer();
+                                  }
+                                },
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: 300,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
                             backgroundColor: Colors.transparent,
-                            shadowColor: Colors.greenAccent.withOpacity(0.5),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shadowColor: Themes.gradientDeepClr,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
                           ).copyWith(
                             elevation: WidgetStateProperty.all(8),
                             backgroundColor: WidgetStateProperty.resolveWith(
                               (states) => states.contains(WidgetState.pressed)
-                                  ? Colors.green.shade700
-                                  : Colors.green,
+                                  ? const Color.fromARGB(255, 60, 115, 233)
+                                  : Themes.gradientDeepClr,
                             ),
                           ),
                           onPressed: completeExercise,
@@ -382,15 +346,105 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.check_circle,
-                                  color: Colors.white, size: 20),
+                                  color: Colors.white, size: 24),
                               SizedBox(width: 8),
                               Text('Xong',
                                   style: TextStyle(
-                                      fontSize: 16, color: Colors.white)),
+                                      fontSize: 20, color: Colors.white)),
                             ],
                           ),
                         ),
                       ),
+                      if (!isResting)
+                        Column(
+                          children: [
+                            const SizedBox(height: 32),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: goToPreviousExercise,
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.skip_previous,
+                                            color: Colors.grey, size: 24),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Trước đó',
+                                          style: TextStyle(
+                                              fontSize: 20, color: Colors.grey),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: skipExercise,
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.skip_next,
+                                            color: Colors.grey, size: 24),
+                                        SizedBox(width: 8),
+                                        Text('Bỏ qua',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.grey)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      if (isResting)
+                        Column(
+                          children: [
+                            SizedBox(height: 24),
+                            SizedBox(
+                              width: 300,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  backgroundColor: Colors
+                                      .grey.shade300, // Màu nền kém nổi bật hơn
+                                  shadowColor: Colors.grey, // Màu bóng nhẹ hơn
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                ).copyWith(
+                                  elevation: WidgetStateProperty.all(
+                                      4), // Giảm độ nổi của bóng
+                                ),
+                                onPressed: skipExercise,
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.skip_next,
+                                      color: Colors.grey,
+                                      size: 24,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Bỏ qua',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 ),

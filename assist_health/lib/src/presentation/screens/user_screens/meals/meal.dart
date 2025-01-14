@@ -18,7 +18,7 @@ class Meal {
   // Phương thức fromMap
   factory Meal.fromMap(Map<String, dynamic> map) {
     return Meal(
-      name: map['name'] ?? '',
+      name: map['customName'] ?? map['originalName'],
       weight: (map['weight'] ?? 0).toDouble(),
       calories: (map['calories'] ?? 0).toDouble(),
       nutrients: (map['nutrients'] as List<dynamic>?)

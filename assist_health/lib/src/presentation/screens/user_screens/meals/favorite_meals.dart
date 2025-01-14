@@ -58,7 +58,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                       .update({'customName': _nameController.text});
                   Navigator.pop(context); // Close dialog
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text("Tên món ăn đã được cập nhật!",
                           style: TextStyle(color: Colors.white)),
                       backgroundColor: Colors.greenAccent,
@@ -78,7 +78,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Danh Sách Yêu Thích"), // Screen title
+        title: const Text("Danh Sách Yêu Thích"), // Screen title
         centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -95,14 +95,13 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
 
           // Error state
           if (snapshot.hasError) {
-            return Center(
+            return const Center(
                 child:
                     Text("Đã xảy ra lỗi khi tải dữ liệu! Vui lòng thử lại."));
           }
-
           // Empty state
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -168,7 +167,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                             weight: weight,
                             nutrients: nutrients,
                             ingredients: ingredients,
-                            warnings: meal['warnings'] ?? "",
+                            warnings: meal['warnings'] ?? [],
                           ),
                           imageUrl: imageUrl,
                           isFavorite: true,
@@ -229,11 +228,11 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                           }
                         },
                         itemBuilder: (BuildContext context) => [
-                          PopupMenuItem(
+                          const PopupMenuItem(
                             value: 'edit',
                             child: Text("Chỉnh sửa"),
                           ),
-                          PopupMenuItem(
+                          const PopupMenuItem(
                             value: 'delete',
                             child: Text("Xóa"),
                           ),

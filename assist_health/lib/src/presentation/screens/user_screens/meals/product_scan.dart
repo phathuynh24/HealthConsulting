@@ -76,9 +76,11 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
       _pickImageFromGallery();
     } else if (index == 1) {
       _pickImageFromCamera();
-    } else if (index == 2) {
-      _navigateToTextEntryScreen();
-    } else if (index == 3) {
+    } 
+    // else if (index == 2) {
+    //   _navigateToTextEntryScreen();
+    // } 
+    else if (index == 2) {
       _navigateToFavoriteMealsScreen();
     }
   }
@@ -134,10 +136,10 @@ class _ProductScanScreenState extends State<ProductScanScreen> {
             icon: Icon(Icons.camera_alt),
             label: "Chụp ảnh",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.text_fields),
-            label: "Nhập mô tả",
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.text_fields),
+          //   label: "Nhập mô tả",
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: "Yêu thích",
