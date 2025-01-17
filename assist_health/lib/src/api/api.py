@@ -141,10 +141,13 @@ def predict_disease_weighted_combination():
         disease_vi_entry = df_disease_vi_en.loc[df_disease_vi_en['Disease_En'].str.lower() == disease]
         if not disease_vi_entry.empty:
             disease_vi = disease_vi_entry['Disease_Vi'].values[0].capitalize()
+            description = disease_vi_entry['Description_Vi'].values[0]
         else:
-            disease_vi = "N/A"  # or handle it in some other way if needed
+            disease_vi = "N/A" 
+            description = "N/A"
         percentage = f"{score * 100:.2f}%"
-        processed_results.append([disease_en, disease_vi, percentage])
+        
+        processed_results.append([disease_en, disease_vi, percentage, description])
 
     # Return the processed results
     return jsonify({"disease": processed_results})

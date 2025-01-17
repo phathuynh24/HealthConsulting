@@ -35,6 +35,7 @@ class _WaterTrackerWidgetState extends State<WaterTrackerWidget> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -49,7 +50,7 @@ class _WaterTrackerWidgetState extends State<WaterTrackerWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Water",
+                    "Uống nước hôm nay",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(

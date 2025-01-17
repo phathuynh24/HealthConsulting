@@ -75,6 +75,16 @@ class Diet {
         description:
             "Chế độ ăn Pescatarian là chế độ ăn chủ yếu dựa trên thực vật nhưng vẫn bao gồm cá và hải sản. Người theo chế độ này không ăn thịt động vật trên cạn (như thịt gà, bò, lợn) nhưng vẫn bổ sung dinh dưỡng từ cá, hải sản, và các sản phẩm từ thực vật như rau củ, ngũ cốc, trái cây, và các loại hạt. Đây là chế độ ăn giàu protein, axit béo omega-3, và phù hợp cho những người muốn giảm tiêu thụ thịt nhưng vẫn nhận được các dưỡng chất từ hải sản.",
       ),
+      Diet(
+        name: "FODMAP Friendly",
+        description:
+            "Hạn chế thực phẩm chứa FODMAPs cao (carbohydrate khó tiêu) để giảm triệu chứng đầy hơi, chướng bụng, đặc biệt dành cho người mắc hội chứng ruột kích thích (IBS). Ưu tiên thực phẩm như thịt, cá, trứng, rau củ FODMAP thấp (cà rốt, dưa chuột), và trái cây như chuối, dâu tây. Hạn chế hành, tỏi, lúa mì, đậu, và một số trái cây như táo, lê.",
+      ),
+      Diet(
+        name: "Paleolithic",
+        description:
+            "Chế độ ăn Paleo dựa trên thực phẩm tự nhiên như thịt, cá, trứng, rau, trái cây, các loại hạt, và không chứa thực phẩm chế biến hoặc ngũ cốc.",
+      ),
     ];
   }
 }

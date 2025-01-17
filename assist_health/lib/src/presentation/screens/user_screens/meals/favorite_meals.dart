@@ -1,3 +1,4 @@
+import 'package:assist_health/src/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,8 +79,93 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Danh Sách Yêu Thích"), // Screen title
+        foregroundColor: Colors.white,
+        toolbarHeight: 80,
+        title: Column(
+          children: [
+            const Text(
+              'Danh sách món ăn yêu thích',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.9),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: 38,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey.shade800.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: TextFormField(
+                // controller: _searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
+                  hintText: 'Tên món ăn',
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 15,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.white70,
+                    size: 23,
+                  ),
+                  border: InputBorder.none,
+                  suffixIconConstraints:
+                      const BoxConstraints(maxHeight: 30, maxWidth: 30),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        // _searchText = '';
+                        // _searchController.text = _searchText;
+                      });
+                    },
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      margin: const EdgeInsets.only(
+                        right: 10,
+                      ),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white70,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.clear,
+                          size: 15,
+                          color: Colors.blueGrey.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    // _searchText = value;
+                    // _searchController.text = _searchText;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
         centerTitle: true,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         // Get favorite meals from Firestore
@@ -152,7 +238,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                       [];
 
               return Card(
-                margin: EdgeInsets.all(8.0),
+                margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 elevation: 4,
                 child: InkWell(
                   // Navigate to meal details screen
@@ -178,18 +264,16 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.lightBlue[50],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: EdgeInsets.all(12),
                     child: ListTile(
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: imageUrl.isNotEmpty
                             ? Image.network(
                                 imageUrl,
-                                width: 60,
-                                height: 60,
+                                width: 80,
+                                height: 80,
                                 fit: BoxFit.cover,
                               )
                             : Icon(Icons.fastfood,
@@ -206,7 +290,6 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 4),
                           Text(
                             "Calories: $calories kcal",
                             style: TextStyle(

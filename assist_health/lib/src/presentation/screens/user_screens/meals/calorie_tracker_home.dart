@@ -5,6 +5,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/meals/meal_h
 import 'package:assist_health/src/presentation/screens/user_screens/meals/recipe_recommendation_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/water_tracker_widget.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/product_scan.dart';
+import 'package:assist_health/src/widgets/my_separator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class CalorieTrackerHome extends StatefulWidget {
 
 class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
   DateTime selectedDate = DateTime.now();
-  final remainingCalories = 0;
+  var remainingCalories;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,23 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
             ),
           );
         },
-        child: const Icon(Icons.camera_alt),
+        backgroundColor: Colors.blueAccent.shade400,
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.deepPurple.withOpacity(0.4),
+                spreadRadius: 1,
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Image.asset(
+            'assets/camera.png',
+            width: 50,
+            height: 50,
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -97,34 +114,107 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
             },
           );
 
-          return Column(
-            children: [
-              _buildCalorieSummary(totalCalories),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  children: [
-                    FutureBuilder<DocumentSnapshot>(
-                      future: FirebaseFirestore.instance
-                          .collection('user_goal_plans')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .get(),
-                      builder: (context, snapshot) {
-                        // Check if the snapshot has data and is not loading
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child:
-                                  CircularProgressIndicator()); // Show a loading indicator while waiting
-                        }
+          return Container(
+            color: const Color.fromARGB(255, 225, 236, 249),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                _buildCalorieSummary(totalCalories),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('user_goal_plans')
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
+                            .get(),
+                        builder: (context, snapshot) {
+                          // Check if the snapshot has data and is not loading
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child:
+                                    CircularProgressIndicator()); // Show a loading indicator while waiting
+                          }
 
-                        if (snapshot.hasError) {
-                          return Center(
-                              child: Text(
-                                  'Error: ${snapshot.error}')); // Show error if any
-                        }
+                          if (snapshot.hasError) {
+                            return Center(
+                                child: Text(
+                                    'Error: ${snapshot.error}')); // Show error if any
+                          }
 
-                        if (!snapshot.hasData || snapshot.data == null) {
+                          if (!snapshot.hasData || snapshot.data == null) {
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const GenderSelectionScreen()),
+                                );
+                              },
+                              child: Card(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      15), // Mềm mại các góc
+                                ),
+                                elevation: 5, // Độ bóng nhẹ
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Colors.blueAccent,
+                                        Colors.greenAccent
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Vui lòng nhấn vào để nhập thông tin',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors
+                                                  .white, // Màu chữ sáng trên nền gradient
+                                            ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      const Text(
+                                        'Chưa có thông tin về chiều cao, cân nặng và giới tính.',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors
+                                              .white70, // Màu chữ nhẹ nhàng, dễ nhìn
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          // When data is available, parse the snapshot
+                          final userDoc =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          final height = userDoc['height'] ?? '0';
+                          final weight = userDoc['weight'] ?? '0';
+                          final gender = userDoc['gender'] ?? '';
+
+                          bool _isExpanded = false; // Trạng thái mở/thu gọn
+
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -134,126 +224,89 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                                         const GenderSelectionScreen()),
                               );
                             },
-                            child: Card(
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    15), // Mềm mại các góc
-                              ),
-                              elevation: 5, // Độ bóng nhẹ
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Colors.blueAccent,
-                                      Colors.greenAccent
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
+                            child: StatefulBuilder(
+                              builder: (context, setState) {
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 15),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        12), // Mềm mại các góc
                                   ),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                padding: const EdgeInsets.all(15.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Vui lòng nhấn vào để nhập thông tin',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors
-                                                .white, // Màu chữ sáng trên nền gradient
+                                  elevation:
+                                      8, // Độ bóng đổ mạnh hơn để tạo sự nổi bật
+                                  color: Colors.blueAccent.shade100,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _isExpanded = !_isExpanded;
+                                            });
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Thông tin cá nhân',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleLarge
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white,
+                                                      fontSize: 18,
+                                                    ),
+                                              ),
+                                              Icon(
+                                                _isExpanded
+                                                    ? Icons.keyboard_arrow_up
+                                                    : Icons.keyboard_arrow_down,
+                                                color: Colors.white,
+                                              ),
+                                            ],
                                           ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        if (_isExpanded) ...[
+                                          _buildInfoText(
+                                              'Chiều cao: ', '$height'),
+                                          _buildInfoText(
+                                              'Cân nặng: ', '$weight'),
+                                          _buildInfoText('Giới tính: ', gender),
+                                        ],
+                                      ],
                                     ),
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      'Chưa có thông tin về chiều cao, cân nặng và giới tính.',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors
-                                            .white70, // Màu chữ nhẹ nhàng, dễ nhìn
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             ),
                           );
-                        }
-
-                        // When data is available, parse the snapshot
-                        final userDoc =
-                            snapshot.data!.data() as Map<String, dynamic>;
-                        final height = userDoc['height'] ?? '0';
-                        final weight = userDoc['weight'] ?? '0';
-                        final gender = userDoc['gender'] ?? '';
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const GenderSelectionScreen()),
-                            );
-                          },
-                          child: Card(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(12), // Mềm mại các góc
-                            ),
-                            elevation:
-                                8, // Độ bóng đổ mạnh hơn để tạo sự nổi bật
-                            color: Colors.green,
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Thông tin cơ thể:',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors
-                                              .white, // Màu chữ sáng trên nền cam
-                                        ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  _buildInfoText('Chiều cao: ', '$height'),
-                                  _buildInfoText('Cân nặng: ', '$weight'),
-                                  _buildInfoText('Giới tính: ', gender),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                    _buildMealEntry(
-                        "Đề xuất món ăn", Icons.fastfood),
-                    _buildMealTypeSection('Buổi sáng', Icons.breakfast_dining),
-                    _buildMealTypeSection('Buổi trưa', Icons.lunch_dining),
-                    _buildMealTypeSection('Buổi tối', Icons.dinner_dining),
-                    _buildMealTypeSection('Ăn vặt', Icons.fastfood),
-                    const Divider(),
-                    _buildExerciseEntry(
-                        "Exercise", Icons.directions_run, "0 Cal"),
-                    _buildExerciseEntry(
-                        "Daily steps", Icons.directions_walk, "5000 steps"),
-                    WaterTrackerWidget()
-                  ],
+                        },
+                      ),
+                      _buildMealEntry(),
+                      _buildMealTypeSection(
+                          'Buổi sáng', Icons.breakfast_dining),
+                      _buildMealTypeSection('Buổi trưa', Icons.lunch_dining),
+                      _buildMealTypeSection('Buổi tối', Icons.dinner_dining),
+                      _buildMealTypeSection('Ăn vặt', Icons.fastfood),
+                      // const Divider(),
+                      // _buildExerciseEntry(
+                      //     "Exercise", Icons.directions_run, "0 Cal"),
+                      // _buildExerciseEntry(
+                      //     "Daily steps", Icons.directions_walk, "5000 steps"),
+                      WaterTrackerWidget()
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -327,12 +380,12 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
           totalProtein = double.parse(totalProtein.toStringAsFixed(1));
           totalFat = double.parse(totalFat.toStringAsFixed(1));
 
-          return Padding(
+          return Container(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
-              elevation: 2,
+              color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -354,7 +407,9 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                         _buildCalorieDetails(),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(
+                        height: 40,
+                        child: MySeparator(color: Colors.grey.shade400)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -459,7 +514,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                               },
                             );
 
-                            final remainingCalories =
+                            remainingCalories =
                                 goal - totalCalories + totalCaloriesExercise;
 
                             return Text(
@@ -510,6 +565,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                   Text("Mục tiêu: ${baseGoal.toInt()}"),
                 ],
               ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   const Icon(Icons.restaurant, color: Colors.blue),
@@ -543,6 +599,7 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
                       }),
                 ],
               ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   const Icon(Icons.local_fire_department, color: Colors.red),
@@ -602,19 +659,53 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
     );
   }
 
-  Widget _buildMealEntry(String title, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.orange),
-      title: Text(title, style: const TextStyle(fontSize: 18)),
+  Widget _buildMealEntry() {
+    return InkWell(
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const RecipeRecommendationScreen(
-              defaultCalories: 2502,
+            builder: (context) => RecipeRecommendationScreen(
+              defaultCalories: remainingCalories,
             ),
           ),
         );
       },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.orangeAccent.shade200,
+              Colors.orangeAccent.shade100,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.restaurant, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Gợi ý món ăn',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -622,10 +713,38 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          leading: Icon(icon, color: Colors.orange),
-          title: Text(mealType, style: const TextStyle(fontSize: 18)),
-          trailing: const Icon(Icons.add, color: Colors.green),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ListTile(
+            leading: Icon(icon, color: Colors.orange),
+            title: Text(mealType, style: const TextStyle(fontSize: 18)),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.add_circle,
+                color: Colors.green,
+                size: 30,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ProductScanScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
@@ -642,41 +761,71 @@ class _CalorieTrackerHomeState extends State<CalorieTrackerHome> {
             }
             final meals = snapshot.data?.docs ?? [];
 
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: meals.length,
-              itemBuilder: (context, index) {
-                final meal = meals[index].data() as Map<String, dynamic>;
-                return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      leading: meal['imageUrl'] != null &&
-                              meal['imageUrl'].toString().startsWith('http')
-                          ? Image.network(
-                              meal['imageUrl'],
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )
-                          : const Icon(Icons.fastfood),
-                      title: Text(meal['customName'] ?? meal['originalName']),
-                      subtitle: Text(
-                        meal['loggedAt'] ?? '',
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MealHomeScreen(
-                              meal: Meal.fromMap(meal),
-                              imageUrl: meal['imageUrl'] ?? '',
-                            ),
+            return Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: meals.length,
+                itemBuilder: (context, index) {
+                  final meal = meals[index].data() as Map<String, dynamic>;
+                  return Card(
+                      color: Colors.white,
+                      margin: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: ListTile(
+                        leading: meal['imageUrl'] != null &&
+                                meal['imageUrl'].toString().startsWith('http')
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    12), // Bo góc 12px (có thể thay đổi)
+                                child: Image.network(
+                                  meal['imageUrl'],
+                                  width: 50,
+                                  height: 50,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  width: 50,
+                                  height: 50,
+                                  color:
+                                      Colors.grey.shade200, // Màu nền cho icon
+                                  child: const Icon(
+                                    Icons.fastfood,
+                                    size: 30,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                        title: Text(meal['customName'] ?? meal['originalName'],
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(
+                          '${meal['weight']}g',
+                        ),
+                        trailing: Text(
+                          '${meal['calories']} Cal',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
                           ),
-                        );
-                      },
-                    ));
-              },
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MealHomeScreen(
+                                meal: Meal.fromMap(meal),
+                                imageUrl: meal['imageUrl'] ?? '',
+                              ),
+                            ),
+                          );
+                        },
+                      ));
+                },
+              ),
             );
           },
         )

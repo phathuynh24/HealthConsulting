@@ -456,6 +456,19 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
+                                    'Bác sĩ quan tâm',
+                                    Icons.favorite,
+                                    const Color(0xFFE57373), // Màu đỏ nhạt
+                                    const Color(0xFFD32F2F), // Màu đỏ đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const FavoriteDoctorList()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
                                       'Chỉ số sức khỏe',
                                       FontAwesomeIcons.chartColumn,
                                       const Color(0xFFFFDF3F),
@@ -501,6 +514,31 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     );
                                   }),
                                   itemDashboard(
+                                    'Bài viết sức khoẻ',
+                                    Icons.article_outlined,
+                                    const Color.fromARGB(255, 155, 233, 159), // Màu xanh lá nhạt
+                                    const Color(0xFF388E3C), // Màu xanh lá đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) => BlogListPage()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
+                                    'Luyện tập thể hình',
+                                    Icons.fitness_center,
+                                    const Color.fromARGB(255, 141, 199, 248), // Màu xanh nhạt
+                                    const Color(0xFF1E88E5), // Màu xanh đậm
+                                    () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                DailyWorkoutScreen()),
+                                      );
+                                    },
+                                  ),
+                                  itemDashboard(
                                     'Đề xuất bác sĩ',
                                     FontAwesomeIcons.robot,
                                     const Color(0xFF2EF76F),
@@ -522,44 +560,6 @@ class _MyHomeScreen extends State<HomeScreen> {
                                         MaterialPageRoute(
                                             builder: (_) =>
                                                 const CalorieTrackerHome()),
-                                      );
-                                    },
-                                  ),
-                                  itemDashboard(
-                                    'Bài tập',
-                                    Icons.fitness_center,
-                                    const Color(0xFF42A5F5), // Màu xanh nhạt
-                                    const Color(0xFF1E88E5), // Màu xanh đậm
-                                    () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                DailyWorkoutScreen()),
-                                      );
-                                    },
-                                  ),
-                                  itemDashboard(
-                                    'Bài viết',
-                                    Icons.article_outlined,
-                                    const Color(0xFF66BB6A), // Màu xanh lá nhạt
-                                    const Color(0xFF388E3C), // Màu xanh lá đậm
-                                    () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (_) => BlogListPage()),
-                                      );
-                                    },
-                                  ),
-                                  itemDashboard(
-                                    'Danh sách quan tâm',
-                                    Icons.favorite,
-                                    const Color(0xFFE57373), // Màu đỏ nhạt
-                                    const Color(0xFFD32F2F), // Màu đỏ đậm
-                                    () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                const FavoriteDoctorList()),
                                       );
                                     },
                                   ),
@@ -855,8 +855,23 @@ class _MyHomeScreen extends State<HomeScreen> {
               MaterialPageRoute(builder: (_) => const GeminiChatBot()),
             );
           },
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.comment),
+          backgroundColor: Colors.blueAccent.shade400,
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.deepPurple.withOpacity(0.4),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Image.asset(
+              'assets/chatbot.png',
+              width: 60,
+              height: 60,
+            ),
+          ),
         ),
       ),
     );

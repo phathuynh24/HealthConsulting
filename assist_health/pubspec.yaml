@@ -180,6 +180,8 @@ flutter:
     - assets/leg1.jpg
     - assets/leg2.jpg
     - assets/leg3.jpg
+    - assets/chatbot.png
+    - assets/camera.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

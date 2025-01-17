@@ -177,7 +177,7 @@ class _DiseaseResultsScreenState extends State<DiseaseResultsScreen> {
                     child: Container(
                       height: 150,
                       decoration: BoxDecoration(
-                        image: DecorationImage(
+                        image: const DecorationImage(
                           image: AssetImage(
                               'assets/recommendation/bg_gradient.png'),
                           fit: BoxFit.cover,
@@ -192,8 +192,8 @@ class _DiseaseResultsScreenState extends State<DiseaseResultsScreen> {
                           ),
                         ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
                             horizontal: 32, vertical: 24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

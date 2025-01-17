@@ -24,7 +24,8 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       }
 
       String userId = user.uid;
-      String docId = recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
+      String docId =
+          recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
 
       // Lưu món ăn vào Firestore
       await FirebaseFirestore.instance
@@ -60,7 +61,8 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       }
 
       String userId = user.uid;
-      String docId = recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
+      String docId =
+          recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
 
       // Xóa món ăn khỏi Firestore
       await FirebaseFirestore.instance
@@ -97,7 +99,8 @@ class _RecipeDetailsState extends State<RecipeDetails> {
       }
 
       String userId = user.uid;
-      String docId = widget.recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
+      String docId =
+          widget.recipe['id'].toString(); // Sử dụng ID món ăn làm ID tài liệu
 
       // Kiểm tra món ăn đã được lưu chưa
       DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -189,36 +192,28 @@ class _RecipeDetailsState extends State<RecipeDetails> {
               ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // const Icon(Icons.restaurant,
-                //     color: Colors.teal, size: 28), // Icon cho tiêu đề
-                // const SizedBox(width: 8),
                 Flexible(
                   child: Text(
                     recipe['title_translated'] ?? 'Không có tiêu đề',
                     style: const TextStyle(
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.teal,
+                      // color: Colors.teal,
                     ),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                     softWrap: true, // Tự động xuống dòng khi hết chiều rộng
                     overflow:
                         TextOverflow.ellipsis, // Hiển thị dấu "..." nếu quá dài
-                    maxLines: 2, // Giới hạn số dòng
+                    maxLines: 3, // Giới hạn số dòng
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
             // Thông tin chi tiết món ăn
             Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -374,12 +369,12 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                       (index) {
                     final ingredient = recipe['extendedIngredients'][index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 8.0),
+                      // margin: const EdgeInsets.only(bottom: 8.0),
                       padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+                      // decoration: BoxDecoration(
+                      //   color: Colors.teal.withOpacity(0.1),
+                      //   borderRadius: BorderRadius.circular(8.0),
+                      // ),
                       child: Row(
                         children: [
                           if (ingredient['image'] != null)
@@ -387,6 +382,21 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                               'https://spoonacular.com/cdn/ingredients_100x100/${ingredient['image']}',
                               width: 40,
                               height: 40,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Trả về Icon nếu ảnh lỗi
+                                return const Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.grey,
+                                  size: 40,
+                                );
+                              },
+                            )
+                          else
+                            const Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey,
+                              size: 40,
                             ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -401,7 +411,6 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   }),
                 ],
               ),
-            const SizedBox(height: 16),
             const SizedBox(height: 16),
             // Các bước
             const Text(
@@ -421,10 +430,10 @@ class _RecipeDetailsState extends State<RecipeDetails> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8.0),
                     padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.orangeAccent.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
+                    // decoration: BoxDecoration(
+                    //   color: Colors.orangeAccent.withOpacity(0.1),
+                    //   borderRadius: BorderRadius.circular(8.0),
+                    // ),
                     child: Text(
                       '- ${step['translated_step']}',
                       style: const TextStyle(fontSize: 16),
@@ -436,51 +445,64 @@ class _RecipeDetailsState extends State<RecipeDetails> {
             const SizedBox(height: 16),
             if (recipe['nutrition'] != null &&
                 recipe['nutrition']['nutrients'] != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Thông tin dinh dưỡng:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.teal.shade100, Colors.teal.shade50],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const SizedBox(height: 8),
-                  ...List.generate(recipe['nutrition']['nutrients'].length,
-                      (index) {
-                    final nutrient = recipe['nutrition']['nutrients'][index];
-                    return Card(
-                      elevation: 3,
-                      margin: const EdgeInsets.only(bottom: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Thông tin dinh dưỡng:',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal,
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
+                    ),
+                    const SizedBox(height: 12),
+                    ...List.generate(recipe['nutrition']['nutrients'].length,
+                        (index) {
+                      final nutrient = recipe['nutrition']['nutrients'][index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
                         child: Row(
                           children: [
                             Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.teal,
-                              size: 20,
+                              Icons.food_bank_outlined,
+                              color: Colors.teal.shade700,
+                              size: 24,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 '${nutrient['name']}: ${nutrient['amount']} ${nutrient['unit']}',
                                 style: const TextStyle(
                                   fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                   color: Colors.black87,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  }),
-                ],
+                      );
+                    }),
+                  ],
+                ),
               ),
           ],
         ),

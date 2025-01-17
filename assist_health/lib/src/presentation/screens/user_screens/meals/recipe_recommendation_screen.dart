@@ -57,7 +57,7 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
   bool isSavory = false;
   bool isFatty = false;
 
-  double tdeeCalories = 2000;
+  double tdeeCalories = 0;
   double inputCalories = 800;
 
   bool isLoading = false;
@@ -73,6 +73,7 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
     super.initState();
     _calculateRecommendedNutrition();
     _tabController = TabController(length: 2, vsync: this);
+    tdeeCalories = widget.defaultCalories;
     fetchSavedRecipes();
   }
 
@@ -238,9 +239,9 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
           "Tăng cân",
           "Giảm cân",
           "Tập gym",
-          "Suy dinh dưỡng",
-          "Béo phì",
-          "Bệnh tim mạch",
+          // "Suy dinh dưỡng",
+          // "Béo phì",
+          // "Bệnh tim mạch",
         ]
             .map((goal) => DropdownMenuItem(
                   value: goal,
@@ -334,7 +335,7 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
           ElevatedButton(
             onPressed: () {
               setState(() {
-                inputCalories = tdeeCalories * 0.6;
+                inputCalories = tdeeCalories;
               });
             },
             style: ElevatedButton.styleFrom(
@@ -613,99 +614,101 @@ class _RecipeRecommendationScreenState extends State<RecipeRecommendationScreen>
   }
 
   Widget _buildSavedRecipesTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: savedRecipes.isEmpty
-          ? const Center(
-              child: Text(
-                'Không có món ăn nào được lưu.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10.0),
-                  child: Text(
-                    'Danh sách món ăn đã lưu:',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: savedRecipes.isEmpty
+            ? const Center(
+                child: Text(
+                  'Không có món ăn nào được lưu.',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text(
+                      'Danh sách món ăn đã lưu:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
                     ),
                   ),
-                ),
-                ...savedRecipes.map((recipe) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 5,
-                    color: Colors.white,
-                    child: ListTile(
-                      leading: recipe['image'] != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.network(
-                                recipe['image'],
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : const Icon(Icons.fastfood,
-                              color: Colors.deepPurple),
-                      title: Text(
-                        recipe['title_translated'] ??
-                            'N/A',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
+                  ...savedRecipes.map((recipe) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      subtitle: (recipe['nutrition'] != null &&
-                              recipe['nutrition']['nutrients'] != null)
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ...List.generate(
-                                  recipe['nutrition']['nutrients'].length,
-                                  (index) {
-                                    final nutrient =
-                                        recipe['nutrition']['nutrients'][index];
-                                    return Text(
-                                      '${nutrient['name']}: ${nutrient['amount']} ${nutrient['unit']}',
-                                      style: const TextStyle(fontSize: 14),
-                                    );
-                                  },
+                      elevation: 5,
+                      color: Colors.white,
+                      child: ListTile(
+                        leading: recipe['image'] != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.network(
+                                  recipe['image'],
+                                  width: 60,
+                                  height: 60,
+                                  fit: BoxFit.cover,
                                 ),
-                              ],
-                            )
-                          : const Text(
-                              'Không có thông tin dinh dưỡng.',
-                              style: TextStyle(fontSize: 14),
-                            ),
-                      onTap: () => {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RecipeDetails(recipe: recipe),
+                              )
+                            : const Icon(Icons.fastfood,
+                                color: Colors.deepPurple),
+                        title: Text(
+                          recipe['title_translated'] ??
+                              'N/A',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
                           ),
                         ),
-                      },
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await _deleteSavedRecipe(recipe['id']);
+                        subtitle: (recipe['nutrition'] != null &&
+                                recipe['nutrition']['nutrients'] != null)
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ...List.generate(
+                                    recipe['nutrition']['nutrients'].length,
+                                    (index) {
+                                      final nutrient =
+                                          recipe['nutrition']['nutrients'][index];
+                                      return Text(
+                                        '${nutrient['name']}: ${nutrient['amount']} ${nutrient['unit']}',
+                                        style: const TextStyle(fontSize: 14),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                            : const Text(
+                                'Không có thông tin dinh dưỡng.',
+                                style: TextStyle(fontSize: 14),
+                              ),
+                        onTap: () => {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RecipeDetails(recipe: recipe),
+                            ),
+                          ),
                         },
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            await _deleteSavedRecipe(recipe['id']);
+                          },
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
+                    );
+                  }).toList(),
+                ],
+              ),
+      ),
     );
   }
 

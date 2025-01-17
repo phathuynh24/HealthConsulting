@@ -386,19 +386,46 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
                             snapshot) {
                       if (snapshot.hasData) {
+                        final feedbackDocs = snapshot.data!.docs.where((doc) {
+                          final feedbackDoctor =
+                              FeedbackDoctor.fromJson(doc.data());
+                          return feedbackDoctor.idDoctor == _doctorInfo!.uid;
+                        }).toList();
+
+                        if (feedbackDocs.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/no_result_search_icon.png', // Đường dẫn tới icon
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.contain,
+                                ),
+                                const Text(
+                                  'Không có đánh giá nào cho bác sĩ này.',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
                         return ListView.builder(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
-                          itemCount: snapshot.data!.docs.length,
+                          itemCount: feedbackDocs.length,
                           itemBuilder: (BuildContext context, int index) {
-                            final doc = snapshot.data!.docs[index];
+                            final doc = feedbackDocs[index];
                             final feedbackDoctor =
                                 FeedbackDoctor.fromJson(doc.data());
                             String formattedDate = DateFormat('dd/MM/yyyy')
                                 .format(feedbackDoctor.rateDate!);
-                            if (feedbackDoctor.idDoctor != _doctorInfo!.uid) {
-                              return const SizedBox();
-                            }
+
                             return Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
