@@ -23,9 +23,13 @@ import 'package:path_provider/path_provider.dart';
 class HealthProfileDetailScreen extends StatefulWidget {
   final UserProfile profile;
   bool isUserOfProfile;
+  bool isDoctorViewing;
 
   HealthProfileDetailScreen(
-      {super.key, required this.profile, required this.isUserOfProfile});
+      {super.key,
+      required this.profile,
+      required this.isUserOfProfile,
+      this.isDoctorViewing = false});
 
   @override
   State<HealthProfileDetailScreen> createState() =>
@@ -40,11 +44,17 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
   String? _uid;
   List<File> _selectedFiles = [];
   UserProfile? _currentProfile;
+  bool _isLoadFile = false;
 
   @override
   void initState() {
     super.initState();
-    _uid = _auth.currentUser!.uid;
+    // _uid = _auth.currentUser!.uid;
+    if (widget.isDoctorViewing) {
+      _uid = widget.profile.ownerID;
+    } else {
+      _uid = _auth.currentUser!.uid;
+    }
     _currentProfile = widget.profile;
     loadDataFromFirebase();
   }
@@ -61,9 +71,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          (widget.isUserOfProfile) ? 'Hồ sơ người thân' : 'Hồ sơ sức khỏe',
-          style: const TextStyle(fontSize: 20),
+        title: const Text(
+          'Hồ sơ sức khỏe',
+          style: TextStyle(fontSize: 20),
         ),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -78,7 +88,8 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
           ),
         ),
         actions: [
-          if (_currentProfile!.idDoc != 'main_profile')
+          if (_currentProfile!.idDoc != 'main_profile' &&
+              !widget.isDoctorViewing)
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
@@ -198,6 +209,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                 color: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 15,
+                  vertical: 10,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +411,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                           ),
                       ],
                     ),
-                    Container(
+                    if (_isLoadFile) Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 10,
                       ),
@@ -471,38 +483,57 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                                     ),
                                   );
                                 }),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        File file = _selectedFiles[index];
-                                        // Xóa tệp cục bộ
-                                        file.deleteSync();
-                                        // Xóa tệp khỏi danh sách
-                                        _selectedFiles.removeAt(index);
-                                        // Xóa file trên firebase
-                                        deleteFileFromFirestore(index);
-                                      });
-                                    },
-                                    child: const CircleAvatar(
-                                      backgroundColor: Colors.red,
-                                      radius: 12,
-                                      child: Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                        size: 15,
+                                if (widget.isUserOfProfile ||
+                                    !widget.isDoctorViewing)
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          File file = _selectedFiles[index];
+                                          // Xóa tệp cục bộ
+                                          file.deleteSync();
+                                          // Xóa tệp khỏi danh sách
+                                          _selectedFiles.removeAt(index);
+                                          // Xóa file trên firebase
+                                          deleteFileFromFirestore(index);
+                                        });
+                                      },
+                                      child: const CircleAvatar(
+                                        backgroundColor: Colors.red,
+                                        radius: 12,
+                                        child: Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 15,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           );
                         },
                       ),
                     ),
+                    if (_isLoadFile && _selectedFiles.isEmpty)
+                      const Center(
+                        child: Text(
+                          'Không có tệp nào',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ), 
+                    if (!_isLoadFile)
+                      Container(
+                        margin: const EdgeInsets.only(top: 60),
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),               
                   ],
                 ),
               ),
@@ -637,6 +668,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
     // Cập nhật danh sách các file đã tải về vào biến thành viên
     setState(() {
       _selectedFiles = files;
+      _isLoadFile = true;
     });
   }
 

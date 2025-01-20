@@ -6,6 +6,8 @@ import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/chatroom.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/chatroom_new.dart';
 import 'package:assist_health/src/widgets/doctor_navbar.dart';
+import 'package:assist_health/utils/static_collections.dart';
+import 'package:assist_health/utils/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -81,32 +83,57 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> {
   }
 
   Future<void> getUserProfiles() async {
-    List<UserProfile> tempUserProfiles = [];
     try {
-      final userQuerySnapshot = await _firestore
-          .collection('users')
-          .where("role", whereIn: ["user"]).get();
+      // Lấy danh sách user IDs từ chatRoomList
+      final userIds = chatRoomList.map((chatRoom) => chatRoom.idUser).toSet();
 
-      if (userQuerySnapshot.docs.isNotEmpty) {
-        final userProfilesQuerySnapshot = await _firestore
-            .collection('users')
-            .doc(userQuerySnapshot.docs[0].id)
-            .collection('health_profiles')
-            .get();
-        tempUserProfiles = userProfilesQuerySnapshot.docs
-            .map((doc) => UserProfile.fromJson(doc.data()))
-            .toList();
-        setState(() {
-          userProfiles = tempUserProfiles
-              .where((element1) => chatRoomList
-                  .any((element2) => element2.idProfile == element1.idDoc))
-              .toList();
-        });
-      } else {
+      if (userIds.isEmpty) {
         setState(() {
           userProfiles = [];
         });
+        return;
       }
+
+      // Truy vấn tất cả người dùng có ID trùng với userIds
+      final userQuerySnapshot = await _firestore
+          .collection('users')
+          .where(FieldPath.documentId, whereIn: userIds.toList())
+          .get();
+
+      if (userQuerySnapshot.docs.isEmpty) {
+        setState(() {
+          userProfiles = [];
+        });
+        return;
+      }
+
+      // Duyệt qua từng user để lấy name và health_profiles
+      final tempUserProfiles = await Future.wait(userQuerySnapshot.docs.map(
+        (userDoc) async {
+          final ownerName = userDoc.data()['name'] as String;
+          final ownerID = userDoc.data()['uid'] as String;
+          final healthProfilesSnapshot =
+              await userDoc.reference.collection('health_profiles').get();
+
+          return healthProfilesSnapshot.docs.map((doc) {
+            final profile = UserProfile.fromJson(doc.data());
+            // Gán name của user vào mỗi profile
+            profile.ownerName = ownerName;
+            profile.ownerID = ownerID;
+            return profile;
+          }).toList();
+        },
+      ));
+
+      final flatUserProfiles = tempUserProfiles.expand((x) => x).toList();
+
+      // Chỉ giữ lại các UserProfile liên quan đến chatRoomList
+      setState(() {
+        userProfiles = flatUserProfiles
+            .where((profile) => chatRoomList
+                .any((chatRoom) => chatRoom.idProfile == profile.idDoc))
+            .toList();
+      });
     } catch (error) {
       print("Lỗi khi truy xuất dữ liệu: $error");
     }
@@ -296,15 +323,15 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        Text(
-                                          'Thứ 2 -Thứ 7: 8h30 - 17h30',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            height: 1.2,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
+                                        // Text(
+                                        //   'Thứ 2 -Thứ 7: 8h30 - 17h30',
+                                        //   style: TextStyle(
+                                        //     color: Colors.black,
+                                        //     height: 1.2,
+                                        //     fontSize: 14,
+                                        //     fontWeight: FontWeight.normal,
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),
@@ -436,11 +463,11 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> {
                                       leading: CircleAvatar(
                                         radius: 30,
                                         backgroundImage: NetworkImage(
-                                          doctor.imageURL,
+                                          userProfile.image,
                                         ),
                                       ),
                                       title: Text(
-                                        'Bác sĩ ${doctor.name}',
+                                        "Hồ sơ: ${userProfile.name}",
                                         style: const TextStyle(
                                           color: Colors.black,
                                           height: 1.5,
@@ -460,7 +487,7 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> {
                                             width: 8,
                                           ),
                                           Text(
-                                            'Bệnh nhân ${userProfile.name}',
+                                            "Người tạo: ${userProfile.ownerName}",
                                             style: const TextStyle(
                                               color: Colors.blueGrey,
                                               height: 1.5,

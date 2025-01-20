@@ -1584,7 +1584,8 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                                             builder: (context) =>
                                                 HealthProfileDetailScreen(
                                                     profile: userProfile,
-                                                    isUserOfProfile: false)));
+                                                    isUserOfProfile: false,
+                                                    isDoctorViewing: true)));
                                   },
                                   child: Container(
                                     width: double.infinity,

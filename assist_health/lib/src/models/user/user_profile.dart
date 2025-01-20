@@ -7,6 +7,8 @@ class UserProfile {
   String image;
   String idDoc;
   String idProfile;
+  String ownerName = '';
+  String ownerID = '';
 
   UserProfile(this.name, this.phone, this.gender, this.doB, this.relationship,
       this.image, this.idDoc, this.idProfile);

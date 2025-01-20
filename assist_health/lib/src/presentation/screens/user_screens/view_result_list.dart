@@ -7,6 +7,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/view_result.
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 
 class ViewResultListScreen extends StatefulWidget {
   const ViewResultListScreen({super.key});
@@ -252,12 +253,16 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                       );
                     }
                     //--------------------------------
-
+                    sesultsSearch.sort((a, b) => b.timeResult!.compareTo(a.timeResult!)); // Sắp xếp giảm dần theo thời gian
                     return ListView.builder(
                       shrinkWrap: true,
                       itemCount: sesultsSearch.length,
                       itemBuilder: (context, index) {
                         Result result = sesults[index];
+                        final formattedTimeResult =
+                            DateFormat('HH:mm dd-MM-yyyy')
+                                .format(result.timeResult!);
+
                         return Container(
                           margin: EdgeInsets.only(
                             top: 15,
@@ -331,7 +336,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                                       height: 8,
                                     ),
                                     Text(
-                                      'Ngày trả kết quả: ${result.timeResult!}',
+                                      'Ngày trả kết quả: ${formattedTimeResult}',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.black54,

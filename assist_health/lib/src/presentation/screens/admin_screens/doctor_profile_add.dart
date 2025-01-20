@@ -420,9 +420,14 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
       // Create a reference to the image file
       Reference storageReference = storage.ref().child('images/$uid.jpg');
+      
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+        // customMetadata: {'uploaded_by': 'admin'},
+      );
 
       // Upload the image file to Firebase Storage
-      UploadTask uploadTask = storageReference.putFile(imageFile);
+      UploadTask uploadTask = storageReference.putFile(imageFile, metadata);
       TaskSnapshot taskSnapshot = await uploadTask;
 
       // Get the download URL of the uploaded image
@@ -494,7 +499,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
       // Create a new document in the 'users' collection with the generated UID
       DocumentReference doctorRef =
           firestore.collection('users').doc(userCredential.user!.uid);
-      String? downloadURL;
+      String? downloadURL = '';
       if (_selectedImage != null) {
         downloadURL = await _uploadImageToFirebase(_selectedImage!, uid);
       }

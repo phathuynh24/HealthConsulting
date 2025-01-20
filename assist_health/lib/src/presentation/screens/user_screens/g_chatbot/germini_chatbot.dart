@@ -15,7 +15,7 @@ class GeminiChatBot extends StatefulWidget {
 
 class _GeminiChatBotState extends State<GeminiChatBot> {
   TextEditingController promptController = TextEditingController();
-  static const apiKey = "";
+  static const apiKey = "AIzaSyBKSzeUu5X7DgLHqg_p0qMdKjXiSNwhx0c";
   final model = GenerativeModel(model: "gemini-pro", apiKey: apiKey);
 
   final List<ModelMessage> messages = [];

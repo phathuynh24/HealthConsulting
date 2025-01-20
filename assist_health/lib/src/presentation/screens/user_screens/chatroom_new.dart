@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:assist_health/src/models/doctor/doctor_info.dart';
 import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/health_profile_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -141,14 +142,30 @@ class _ChatRoomNewState extends State<ChatRoomNew> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    (name != 'Chăm Sóc Khách Hàng') ? 'Bác sĩ $name' : name,
-                    style: const TextStyle(fontSize: 16, height: 1.7),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HealthProfileDetailScreen(
+                            profile: widget.userProfile, // Hồ sơ cần truyền
+                            isUserOfProfile: false, // Trạng thái quyền sở hữu
+                            isDoctorViewing: true, // Trạng thái xem của bác sĩ
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      (name != 'Chăm Sóc Khách Hàng')
+                          ? 'Bệnh nhân: ${widget.userProfile.name}'
+                          : name,
+                      style: const TextStyle(fontSize: 16, height: 1.7, color: Colors.white),
+                    ),
                   ),
-                  Text(
-                    'Bệnh nhân: ${widget.userProfile.name}',
-                    style: const TextStyle(fontSize: 12),
-                  ),
+                  // Text(
+                  //   'Bệnh nhân: ${widget.userProfile.name}',
+                  //   style: const TextStyle(fontSize: 12),
+                  // ),
                 ],
               );
             } else {

@@ -59,6 +59,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     setState(() {
       _imageUrls = [..._imageUrls, ...imagePaths];
       _selectedImageIndex = index;
+      print('Selected image index: $_imageUrls');
     });
   }
 
@@ -75,19 +76,55 @@ class _AddProductScreenState extends State<AddProductScreen> {
         _imageUrls.length == 3 &&
         _selectedCategory != null) {
       try {
-        List<String> imageUrls = [];
-        for (String imagePath in _imageUrls) {
-          final Reference storageRef = FirebaseStorage.instance
-              .ref()
-              .child('product_images')
-              .child(DateTime.now().toString());
-          final File imageFile = File(imagePath);
-          final UploadTask uploadTask = storageRef.putFile(imageFile);
-          final TaskSnapshot storageSnapshot =
-              await uploadTask.whenComplete(() {});
+        // Hiển thị Loading Indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        );
 
-          final String imageUrl = await storageSnapshot.ref.getDownloadURL();
-          imageUrls.add(imageUrl);
+        List<String> imageUrls = [];
+        if (_imageUrls.isEmpty) {
+          print('Danh sách ảnh trống.');
+          Navigator.pop(context); // Đóng Loading Indicator
+          return;
+        }
+
+        for (String imagePath in _imageUrls) {
+          try {
+            print('Uploading image: $imagePath');
+            final Reference storageRef = FirebaseStorage.instance
+                .ref()
+                .child('product_images')
+                .child(DateTime.now().toString());
+            final File imageFile = File(imagePath);
+
+            if (!imageFile.existsSync()) {
+              print('Tệp không tồn tại: $imagePath');
+              continue;
+            }
+
+            SettableMetadata metadata = SettableMetadata(
+              contentType: 'image/jpeg',
+              customMetadata: {'uploaded_by': 'admin'},
+            );
+
+            final UploadTask uploadTask =
+                storageRef.putFile(imageFile, metadata);
+            final TaskSnapshot storageSnapshot =
+                await uploadTask.whenComplete(() {});
+
+            final String imageUrl = await storageSnapshot.ref.getDownloadURL();
+            imageUrls.add(imageUrl);
+          } catch (e) {
+            print('Lỗi khi tải ảnh: $e');
+            Navigator.pop(context); // Đóng Loading Indicator
+            return;
+          }
         }
 
         final Product newProduct = Product(
@@ -101,63 +138,59 @@ class _AddProductScreenState extends State<AddProductScreen> {
           description: _descriptionController.text.trim(),
         );
 
-        final productRef = await FirebaseFirestore.instance
-            .collection('products')
-            .add(newProduct.toMap());
-        await productRef.update({'category': _selectedCategory});
+        try {
+          final productRef = await FirebaseFirestore.instance
+              .collection('products')
+              .add(newProduct.toMap());
+          await productRef.update({'category': _selectedCategory});
 
-        setState(() {
-          _nameController.text = '';
-          _priceController.text = '';
-          _oldPriceController.text = '';
-          _quantityController.text = '';
-          _descriptionController.text = '';
-          _imageUrls = [];
-          _selectedCategory = '';
-          _selectedImageIndex = -1; // Reset selected image index
-        });
+          setState(() {
+            _nameController.clear();
+            _priceController.clear();
+            _oldPriceController.clear();
+            _quantityController.clear();
+            _descriptionController.clear();
+            _imageUrls.clear();
+            _selectedCategory = '';
+            _selectedImageIndex = -1;
+          });
 
-        Navigator.pop(context);
+          Navigator.pop(context); // Đóng Loading Indicator
+          Navigator.pop(context); // Quay lại màn hình trước
+        } catch (e) {
+          print('Lỗi khi lưu sản phẩm vào Firestore: $e');
+          Navigator.pop(context); // Đóng Loading Indicator
+          _showErrorDialog('Lỗi khi lưu sản phẩm. Vui lòng thử lại sau.');
+        }
       } catch (e) {
         print('Error saving product: $e');
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const Text(
-                  'An error occurred while saving the product. Please try again later.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          },
-        );
+        Navigator.pop(context); // Đóng Loading Indicator
+        _showErrorDialog(
+            'Đã xảy ra lỗi khi lưu sản phẩm. Vui lòng thử lại sau.');
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Thông báo'),
-            content: const Text('Hãy điền hết các thông tin và ảnh.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
+      _showErrorDialog('Hãy điền đầy đủ các thông tin và ảnh.');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Thông báo'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _onCategoryChanged(String? newValue) {
@@ -170,6 +203,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('Selected image index: ${_imageUrls.length}');
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -211,7 +245,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   prefixIcon: Icon(Icons.attach_money),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [PriceInputFormatter()],
+                // inputFormatters: [PriceInputFormatter()],
               ),
               const SizedBox(height: 16.0),
               TextField(
@@ -222,7 +256,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   prefixIcon: Icon(Icons.money),
                 ),
                 keyboardType: TextInputType.number,
-                inputFormatters: [PriceInputFormatter()],
+                // inputFormatters: [PriceInputFormatter()],
               ),
               const SizedBox(height: 16.0),
               TextField(
