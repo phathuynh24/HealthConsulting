@@ -47,19 +47,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: password,
       );
 
-      final now = DateTime.now();
-      final formattedDate = "${now.day}-${now.month}-${now.year}";
-      final docId = 'user_${formattedDate}_${userCredential.user!.uid}';
+      final docId = userCredential.user!.uid;
 
       // Create collection `users` and document with `docId`
       await firestore.collection('users').doc(docId).set({
-        'name': name,
         'email': email,
         'uid': userCredential.user!.uid,
-        'imageURL': '',
         'role': 'user',
         'isOnline': false,
-        'createdAt': now.toIso8601String(),
+        'createdAt': DateTime.now().toIso8601String(),
       });
 
       // Create subcollection `health_profiles` and document with `idDoc`

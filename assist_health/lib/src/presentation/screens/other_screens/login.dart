@@ -64,15 +64,16 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<String?> getUserRole(User user) async {
     final firestore = FirebaseFirestore.instance;
 
-    final querySnapshot = await firestore
-        .collection('users')
-        .where('uid', isEqualTo: user.uid)
-        .limit(1)
-        .get();
+    try {
+      final docSnapshot =
+          await firestore.collection('users').doc(user.uid).get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      final userDoc = querySnapshot.docs.first.data();
-      return userDoc['role'] ?? '';
+      if (docSnapshot.exists) {
+        final userDoc = docSnapshot.data();
+        return userDoc?['role'] ?? '';
+      }
+    } catch (e) {
+      return null;
     }
 
     return null;
@@ -265,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Center(
                       child: InkWell(
-                        onTap: () => resetPassword(_emailController.text),
+                        onTap: () => resetPassword(_emailController.text.trim()),
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text(
