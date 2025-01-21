@@ -32,94 +32,112 @@ class _LoginScreenState extends State<LoginScreen> {
     return emailRegex.hasMatch(email);
   }
 
-  Future<void> resetPassword(String email) async {
+  bool validateInputs() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty && password.isEmpty) {
+      _showSnackBar("Vui lòng nhập email và mật khẩu.", Colors.orange);
+      return false;
+    }
+    if (email.isEmpty) {
+      _showSnackBar("Vui lòng nhập email.", Colors.orange);
+      return false;
+    }
+    if (!_isValidEmail(email)) {
+      _showSnackBar("Email không hợp lệ.", Colors.red);
+      return false;
+    }
+    if (password.isEmpty) {
+      _showSnackBar("Vui lòng nhập mật khẩu.", Colors.orange);
+      return false;
+    }
+    return true;
+  }
+
+  void _showSnackBar(String message, Color color) {
     final overlay = Overlay.of(context);
     final mediaQuery = MediaQuery.of(context);
+    TopSnackBar.show(overlay, mediaQuery, message, color);
+  }
 
+  Future<String?> getUserRole(User user) async {
+    final firestore = FirebaseFirestore.instance;
+
+    final querySnapshot = await firestore
+        .collection('users')
+        .where('uid', isEqualTo: user.uid)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final userDoc = querySnapshot.docs.first.data();
+      return userDoc['role'] ?? '';
+    }
+
+    return null;
+  }
+
+  Future<void> resetPassword(String email) async {
     if (email.isEmpty) {
-      TopSnackBar.show(overlay, mediaQuery,
-          "Vui lòng nhập email để đặt lại mật khẩu.", Colors.orange);
+      _showSnackBar("Vui lòng nhập email để đặt lại mật khẩu.", Colors.orange);
       return;
     }
     if (!_isValidEmail(email)) {
-      TopSnackBar.show(overlay, mediaQuery, "Email không hợp lệ.", Colors.red);
+      _showSnackBar("Email không hợp lệ.", Colors.red);
       return;
     }
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      TopSnackBar.show(overlay, mediaQuery,
-          "Liên kết đặt lại mật khẩu đã được gửi.", Colors.green);
+      _showSnackBar("Liên kết đặt lại mật khẩu đã được gửi.", Colors.green);
     } catch (error) {
-      TopSnackBar.show(
-          overlay, mediaQuery, "Đã xảy ra lỗi: $error", Colors.red);
+      _showSnackBar("Đã xảy ra lỗi: $error", Colors.red);
     }
   }
 
   Future<void> handleLogin() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final overlay = Overlay.of(context);
-    final mediaQuery = MediaQuery.of(context);
-
-    if (email.isEmpty && password.isEmpty) {
-      TopSnackBar.show(overlay, mediaQuery, "Vui lòng nhập email và mật khẩu.",
-          Colors.orange);
-      return;
-    }
-    if (email.isEmpty) {
-      TopSnackBar.show(
-          overlay, mediaQuery, "Vui lòng nhập email.", Colors.orange);
-      return;
-    }
-    if (!_isValidEmail(email)) {
-      TopSnackBar.show(overlay, mediaQuery, "Email không hợp lệ.", Colors.red);
-      return;
-    }
-    if (password.isEmpty) {
-      TopSnackBar.show(
-          overlay, mediaQuery, "Vui lòng nhập mật khẩu.", Colors.orange);
-      return;
-    }
+    if (!validateInputs()) return;
 
     setState(() => isLoading = true);
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
     try {
       User? user = await logIn(email, password);
 
       if (user == null) {
-        TopSnackBar.show(
-            overlay, mediaQuery, "Đăng nhập không thành công!", Colors.red);
+        _showSnackBar("Đăng nhập không thành công!", Colors.red);
         return;
       }
 
-      DocumentSnapshot userDoc =
-          await firestore.collection('users').doc(user.uid).get();
-      String role = userDoc['role'] ?? '';
+      final role = await getUserRole(user);
+
+      if (role == null || role.isEmpty) {
+        _showSnackBar("Vai trò không hợp lệ.", Colors.red);
+        return;
+      }
 
       if (!mounted) return;
 
       switch (role) {
         case 'user':
-          TopSnackBar.show(
-              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          _showSnackBar("Đăng nhập thành công!", Colors.green);
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => const UserNavBar()));
           break;
         case 'doctor':
-          TopSnackBar.show(
-              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          _showSnackBar("Đăng nhập thành công!", Colors.green);
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => const DoctorNavBar()));
           break;
         case 'admin':
-          TopSnackBar.show(
-              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          _showSnackBar("Đăng nhập thành công!", Colors.green);
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => const AdminNavBar()));
           break;
         default:
-          TopSnackBar.show(
-              overlay, mediaQuery, "Vai trò không hợp lệ.", Colors.red);
+          _showSnackBar("Vai trò không hợp lệ.", Colors.red);
       }
 
       await firestore
@@ -144,9 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
         default:
           errorMessage = "Đăng nhập không thành công!";
       }
-      TopSnackBar.show(overlay, mediaQuery, errorMessage, Colors.red);
+      _showSnackBar(errorMessage, Colors.red);
     } catch (e) {
-      TopSnackBar.show(overlay, mediaQuery, "Lỗi: $e", Colors.red);
+      _showSnackBar("Lỗi: $e", Colors.red);
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -205,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         shadowColor: Colors.black54,
-                        elevation: 5,
+                        elevation: isLoading ? 0 : 5,
                       ),
                       child: const Text(
                         "Đăng nhập",
@@ -266,7 +284,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          // Loading Indicator
           LoadingIndicator(isLoading: isLoading),
         ],
       ),

@@ -332,7 +332,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _currentProfile!.phone,
+                      _currentProfile!.phone == ''
+                          ? 'Chưa cập nhật'
+                          : _currentProfile!.phone,
                       style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
@@ -348,7 +350,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _currentProfile!.doB,
+                      _currentProfile!.doB == ''
+                          ? 'Chưa cập nhật'
+                          : _currentProfile!.doB,
                       style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
@@ -364,7 +368,9 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      _currentProfile!.gender,
+                      _currentProfile!.gender == ''
+                          ? 'Chưa cập nhật'
+                          : _currentProfile!.gender,
                       style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
@@ -411,129 +417,134 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                           ),
                       ],
                     ),
-                    if (_isLoadFile) Container(
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 10,
-                      ),
-                      child: GridView.builder(
-                        padding: EdgeInsets.zero,
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _selectedFiles.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 6.0,
-                          crossAxisSpacing: 6.0,
-                          childAspectRatio: 1.0,
+                    if (_isLoadFile)
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 10,
                         ),
-                        itemBuilder: (context, index) {
-                          File file = _selectedFiles[index];
-                          String extension =
-                              file.path.split('.').last.toLowerCase();
-                          return GestureDetector(
-                            onTap: () {
-                              OpenFile.open(file.path);
-                            },
-                            child: Stack(
-                              children: [
-                                LayoutBuilder(builder: (BuildContext context,
-                                    BoxConstraints constraints) {
-                                  return Center(
-                                    child: Container(
-                                      height: constraints.maxWidth - 10,
-                                      width: constraints.maxHeight - 10,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(6),
-                                        color: Colors.grey,
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          if (extension == 'pdf')
-                                            const Icon(Icons.picture_as_pdf,
-                                                size: 50),
-                                          if (extension == 'doc' ||
-                                              extension == 'docx')
-                                            const Icon(Icons.description,
-                                                size: 50),
-                                          if (extension == 'mp4')
-                                            const Icon(Icons.play_circle_filled,
-                                                size: 50),
-                                          if (extension == 'png' ||
-                                              extension == 'jpg' ||
-                                              extension == 'jpeg')
-                                            SizedBox(
-                                              height: constraints.maxWidth - 10,
-                                              width: constraints.maxHeight - 10,
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                child: Image.file(
-                                                  file,
-                                                  fit: BoxFit.cover,
+                        child: GridView.builder(
+                          padding: EdgeInsets.zero,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _selectedFiles.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 6.0,
+                            crossAxisSpacing: 6.0,
+                            childAspectRatio: 1.0,
+                          ),
+                          itemBuilder: (context, index) {
+                            File file = _selectedFiles[index];
+                            String extension =
+                                file.path.split('.').last.toLowerCase();
+                            return GestureDetector(
+                              onTap: () {
+                                OpenFile.open(file.path);
+                              },
+                              child: Stack(
+                                children: [
+                                  LayoutBuilder(builder: (BuildContext context,
+                                      BoxConstraints constraints) {
+                                    return Center(
+                                      child: Container(
+                                        height: constraints.maxWidth - 10,
+                                        width: constraints.maxHeight - 10,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          color: Colors.grey,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            if (extension == 'pdf')
+                                              const Icon(Icons.picture_as_pdf,
+                                                  size: 50),
+                                            if (extension == 'doc' ||
+                                                extension == 'docx')
+                                              const Icon(Icons.description,
+                                                  size: 50),
+                                            if (extension == 'mp4')
+                                              const Icon(
+                                                  Icons.play_circle_filled,
+                                                  size: 50),
+                                            if (extension == 'png' ||
+                                                extension == 'jpg' ||
+                                                extension == 'jpeg')
+                                              SizedBox(
+                                                height:
+                                                    constraints.maxWidth - 10,
+                                                width:
+                                                    constraints.maxHeight - 10,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
+                                                  child: Image.file(
+                                                    file,
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }),
-                                if (widget.isUserOfProfile ||
-                                    !widget.isDoctorViewing)
-                                  Positioned(
-                                    top: 0,
-                                    right: 0,
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          File file = _selectedFiles[index];
-                                          // Xóa tệp cục bộ
-                                          file.deleteSync();
-                                          // Xóa tệp khỏi danh sách
-                                          _selectedFiles.removeAt(index);
-                                          // Xóa file trên firebase
-                                          deleteFileFromFirestore(index);
-                                        });
-                                      },
-                                      child: const CircleAvatar(
-                                        backgroundColor: Colors.red,
-                                        radius: 12,
-                                        child: Icon(
-                                          Icons.close,
-                                          color: Colors.white,
-                                          size: 15,
+                                    );
+                                  }),
+                                  if (widget.isUserOfProfile ||
+                                      !widget.isDoctorViewing)
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            File file = _selectedFiles[index];
+                                            // Xóa tệp cục bộ
+                                            file.deleteSync();
+                                            // Xóa tệp khỏi danh sách
+                                            _selectedFiles.removeAt(index);
+                                            // Xóa file trên firebase
+                                            deleteFileFromFirestore(index);
+                                          });
+                                        },
+                                        child: const CircleAvatar(
+                                          backgroundColor: Colors.red,
+                                          radius: 12,
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                            size: 15,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                          );
-                        },
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
                     if (_isLoadFile && _selectedFiles.isEmpty)
                       const Center(
                         child: Text(
-                          'Không có tệp nào',
+                          'Chưa có tệp nào',
                           style: TextStyle(
                               fontSize: 16,
                               color: Colors.blueGrey,
                               fontWeight: FontWeight.w400),
                         ),
-                      ), 
+                      ),
                     if (!_isLoadFile)
                       Container(
                         margin: const EdgeInsets.only(top: 60),
                         child: const Center(
                           child: CircularProgressIndicator(),
                         ),
-                      ),               
+                      ),
                   ],
                 ),
               ),
