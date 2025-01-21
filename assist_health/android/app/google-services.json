@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "310244111218",
+    "firebase_url": "https://assist-health-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "assist-health",
     "storage_bucket": "assist-health.appspot.com"
   },
