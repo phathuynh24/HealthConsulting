@@ -1,6 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/phone.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/sign_up.dart';
+import 'package:assist_health/src/presentation/screens/other_screens/sign_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';

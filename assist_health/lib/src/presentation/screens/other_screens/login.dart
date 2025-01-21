@@ -1,13 +1,15 @@
+import 'package:assist_health/src/presentation/screens/other_screens/sign_up.dart';
+import 'package:assist_health/src/widgets/loading_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/other_screens/welcome.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/widgets/user_navbar.dart';
 import 'package:assist_health/src/widgets/doctor_navbar.dart';
 import 'package:assist_health/src/widgets/admin_navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:assist_health/src/widgets/top_snackbar.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,228 +23,196 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool passToggle = true;
   bool isLoading = false;
-  final TextEditingController _name = TextEditingController();
-  final TextEditingController _password = TextEditingController();
-  late DocumentReference documentReference;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> setOffline() async {
-    await documentReference.update({'status': 'offline'});
+  bool _isValidEmail(String email) {
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
   }
 
-  void resetPassword(String email) async {
+  Future<void> resetPassword(String email) async {
+    final overlay = Overlay.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
+    if (email.isEmpty) {
+      TopSnackBar.show(overlay, mediaQuery,
+          "Vui lòng nhập email để đặt lại mật khẩu.", Colors.orange);
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      TopSnackBar.show(overlay, mediaQuery, "Email không hợp lệ.", Colors.red);
+      return;
+    }
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      // Thành công: Hiển thị thông báo cho người dùng rằng email đã được gửi thành công
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Thành công"),
-            content: const Text(
-                "Một liên kết đặt lại mật khẩu đã được gửi đến email của bạn."),
-            actions: [
-              TextButton(
-                child: const Text("Đóng"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      TopSnackBar.show(overlay, mediaQuery,
+          "Liên kết đặt lại mật khẩu đã được gửi.", Colors.green);
     } catch (error) {
-      // Xử lý lỗi: Hiển thị thông báo lỗi cho người dùng
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Lỗi"),
-            content: Text("Đã xảy ra lỗi: $error"),
-            actions: [
-              TextButton(
-                child: const Text("Đóng"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      TopSnackBar.show(
+          overlay, mediaQuery, "Đã xảy ra lỗi: $error", Colors.red);
+    }
+  }
+
+  Future<void> handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final overlay = Overlay.of(context);
+    final mediaQuery = MediaQuery.of(context);
+
+    if (email.isEmpty && password.isEmpty) {
+      TopSnackBar.show(overlay, mediaQuery, "Vui lòng nhập email và mật khẩu.",
+          Colors.orange);
+      return;
+    }
+    if (email.isEmpty) {
+      TopSnackBar.show(
+          overlay, mediaQuery, "Vui lòng nhập email.", Colors.orange);
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      TopSnackBar.show(overlay, mediaQuery, "Email không hợp lệ.", Colors.red);
+      return;
+    }
+    if (password.isEmpty) {
+      TopSnackBar.show(
+          overlay, mediaQuery, "Vui lòng nhập mật khẩu.", Colors.orange);
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      User? user = await logIn(email, password);
+
+      if (user == null) {
+        TopSnackBar.show(
+            overlay, mediaQuery, "Đăng nhập không thành công!", Colors.red);
+        return;
+      }
+
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(user.uid).get();
+      String role = userDoc['role'] ?? '';
+
+      if (!mounted) return;
+
+      switch (role) {
+        case 'user':
+          TopSnackBar.show(
+              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const UserNavBar()));
+          break;
+        case 'doctor':
+          TopSnackBar.show(
+              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const DoctorNavBar()));
+          break;
+        case 'admin':
+          TopSnackBar.show(
+              overlay, mediaQuery, "Đăng nhập thành công!", Colors.green);
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => const AdminNavBar()));
+          break;
+        default:
+          TopSnackBar.show(
+              overlay, mediaQuery, "Vai trò không hợp lệ.", Colors.red);
+      }
+
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .update({'status': 'online'});
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = "Email không tồn tại.";
+          break;
+        case 'wrong-password':
+          errorMessage = "Mật khẩu không chính xác.";
+          break;
+        case 'invalid-email':
+          errorMessage = "Email không hợp lệ.";
+          break;
+        case 'invalid-credential':
+          errorMessage = "Tài khoản hoặc mật khẩu không hợp lệ.";
+          break;
+        default:
+          errorMessage = "Đăng nhập không thành công!";
+      }
+      TopSnackBar.show(overlay, mediaQuery, errorMessage, Colors.red);
+    } catch (e) {
+      TopSnackBar.show(overlay, mediaQuery, "Lỗi: $e", Colors.red);
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async {
-          // Navigate back to the WelcomeScreen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-          );
-          return true;
-        },
-        child: Material(
-          color: Themes.backgroundClr,
-          child: Scaffold(
-            body: SingleChildScrollView(
-              child: SafeArea(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Image.asset(
-                        "assets/doctors.png",
+                    const SizedBox(height: 20),
+                    Image.asset("assets/login/login.png"),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: "Email",
+                        prefixIcon: Icon(Icons.email),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: TextField(
-                        controller: _name,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          label: Text("Nhập email"),
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: TextField(
-                        controller: _password,
-                        obscureText: passToggle ? true : false,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          label: const Text("Nhập mật khẩu"),
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: InkWell(
-                            onTap: () {
-                              if (passToggle == true) {
-                                passToggle = false;
-                              } else {
-                                passToggle = true;
-                              }
-                              setState(() {});
-                            },
-                            child: passToggle
-                                ? const Icon(CupertinoIcons.eye_slash_fill)
-                                : const Icon(CupertinoIcons.eye_fill),
-                          ),
+                    const SizedBox(height: 15),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: passToggle,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: "Mật khẩu",
+                        prefixIcon: const Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                          icon: Icon(passToggle
+                              ? CupertinoIcons.eye_slash_fill
+                              : CupertinoIcons.eye_fill),
+                          onPressed: () =>
+                              setState(() => passToggle = !passToggle),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: InkWell(
-                        onTap: () async {
-                          if (_name.text.isNotEmpty &&
-                              _password.text.isNotEmpty) {
-                            setState(() {
-                              isLoading = true;
-                            });
-
-                            try {
-                              User? user = await logIn(
-                                  _name.text.trim(), _password.text.trim());
-                              if (user == null) {
-                                print("Login failed");
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                return;
-                              }
-
-                              print("Login Successful for user: ${user.email}");
-
-                              // Điều hướng dựa trên dữ liệu từ Firestore
-                              DocumentReference documentReference =
-                                  firestore.collection('users').doc(user.uid);
-                              DocumentSnapshot document =
-                                  await documentReference.get();
-
-                              if (!document.exists) {
-                                print("User document not found in Firestore.");
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                return;
-                              }
-
-                              String? role = document['role'];
-                              if (role == null) {
-                                print("Role not found in Firestore document.");
-                                setState(() {
-                                  isLoading = false;
-                                });
-                                return;
-                              }
-
-                              switch (role) {
-                                case 'user':
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => const UserNavBar()));
-                                  break;
-                                case 'doctor':
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const DoctorNavBar()));
-                                  break;
-                                case 'admin':
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => const AdminNavBar()));
-                                  break;
-                                default:
-                                  print("Invalid role: $role");
-                              }
-
-                              await documentReference
-                                  .update({'status': 'online'});
-                            } catch (e) {
-                              print("Unexpected Error: $e");
-                            } finally {
-                              setState(() {
-                                isLoading = false;
-                              });
-                            }
-                          } else {
-                            print("Name or password is empty");
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Themes.buttonClr,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 4,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Đăng nhập",
-                              style: TextStyle(
-                                fontSize: 23,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                    ElevatedButton(
+                      onPressed: isLoading ? null : handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Themes.buttonClr,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        shadowColor: Colors.black54,
+                        elevation: 5,
+                      ),
+                      child: const Text(
+                        "Đăng nhập",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -251,7 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "Nếu bạn chưa có tài khoản?",
+                          "Chưa có tài khoản?",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -259,15 +229,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {
-                            // Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (_) => const SignUpScreen1(),
-                            //     ));
-                          },
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const SignUpScreen()),
+                          ),
                           child: const Text(
-                            "Đăng ký",
+                            "Đăng ký ngay!",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -277,91 +245,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    InkWell(
-                      onTap: () {
-                        // Call resetPassword when the user clicks "Quên mật khẩu"
-                        if (_name.text.isNotEmpty) {
-                          resetPassword(_name.text);
-                        } else {
-                          // Show an error or prompt the user to enter an email
-                          print("Vui lòng nhập email của bạn");
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          "Quên mật khẩu?",
-                          style: TextStyle(
-                            color: Themes.primaryColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                    Center(
+                      child: InkWell(
+                        onTap: () => resetPassword(_emailController.text),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            "Quên mật khẩu?",
+                            style: TextStyle(
+                              color: Themes.primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
           ),
-        ));
+          // Loading Indicator
+          LoadingIndicator(isLoading: isLoading),
+        ],
+      ),
+    );
   }
 
   @override
   void dispose() {
-    // Call setOffline when the widget is disposed (e.g., when user logs out or closes the app)
-    setOffline();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
-  }
-
-  void showCustomTopSnackBar(BuildContext context, String message) {
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).padding.top +
-            10, // Hiển thị ngay dưới thanh trạng thái
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Thêm thông báo vào Overlay
-    overlay.insert(overlayEntry);
-
-    // Tự động ẩn thông báo sau 3 giây
-    Future.delayed(const Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
   }
 }

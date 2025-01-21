@@ -52,27 +52,10 @@ Future<User?> createAccount(
 }
 
 Future<User?> logIn(String email, String password) async {
-  // try {
-    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email, password: password);
-
-    print("User: $userCredential");
-    // _auth
-    print(_auth.currentUser);
-
-    // print("Login Sucessfull");
-    _firestore
-        .collection('users')
-        .doc(_auth.currentUser!.uid)
-        .get()
-        .then((value) => userCredential.user!.updateDisplayName(value['name']));
-
-    print("Login: ${userCredential.user!.displayName}");
-    return userCredential.user;
-  // } catch (e) {
-  //   print(e);
-  //   return null;
-  // }
+  UserCredential userCredential =
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+  _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+  return userCredential.user;
 }
 
 Future<void> logOut(BuildContext context) async {

@@ -48,3 +48,6 @@ app.*.map.json
 
 # Ignore env python for Flask
 **/myenv
+
+# FVM Version Cache
+.fvm/
