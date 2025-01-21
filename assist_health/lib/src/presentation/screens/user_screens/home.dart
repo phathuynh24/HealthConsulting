@@ -6,7 +6,6 @@ import 'package:assist_health/src/models/doctor/doctor_info.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/chatbot/chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_chat.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_detail.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/doctor_list.dart';
@@ -950,19 +949,36 @@ class _MyHomeScreen extends State<HomeScreen> {
 
   Future<void> getUserData(String uid) async {
     try {
-      DocumentSnapshot snapshot =
-          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final firestore = FirebaseFirestore.instance;
+      final querySnapshot = await firestore
+          .collection('users')
+          .where('uid', isEqualTo: uid)
+          .limit(1)
+          .get();
 
-      if (snapshot.exists) {
-        setState(() {
-          imageURL = snapshot.get('imageURL');
-          name = snapshot.get('name');
-        });
-      } else {
-        print('User does not exist');
+      if (querySnapshot.docs.isEmpty) {
+        throw Exception("Không tìm thấy tài liệu người dùng.");
       }
-    } catch (error) {
-      print('Failed to fetch user data: $error');
+
+      final userDocId = querySnapshot.docs.first.id;
+
+      final profileSnapshot = await firestore
+          .collection('users')
+          .doc(userDocId)
+          .collection('health_profiles')
+          .doc('main_profile')
+          .get();
+
+      if (!profileSnapshot.exists) {
+        throw Exception("Không tìm thấy thông tin 'main_profile'.");
+      }
+
+      setState(() {
+          imageURL = profileSnapshot.get('imageURL');
+          name = profileSnapshot.get('name');
+        });
+    } catch (e) {
+      print('Failed to fetch user data: $e');
     }
   }
 }

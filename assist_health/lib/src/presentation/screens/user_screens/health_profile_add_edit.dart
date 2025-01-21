@@ -73,10 +73,14 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
       _phoneController.text = _currentUserProfile!.phone;
 
       _dobController.text = _currentUserProfile!.doB;
-      _selectedDate = DateFormat('dd/MM/yyyy').parse(_currentUserProfile!.doB);
+      _selectedDate = (_currentUserProfile!.doB != '')
+          ? DateFormat('dd/MM/yyyy').parse(_currentUserProfile!.doB)
+          : null;
 
-      _selectedGender = _currentUserProfile!.gender;
-      _isMale = (_selectedGender == 'Nam') ? true : false;
+      _selectedGender = (_currentUserProfile?.gender ?? '').isEmpty
+          ? 'Nam'
+          : _currentUserProfile!.gender;
+      _isMale = (_selectedGender == 'Nam');
 
       _selectedRelationship = _currentUserProfile!.relationship;
     }

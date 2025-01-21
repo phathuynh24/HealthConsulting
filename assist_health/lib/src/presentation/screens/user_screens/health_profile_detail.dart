@@ -7,6 +7,7 @@ import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_add_edit.dart';
+import 'package:assist_health/src/widgets/loading_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,11 +46,11 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
   List<File> _selectedFiles = [];
   UserProfile? _currentProfile;
   bool _isLoadFile = false;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // _uid = _auth.currentUser!.uid;
     if (widget.isDoctorViewing) {
       _uid = widget.profile.ownerID;
     } else {
@@ -69,68 +70,340 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Hồ sơ sức khỏe',
-          style: TextStyle(fontSize: 20),
-        ),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Hồ sơ sức khỏe',
+              style: TextStyle(fontSize: 20),
             ),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+            actions: [
+              if (_currentProfile!.idDoc != 'main_profile' &&
+                  !widget.isDoctorViewing)
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    deleteDocumentProfile(_currentProfile!.idDoc);
+                  },
+                ),
+            ],
           ),
-        ),
-        actions: [
-          if (_currentProfile!.idDoc != 'main_profile' &&
-              !widget.isDoctorViewing)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                deleteDocumentProfile(_currentProfile!.idDoc);
-              },
-            ),
-        ],
-      ),
-      body: Container(
-        height: double.infinity,
-        color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  height: 180,
-                  decoration: (_currentProfile!.image != '')
-                      ? BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(_currentProfile!.image),
-                            fit: BoxFit.cover,
+          body: Container(
+            height: double.infinity,
+            color: Colors.white,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      height: 180,
+                      decoration: (_currentProfile!.image != '')
+                          ? BoxDecoration(
+                              image: DecorationImage(
+                                image: NetworkImage(_currentProfile!.image),
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : null,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: 15,
+                                sigmaY: 15,
+                              ),
+                              child: _currentProfile!.image.isNotEmpty
+                                  ? Container(
+                                      color: Colors.transparent,
+                                    )
+                                  : Container(
+                                      decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Themes.gradientDeepClr,
+                                            Themes.gradientLightClr
+                                          ],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                      ),
+                                    ),
+                            ),
                           ),
-                        )
-                      : null,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: 15,
-                            sigmaY: 15,
+                          // Ảnh nền
+                          Positioned(
+                            bottom: 20,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: Container(
+                                width: 130,
+                                height: 130,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _currentProfile!.image.isNotEmpty
+                                          ? Colors.black26
+                                          : Colors.blue.shade700
+                                              .withOpacity(0.8),
+                                      spreadRadius: 2,
+                                      blurRadius: 0,
+                                      offset: const Offset(0, 2.5),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child: _currentProfile!.image.isNotEmpty
+                                      ? Image.network(
+                                          _currentProfile!.image,
+                                          fit: BoxFit.cover,
+                                          width: 130,
+                                          height: 130,
+                                        )
+                                      : Container(
+                                          width: 130,
+                                          height: 130,
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Themes.gradientDeepClr,
+                                                Themes.gradientLightClr
+                                              ],
+                                              begin: Alignment.bottomCenter,
+                                              end: Alignment.topCenter,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              getAbbreviatedName(
+                                                  _currentProfile!.name),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 60,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
                           ),
-                          child: _currentProfile!.image.isNotEmpty
-                              ? Container(
-                                  color: Colors.transparent,
-                                )
-                              : Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(
+                                  CupertinoIcons.folder_fill_badge_person_crop,
+                                  color: Colors.blue,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 8.0),
+                                Text(
+                                  'Thông tin cơ bản',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.blue),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            if (widget.isUserOfProfile)
+                              TextButton(
+                                onPressed: () async {
+                                  dynamic result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          AddOrEditProfileScreen(
+                                        isEdit: true,
+                                        profile: _currentProfile,
+                                      ),
+                                    ),
+                                  );
+                                  if (result != null && result is Map) {
+                                    bool isEdited = result['isEdited'];
+                                    UserProfile editedUserProfile =
+                                        result['profile'];
+                                    if (isEdited) {
+                                      setState(() {
+                                        _currentProfile = editedUserProfile;
+                                      });
+                                    }
+                                    ScaffoldMessenger.of(context)
+                                        .hideCurrentSnackBar();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content:
+                                          Text('Điều chỉnh hồ sơ thành công!'),
+                                      backgroundColor: Colors.green,
+                                    ));
+                                  }
+                                },
+                                child: const Text(
+                                  'Điều chỉnh',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Mã bệnh nhân',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _currentProfile!.idProfile,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                final data = ClipboardData(
+                                    text: _currentProfile!.idProfile);
+                                Clipboard.setData(data);
+                                showToastMessage(
+                                    context, 'Mã bệnh nhân đã được sao chép');
+                              },
+                              child: const Icon(
+                                Icons.content_copy,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Họ và tên',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _currentProfile!.name,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Số điện thoại',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _currentProfile!.phone == ''
+                              ? 'Chưa cập nhật'
+                              : _currentProfile!.phone,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Ngày sinh',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _currentProfile!.doB == ''
+                              ? 'Chưa cập nhật'
+                              : _currentProfile!.doB,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Giới tính',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _currentProfile!.gender == ''
+                              ? 'Chưa cập nhật'
+                              : _currentProfile!.gender,
+                          style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            const Text(
+                              'LỊCH SỬ XÉT NGHIỆM',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            const Spacer(),
+                            if (widget.isUserOfProfile)
+                              GestureDetector(
+                                onTap: () {
+                                  _showBottomSheet(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    gradient: const LinearGradient(
                                       colors: [
                                         Themes.gradientDeepClr,
                                         Themes.gradientLightClr
@@ -139,419 +412,167 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
                                       end: Alignment.centerRight,
                                     ),
                                   ),
-                                ),
-                        ),
-                      ),
-                      // Ảnh nền
-                      Positioned(
-                        bottom: 20,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Container(
-                            width: 130,
-                            height: 130,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _currentProfile!.image.isNotEmpty
-                                      ? Colors.black26
-                                      : Colors.blue.shade700.withOpacity(0.8),
-                                  spreadRadius: 2,
-                                  blurRadius: 0,
-                                  offset: const Offset(0, 2.5),
-                                ),
-                              ],
-                            ),
-                            child: ClipOval(
-                              child: _currentProfile!.image.isNotEmpty
-                                  ? Image.network(
-                                      _currentProfile!.image,
-                                      fit: BoxFit.cover,
-                                      width: 130,
-                                      height: 130,
-                                    )
-                                  : Container(
-                                      width: 130,
-                                      height: 130,
-                                      decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Themes.gradientDeepClr,
-                                            Themes.gradientLightClr
-                                          ],
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          getAbbreviatedName(
-                                              _currentProfile!.name),
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 60,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 10,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(
-                              CupertinoIcons.folder_fill_badge_person_crop,
-                              color: Colors.blue,
-                              size: 30,
-                            ),
-                            SizedBox(width: 8.0),
-                            Text(
-                              'Thông tin cơ bản',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.blue),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        if (widget.isUserOfProfile)
-                          TextButton(
-                            onPressed: () async {
-                              dynamic result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AddOrEditProfileScreen(
-                                    isEdit: true,
-                                    profile: _currentProfile,
+                                  child: const Text(
+                                    'Cập nhật',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ),
-                              );
-                              if (result != null && result is Map) {
-                                bool isEdited = result['isEdited'];
-                                UserProfile editedUserProfile =
-                                    result['profile'];
-                                if (isEdited) {
-                                  setState(() {
-                                    _currentProfile = editedUserProfile;
-                                  });
-                                }
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentSnackBar();
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text('Điều chỉnh hồ sơ thành công!'),
-                                  backgroundColor: Colors.green,
-                                ));
-                              }
-                            },
-                            child: const Text(
-                              'Điều chỉnh',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 16.0,
                               ),
+                          ],
+                        ),
+                        if (_isLoadFile)
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 10,
                             ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Mã bệnh nhân',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _currentProfile!.idProfile,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            final data =
-                                ClipboardData(text: _currentProfile!.idProfile);
-                            Clipboard.setData(data);
-                            showToastMessage(
-                                context, 'Mã bệnh nhân đã được sao chép');
-                          },
-                          child: const Icon(
-                            Icons.content_copy,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Họ và tên',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _currentProfile!.name,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Số điện thoại',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _currentProfile!.phone == ''
-                          ? 'Chưa cập nhật'
-                          : _currentProfile!.phone,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Ngày sinh',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _currentProfile!.doB == ''
-                          ? 'Chưa cập nhật'
-                          : _currentProfile!.doB,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Giới tính',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      _currentProfile!.gender == ''
-                          ? 'Chưa cập nhật'
-                          : _currentProfile!.gender,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Text(
-                          'LỊCH SỬ XÉT NGHIỆM',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        const Spacer(),
-                        if (widget.isUserOfProfile)
-                          GestureDetector(
-                            onTap: () {
-                              _showBottomSheet(context);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Themes.gradientDeepClr,
-                                    Themes.gradientLightClr
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
+                            child: GridView.builder(
+                              padding: EdgeInsets.zero,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _selectedFiles.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 6.0,
+                                crossAxisSpacing: 6.0,
+                                childAspectRatio: 1.0,
                               ),
-                              child: const Text(
-                                'Cập nhật',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    if (_isLoadFile)
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 10,
-                        ),
-                        child: GridView.builder(
-                          padding: EdgeInsets.zero,
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _selectedFiles.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 6.0,
-                            crossAxisSpacing: 6.0,
-                            childAspectRatio: 1.0,
-                          ),
-                          itemBuilder: (context, index) {
-                            File file = _selectedFiles[index];
-                            String extension =
-                                file.path.split('.').last.toLowerCase();
-                            return GestureDetector(
-                              onTap: () {
-                                OpenFile.open(file.path);
-                              },
-                              child: Stack(
-                                children: [
-                                  LayoutBuilder(builder: (BuildContext context,
-                                      BoxConstraints constraints) {
-                                    return Center(
-                                      child: Container(
-                                        height: constraints.maxWidth - 10,
-                                        width: constraints.maxHeight - 10,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(6),
-                                          color: Colors.grey,
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            if (extension == 'pdf')
-                                              const Icon(Icons.picture_as_pdf,
-                                                  size: 50),
-                                            if (extension == 'doc' ||
-                                                extension == 'docx')
-                                              const Icon(Icons.description,
-                                                  size: 50),
-                                            if (extension == 'mp4')
-                                              const Icon(
-                                                  Icons.play_circle_filled,
-                                                  size: 50),
-                                            if (extension == 'png' ||
-                                                extension == 'jpg' ||
-                                                extension == 'jpeg')
-                                              SizedBox(
-                                                height:
-                                                    constraints.maxWidth - 10,
-                                                width:
-                                                    constraints.maxHeight - 10,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                  child: Image.file(
-                                                    file,
-                                                    fit: BoxFit.cover,
+                              itemBuilder: (context, index) {
+                                File file = _selectedFiles[index];
+                                String extension =
+                                    file.path.split('.').last.toLowerCase();
+                                return GestureDetector(
+                                  onTap: () {
+                                    OpenFile.open(file.path);
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      LayoutBuilder(builder:
+                                          (BuildContext context,
+                                              BoxConstraints constraints) {
+                                        return Center(
+                                          child: Container(
+                                            height: constraints.maxWidth - 10,
+                                            width: constraints.maxHeight - 10,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              color: Colors.grey,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                if (extension == 'pdf')
+                                                  const Icon(
+                                                      Icons.picture_as_pdf,
+                                                      size: 50),
+                                                if (extension == 'doc' ||
+                                                    extension == 'docx')
+                                                  const Icon(Icons.description,
+                                                      size: 50),
+                                                if (extension == 'mp4')
+                                                  const Icon(
+                                                      Icons.play_circle_filled,
+                                                      size: 50),
+                                                if (extension == 'png' ||
+                                                    extension == 'jpg' ||
+                                                    extension == 'jpeg')
+                                                  SizedBox(
+                                                    height:
+                                                        constraints.maxWidth -
+                                                            10,
+                                                    width:
+                                                        constraints.maxHeight -
+                                                            10,
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              6),
+                                                      child: Image.file(
+                                                        file,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                      if (widget.isUserOfProfile ||
+                                          !widget.isDoctorViewing)
+                                        Positioned(
+                                          top: 0,
+                                          right: 0,
+                                          child: InkWell(
+                                            onTap: () async {
+                                              final confirmDelete =
+                                                  await _showDeleteFileConfirmationDialog();
+                                              if (confirmDelete) {
+                                                setState(() {
+                                                  File file =
+                                                      _selectedFiles[index];
+                                                  // Xóa tệp cục bộ
+                                                  file.deleteSync();
+                                                  // Xóa tệp khỏi danh sách
+                                                  _selectedFiles
+                                                      .removeAt(index);
+                                                  // Xóa file trên Firebase
+                                                  deleteFileFromFirestore(
+                                                      index);
+                                                });
+                                              }
+                                            },
+                                            child: const CircleAvatar(
+                                              backgroundColor: Colors.red,
+                                              radius: 12,
+                                              child: Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 15,
                                               ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  if (widget.isUserOfProfile ||
-                                      !widget.isDoctorViewing)
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            File file = _selectedFiles[index];
-                                            // Xóa tệp cục bộ
-                                            file.deleteSync();
-                                            // Xóa tệp khỏi danh sách
-                                            _selectedFiles.removeAt(index);
-                                            // Xóa file trên firebase
-                                            deleteFileFromFirestore(index);
-                                          });
-                                        },
-                                        child: const CircleAvatar(
-                                          backgroundColor: Colors.red,
-                                          radius: 12,
-                                          child: Icon(
-                                            Icons.close,
-                                            color: Colors.white,
-                                            size: 15,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    if (_isLoadFile && _selectedFiles.isEmpty)
-                      const Center(
-                        child: Text(
-                          'Chưa có tệp nào',
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.blueGrey,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    if (!_isLoadFile)
-                      Container(
-                        margin: const EdgeInsets.only(top: 60),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                  ],
-                ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        if (_isLoadFile && _selectedFiles.isEmpty)
+                          const Center(
+                            child: Text(
+                              'Chưa có tệp nào',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blueGrey,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        if (!_isLoadFile)
+                          Container(
+                            margin: const EdgeInsets.only(top: 60),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+        LoadingIndicator(isLoading: isLoading),
+      ],
     );
   }
 
@@ -614,6 +635,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
   }
 
   Future<void> uploadFile(File file) async {
+    setState(() => isLoading = true);
     try {
       // Tạo tham chiếu đến Firebase Storage
       final storageRef = _storage.ref().child(
@@ -638,6 +660,7 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
     } catch (error) {
       print(error);
     }
+    setState(() => isLoading = false);
   }
 
   Future<List<String>> getFileURLsFromStorage() async {
@@ -790,5 +813,29 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
     });
 
     return confirmDelete;
+  }
+
+  Future<bool> _showDeleteFileConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Xác nhận xóa tệp'),
+              content: const Text('Bạn có chắc chắn muốn xóa tệp này không?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false), // Hủy xóa
+                  child: const Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(context).pop(true), // Đồng ý xóa
+                  child: const Text('Xóa'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Trả về false nếu dialog bị đóng mà không chọn
   }
 }
