@@ -122,7 +122,10 @@ class _UpdateDoctorScreenState extends State<UpdateDoctorScreen> {
     try {
       FirebaseStorage storage = FirebaseStorage.instance;
       Reference storageReference = storage.ref().child('images/$doctorId.jpg');
-      UploadTask uploadTask = storageReference.putFile(imageFile);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      UploadTask uploadTask = storageReference.putFile(imageFile, metadata);
       TaskSnapshot taskSnapshot = await uploadTask;
       return await taskSnapshot.ref.getDownloadURL();
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:assist_health/src/presentation/screens/doctor_screens/update_doctor_info_screen.dart';
 import 'package:assist_health/src/presentation/screens/other_screens/sign_up.dart';
 import 'package:assist_health/src/widgets/loading_indicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -119,6 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
+      final userDoc = await firestore.collection('users').doc(user.uid).get();
+      final isFirstLogin = userDoc.data()?['isFirstLogin'] ?? true;
+
       if (!mounted) return;
 
       switch (role) {
@@ -129,8 +133,15 @@ class _LoginScreenState extends State<LoginScreen> {
           break;
         case 'doctor':
           _showSnackBar("Đăng nhập thành công!", Colors.green);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (_) => const DoctorNavBar()));
+          if (isFirstLogin) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const UpdateDoctorInfoScreen()));
+          } else {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (_) => const DoctorNavBar()));
+          }
           break;
         case 'admin':
           _showSnackBar("Đăng nhập thành công!", Colors.green);
@@ -266,7 +277,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Center(
                       child: InkWell(
-                        onTap: () => resetPassword(_emailController.text.trim()),
+                        onTap: () =>
+                            resetPassword(_emailController.text.trim()),
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text(

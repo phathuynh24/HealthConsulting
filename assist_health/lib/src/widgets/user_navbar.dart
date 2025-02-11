@@ -2,7 +2,6 @@ import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/blog_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/excercise/excercise_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/home.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/message.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/schedule.dart';

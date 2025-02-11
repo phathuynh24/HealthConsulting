@@ -15,18 +15,44 @@ class ShopChart extends StatefulWidget {
 }
 
 class _ShopChartState extends State<ShopChart> {
-  int selectedMonth = DateTime.now().month;
-  int selectedYear = DateTime.now().year;
+  DateTime? startDate;
+  DateTime? endDate;
+  String? errorMessage;
+
+  Future<void> _selectDate(BuildContext context, bool isStartDate) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStartDate ? startDate ?? DateTime.now() : endDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStartDate) {
+          startDate = picked;
+        } else {
+          endDate = picked;
+        }
+        _validateDates();
+      });
+    }
+  }
+
+  void _validateDates() {
+    if (startDate != null && endDate != null && startDate!.isAfter(endDate!)) {
+      errorMessage = "Ngày bắt đầu không được lớn hơn ngày kết thúc!";
+    } else {
+      errorMessage = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text(
-          'Thống kê đơn hàng',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Thống kê đơn hàng', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -41,46 +67,41 @@ class _ShopChartState extends State<ShopChart> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                DropdownButton<int>(
-                  value: selectedMonth,
-                  items: List.generate(12, (index) {
-                    return DropdownMenuItem(
-                      value: index + 1,
-                      child: Text('Tháng ${index + 1}'),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedMonth = value!;
-                    });
-                  },
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _selectDate(context, true),
+                    child: Text(
+                      startDate == null
+                          ? "Chọn ngày bắt đầu"
+                          : "Bắt đầu: ${DateFormat('dd/MM/yyyy').format(startDate!)}",
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 16),
-                DropdownButton<int>(
-                  value: selectedYear,
-                  items: List.generate(10, (index) {
-                    int year = DateTime.now().year - 5 + index;
-                    return DropdownMenuItem(
-                      value: year,
-                      child: Text('$year'),
-                    );
-                  }),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedYear = value!;
-                    });
-                  },
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _selectDate(context, false),
+                    child: Text(
+                      endDate == null
+                          ? "Chọn ngày kết thúc"
+                          : "Kết thúc: ${DateFormat('dd/MM/yyyy').format(endDate!)}",
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+          if (errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Text(errorMessage!, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            ),
           Expanded(
-            child: OrderList(
-                selectedMonth: selectedMonth, selectedYear: selectedYear),
+            child: OrderList(startDate: startDate, endDate: endDate),
           ),
         ],
       ),
@@ -88,12 +109,12 @@ class _ShopChartState extends State<ShopChart> {
   }
 }
 
-class OrderList extends StatelessWidget {
-  final int selectedMonth;
-  final int selectedYear;
 
-  const OrderList(
-      {super.key, required this.selectedMonth, required this.selectedYear});
+class OrderList extends StatelessWidget {
+  final DateTime? startDate;
+  final DateTime? endDate;
+
+  const OrderList({super.key, required this.startDate, required this.endDate});
 
   @override
   Widget build(BuildContext context) {
@@ -101,16 +122,24 @@ class OrderList extends StatelessWidget {
   }
 
   Widget buildOrderList() {
-    DateTime startOfMonth = DateTime(selectedYear, selectedMonth, 1);
-    DateTime endOfMonth = DateTime(selectedYear, selectedMonth + 1, 1)
-        .subtract(Duration(days: 1));
+    if (startDate == null || endDate == null) {
+      return const Center(child: Text("Vui lòng chọn khoảng thời gian"));
+    }
+
+    if (startDate!.isAfter(endDate!)) {
+      return const Center(child: Text("Lỗi: Ngày bắt đầu không được lớn hơn ngày kết thúc!", style: TextStyle(color: Colors.red)));
+    }
+
+    Timestamp startTimestamp = Timestamp.fromDate(startDate!);
+    Timestamp endTimestamp = Timestamp.fromDate(endDate!.add(const Duration(days: 1)));
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('orders')
           .where('status', isEqualTo: 'Đã giao')
-          .where('time', isGreaterThanOrEqualTo: startOfMonth)
-          .where('time', isLessThanOrEqualTo: endOfMonth)
+          .where('time', isGreaterThanOrEqualTo: startTimestamp)
+          .where('time', isLessThan: endTimestamp)
+          .orderBy('time', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {

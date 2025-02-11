@@ -712,7 +712,10 @@ class _AddOrEditProfileScreenState extends State<AddOrEditProfileScreen> {
 
         final imageReference =
             _storage.ref().child('images/${DateTime.now()}.png');
-        final uploadTask = imageReference.putFile(_selectedImage!);
+        SettableMetadata metadata = SettableMetadata(
+          contentType: 'image/png',
+        );
+        final uploadTask = imageReference.putFile(_selectedImage!, metadata);
         final storageTaskSnapshot = await uploadTask.whenComplete(() => null);
 
         // Lưu đường dẫn ảnh

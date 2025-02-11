@@ -42,7 +42,7 @@ dependencies:
   flutter_bloc: ^8.1.4
   chat_bubbles: ^1.5.0
   flutter_dotenv: ^5.1.0
-  syncfusion_flutter_sliders: ^25.1.37
+  syncfusion_flutter_sliders: ^27.2.5
   flutter_xlider: ^3.5.0
   shared_preferences: ^2.2.2
   translator: ^1.0.0
@@ -52,6 +52,10 @@ dependencies:
   flutter_screenutil: ^5.9.3
   carousel_slider: ^5.0.0
   youtube_player_flutter: ^8.0.0
+
+  persistent_bottom_nav_bar_v2: ^5.3.1
+  syncfusion_flutter_charts: ^27.2.5
+  event_bus: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -163,3 +167,7 @@ flutter:
     - assets/camera.png
     - assets/login/login.png
     - assets/signup/signup.png
+
+    - assets/camera_scan.png
+    - assets/healthy_tip_1.png
+    - assets/dish_icon.png

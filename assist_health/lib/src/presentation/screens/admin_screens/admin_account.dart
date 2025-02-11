@@ -468,9 +468,6 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 100,
-                        ),
                       ],
                     ),
                   ),

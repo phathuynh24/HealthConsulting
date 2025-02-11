@@ -93,7 +93,10 @@ class Result {
       String fileName = '${documentId}_file_$i';
       Reference storageReference =
           FirebaseStorage.instance.ref().child('result_image').child(fileName);
-      UploadTask uploadTask = storageReference.putFile(listFiles![i]);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      UploadTask uploadTask = storageReference.putFile(listFiles![i], metadata);
       TaskSnapshot taskSnapshot = await uploadTask;
       String fileUrl = await taskSnapshot.ref.getDownloadURL();
       listUrls!.add(fileUrl);

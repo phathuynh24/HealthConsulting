@@ -14,7 +14,9 @@ import 'package:assist_health/src/presentation/screens/user_screens/excercise/ex
 import 'package:assist_health/src/presentation/screens/user_screens/favorite_doctor_list.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/g_chatbot/germini_chatbot.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/health_profile_list.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/meals/calorie_tracker_home.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/core/check_account_active/user_meal_service.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/views/main_screen.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/custom_snackbar.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/home_store.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/view_result_list.dart';
@@ -420,7 +422,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                                 mainAxisSpacing: 10,
                                 children: [
                                   itemDashboard(
-                                      'Gọi video với bác sĩ',
+                                      'Danh sách bác sĩ',
                                       FontAwesomeIcons.mobile,
                                       const Color(0xFFD58EEE),
                                       const Color(0xFF801BE0), () {
@@ -515,7 +517,8 @@ class _MyHomeScreen extends State<HomeScreen> {
                                   itemDashboard(
                                     'Bài viết sức khoẻ',
                                     Icons.article_outlined,
-                                    const Color.fromARGB(255, 155, 233, 159), // Màu xanh lá nhạt
+                                    const Color.fromARGB(
+                                        255, 155, 233, 159), // Màu xanh lá nhạt
                                     const Color(0xFF388E3C), // Màu xanh lá đậm
                                     () {
                                       Navigator.of(context).push(
@@ -527,7 +530,8 @@ class _MyHomeScreen extends State<HomeScreen> {
                                   itemDashboard(
                                     'Luyện tập thể hình',
                                     Icons.fitness_center,
-                                    const Color.fromARGB(255, 141, 199, 248), // Màu xanh nhạt
+                                    const Color.fromARGB(
+                                        255, 141, 199, 248), // Màu xanh nhạt
                                     const Color(0xFF1E88E5), // Màu xanh đậm
                                     () {
                                       Navigator.of(context).push(
@@ -554,12 +558,21 @@ class _MyHomeScreen extends State<HomeScreen> {
                                     Icons.restaurant_menu,
                                     const Color(0xFFFFA726), // Màu cam sáng
                                     const Color(0xFFFF7043), // Màu cam đậm
-                                    () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                const CalorieTrackerHome()),
-                                      );
+                                    () async {
+                                      try {
+                                        // Kiểm tra và tạo dữ liệu nếu cần thiết
+                                        await UserMealService()
+                                            .checkAndCreateUserMealData(
+                                                context);
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          Navigator.of(context)
+                                              .pop(); // Đóng loading
+                                          CustomSnackbar.show(context,
+                                              'Lỗi khi truy cập tính năng.',
+                                              isSuccess: false);
+                                        }
+                                      }
                                     },
                                   ),
                                 ],
@@ -911,7 +924,7 @@ class _MyHomeScreen extends State<HomeScreen> {
                       size: (title == 'Cộng đồng hỏi đáp') ? 32 : 28,
                     ),
                   ),
-                  (title == 'Gọi video với bác sĩ')
+                  (title == 'Danh sách bác sĩ')
                       ? Positioned(
                           left: 0,
                           right: 0,
@@ -974,9 +987,9 @@ class _MyHomeScreen extends State<HomeScreen> {
       }
 
       setState(() {
-          imageURL = profileSnapshot.get('imageURL');
-          name = profileSnapshot.get('name');
-        });
+        imageURL = profileSnapshot.get('imageURL');
+        name = profileSnapshot.get('name');
+      });
     } catch (e) {
       print('Failed to fetch user data: $e');
     }

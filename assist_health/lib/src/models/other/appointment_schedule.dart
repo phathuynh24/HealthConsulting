@@ -143,7 +143,10 @@ class AppointmentSchedule {
           FirebaseStorage.instance.ref().child(filePath);
 
       // Upload file lên Storage
-      UploadTask uploadTask = storageReference.putFile(file);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      UploadTask uploadTask = storageReference.putFile(file, metadata);
 
       // Đợi quá trình upload hoàn thành và lấy URL
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);

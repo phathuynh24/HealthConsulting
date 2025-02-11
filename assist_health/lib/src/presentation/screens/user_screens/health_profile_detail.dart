@@ -640,8 +640,10 @@ class _HealthProfileDetailScreenState extends State<HealthProfileDetailScreen> {
       // Tạo tham chiếu đến Firebase Storage
       final storageRef = _storage.ref().child(
           'files/${DateTime.now().millisecondsSinceEpoch}_${file.path.split('/').last}');
-
-      await storageRef.putFile(file);
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      await storageRef.putFile(file, metadata);
 
       // Lấy đường dẫn tới file vừa tải lên
       String downloadURL = await storageRef.getDownloadURL();

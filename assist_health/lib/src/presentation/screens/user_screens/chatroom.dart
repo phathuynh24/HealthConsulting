@@ -66,8 +66,12 @@ class _ChatRoomState extends State<ChatRoom> {
       var ref =
           FirebaseStorage.instance.ref().child('images').child("$fileName.jpg");
 
-      // ignore: body_might_complete_normally_catch_error
-      var uploadTask = await ref.putFile(imageFile).catchError((error) async {
+      SettableMetadata metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+      var uploadTask =
+          // ignore: body_might_complete_normally_catch_error
+          await ref.putFile(imageFile, metadata).catchError((error) async {
         _firestore
             .collection('chatroom')
             .doc(widget.chatRoomId)

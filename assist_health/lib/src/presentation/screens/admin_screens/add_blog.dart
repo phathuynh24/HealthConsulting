@@ -44,7 +44,10 @@ class _CreateBlogPostPageState extends State<CreateBlogPostPage> {
       if (_image != null) {
         final imagePath =
             'blog_images/${DateTime.now().millisecondsSinceEpoch}.png';
-        final uploadTask = _storage.ref(imagePath).putFile(_image!);
+        SettableMetadata metadata = SettableMetadata(
+          contentType: 'image/png',
+        );
+        final uploadTask = _storage.ref(imagePath).putFile(_image!, metadata);
         final snapshot = await uploadTask.whenComplete(() => null);
         imageUrl = await snapshot.ref.getDownloadURL();
       }

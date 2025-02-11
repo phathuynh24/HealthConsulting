@@ -1,12 +1,18 @@
+import 'dart:io';
+
+import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/loading_indicator.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/models/other/question.dart';
-import 'package:assist_health/src/presentation/screens/user_screens/public_questions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CommunityScreen extends StatefulWidget {
-  const CommunityScreen({Key? key}) : super(key: key);
+  final Question? questionToEdit; // Thêm tham số này để nhận dữ liệu chỉnh sửa
+
+  const CommunityScreen({Key? key, this.questionToEdit}) : super(key: key);
 
   @override
   State<CommunityScreen> createState() => _CommunityScreenState();
@@ -43,6 +49,10 @@ class _CommunityScreenState extends State<CommunityScreen> {
       ),
     );
   }
+
+  List<File> _selectedImages = [];
+  List<String> _existingImageUrls = [];
+  bool isSaving = false;
 
   // Validation function to check if all required fields are filled
   bool _validateFields() {
@@ -136,286 +146,437 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
+  Future<void> _pickImages() async {
+    final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage();
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
+      setState(() {
+        _selectedImages = pickedFiles.map((file) => File(file.path)).toList();
+      });
+    }
+  }
+
+  Future<List<String>> _uploadImages(List<File> images) async {
+    List<String> imageUrls = [];
+    SettableMetadata metadata = SettableMetadata(
+      contentType: 'image/jpeg',
+    );
+    try {
+      for (var image in images) {
+        final ref = FirebaseStorage.instance.ref().child(
+            'question_images/${DateTime.now().millisecondsSinceEpoch}_${image.path.split('/').last}');
+        await ref.putFile(image, metadata);
+        final downloadUrl = await ref.getDownloadURL();
+        imageUrls.add(downloadUrl);
+      }
+    } catch (e) {
+      debugPrint('Error uploading images: $e');
+    }
+    return imageUrls;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.questionToEdit != null) {
+      titleController.text = widget.questionToEdit!.title;
+      contentController.text = widget.questionToEdit!.content;
+      selectedCategories.addAll(widget.questionToEdit!.categories);
+      gender = widget.questionToEdit!.gender;
+      age = widget.questionToEdit!.age;
+      _existingImageUrls = widget.questionToEdit!.imageUrls;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Themes.backgroundClr,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: const Text('Đặt câu hỏi'),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: Themes.backgroundClr,
+          appBar: AppBar(
+            foregroundColor: Colors.white,
+            title: const Text('Đặt câu hỏi'),
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Giới tính',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _genderToggleGender(),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Tuổi',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Expanded(
+                        child: _sliderAge(),
+                      ),
+                      Text(
+                        '${age.toString()} tuổi',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Chủ đề',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: _showCategoryDialog,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Themes.gradientLightClr, // Đặt màu nền là màu đỏ
+                          foregroundColor: Colors.white,
+                          // primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
+                          // onPrimary: Colors.white, // Đặt màu chữ là màu trắng
+                        ),
+                        child: const Text(
+                          'Chọn chủ đề',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        children: selectedCategories.map((category) {
+                          return Container(
+                            margin: const EdgeInsets.only(right: 5),
+                            child: Chip(
+                              label: Text(category),
+                              onDeleted: () {
+                                setState(() {
+                                  selectedCategories.remove(category);
+                                });
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Row(
+                        children: [
+                          Text(
+                            'Tiêu đề',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            ' *',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "Nhập tiêu đề...",
+                        ),
+                        maxLines: 1,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Row(
+                        children: [
+                          Text(
+                            'Nội dung',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            ' *',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: _pickImages,
+                        icon: const Icon(
+                          Icons.image,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Chọn ảnh',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Themes.gradientLightClr,
+                        ),
+                      ),
+                      if (_existingImageUrls.isNotEmpty ||
+                          _selectedImages.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              // Hiển thị ảnh đã có từ Firestore
+                              ..._existingImageUrls.map((url) => Stack(
+                                    children: [
+                                      Image.network(
+                                        url,
+                                        height: 150,
+                                        width: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _existingImageUrls.remove(url);
+                                            });
+                                          },
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+
+                              // Hiển thị ảnh mới chọn
+                              ..._selectedImages.map((image) => Stack(
+                                    children: [
+                                      Image.file(
+                                        image,
+                                        height: 150,
+                                        width: 150,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _selectedImages.remove(image);
+                                            });
+                                          },
+                                          child: Container(
+                                            decoration: const BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: contentController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "Nhập nội dung...",
+                        ),
+                        maxLines: 5,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                ActionChip(
+                  onPressed: () async {
+                    if (!_validateFields()) return;
+
+                    setState(() {
+                      isSaving = true;
+                    });
+
+                    User? user = FirebaseAuth.instance.currentUser;
+                    List<String> imageUrls = [];
+
+                    if (_selectedImages.isNotEmpty) {
+                      imageUrls = await _uploadImages(_selectedImages);
+                    }
+
+                    imageUrls.addAll(
+                        _existingImageUrls); // Giữ lại các ảnh cũ không bị xóa
+
+                    if (user != null) {
+                      Map<String, dynamic> updatedQuestion = {
+                        'title': titleController.text,
+                        'content': contentController.text,
+                        'categories': selectedCategories,
+                        'gender': gender,
+                        'age': age,
+                        'imageUrls': imageUrls,
+                      };
+
+                      if (widget.questionToEdit != null) {
+                        // Chỉnh sửa
+                        await FirebaseFirestore.instance
+                            .collection('questions')
+                            .doc(widget.questionToEdit!.id)
+                            .update(updatedQuestion);
+
+                        updatedQuestion['id'] = widget.questionToEdit!.id;
+                      } else {
+                        // Tạo mới
+                        String currentUserId = user.uid;
+                        final id =
+                            DateTime.now().millisecondsSinceEpoch.toString();
+
+                        updatedQuestion.addAll({
+                          'questionUserId': currentUserId,
+                          'date': DateTime.now(),
+                        });
+
+                        await FirebaseFirestore.instance
+                            .collection('questions')
+                            .doc(id)
+                            .set(updatedQuestion);
+
+                        updatedQuestion['id'] = id;
+                      }
+
+                      setState(() {
+                        isSaving = false;
+                      });
+
+                      Navigator.pop(context,
+                          updatedQuestion); // Trả về dữ liệu câu hỏi đã cập nhật
+                    }
+                  },
+                  avatar: const Icon(Icons.send, color: Colors.white),
+                  backgroundColor: Themes.gradientDeepClr,
+                  label: Text(
+                    widget.questionToEdit != null ? 'Cập nhật' : 'Gửi',
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+              ],
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Giới tính',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  _genderToggleGender(),
-                ],
-              ),
+        if (isSaving)
+          Container(
+            color: Colors.black.withOpacity(0.3),
+            child: const Center(
+              child: LoadingIndicator(),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  const Text(
-                    'Tuổi',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Expanded(
-                    child: _sliderAge(),
-                  ),
-                  Text(
-                    '${age.toString()} tuổi',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Chủ đề',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: _showCategoryDialog,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Themes.gradientLightClr, // Đặt màu nền là màu đỏ
-                      foregroundColor: Colors.white,
-                      // primary: Themes.gradientLightClr, // Đặt màu nền là màu đỏ
-                      // onPrimary: Colors.white, // Đặt màu chữ là màu trắng
-                    ),
-                    child: const Text(
-                      'Chọn chủ đề',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    children: selectedCategories.map((category) {
-                      return Container(
-                        margin: const EdgeInsets.only(right: 5),
-                        child: Chip(
-                          label: Text(category),
-                          onDeleted: () {
-                            setState(() {
-                              selectedCategories.remove(category);
-                            });
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Text(
-                        'Tiêu đề',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        ' *',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    controller: titleController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: "Nhập tiêu đề...",
-                    ),
-                    maxLines: 1,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(
-                horizontal: 15,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Row(
-                    children: [
-                      Text(
-                        'Nội dung',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        ' *',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    controller: contentController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: "Nhập nội dung...",
-                    ),
-                    maxLines: 5,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            ActionChip(
-              onPressed: () async {
-                if (!_validateFields()) {
-                  return;
-                }
-                // Get the current user
-                User? user = FirebaseAuth.instance.currentUser;
-
-                if (user != null) {
-                  String currentUserId = user.uid;
-
-                  final id = DateTime.now().millisecondsSinceEpoch.toString();
-                  final question = Question(
-                    id: id,
-                    gender: gender,
-                    age: age,
-                    answerCount: 0,
-                    title: titleController.text,
-                    content: contentController.text,
-                    categories: selectedCategories,
-                    questionUserId: currentUserId,
-                    date: DateTime.now(),
-                  );
-
-                  await FirebaseFirestore.instance
-                      .collection('questions')
-                      .doc(id)
-                      .set({
-                    'gender': question.gender,
-                    'age': question.age,
-                    'title': question.title,
-                    'content': question.content,
-                    'categories': FieldValue.arrayUnion(question.categories),
-                    'questionUserId': currentUserId,
-                    'date': question.date!,
-                  });
-
-                  // ignore: use_build_context_synchronously
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const PublicQuestionsScreen()),
-                  );
-
-                  setState(() {
-                    questions.add(question);
-                  });
-
-                  titleController.clear();
-                  contentController.clear();
-                }
-              },
-              avatar: const Icon(
-                Icons.send,
-                color: Colors.white,
-              ),
-              backgroundColor: Themes.gradientDeepClr,
-              label: const Text(
-                'Gửi',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                ),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 
