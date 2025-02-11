@@ -812,7 +812,7 @@ class _RegisterCallNowStep3State extends State<RegisterCallNowStep3> {
                                                     )),
                                                 Expanded(
                                                   child: Text(
-                                                    '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                                    '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                                                     style: const TextStyle(
                                                       fontSize: 15,
                                                       letterSpacing: 1.1,

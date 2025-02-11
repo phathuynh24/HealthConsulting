@@ -1,19 +1,13 @@
 import 'package:assist_health/src/others/theme.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/add_blog.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_account.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/admin_blog_list.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/admin_payment_management_screen.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/content_topbar.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/message_admin.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/shop_chart.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/voucher/add_voucher_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AdminNavBar extends StatefulWidget {
   const AdminNavBar({super.key});
@@ -26,9 +20,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
   int _selectedIndex = 0;
   final _screens = [
     // Screen 1
+    const AdminPaymentManagementScreen(),
     // const RevenueChartScreen(),
     // ReviewManagementPage(),
-    ShopChart(),
+    const ShopChart(),
     AdminBlog(),
     const AddVoucherScreen(),
     // Screen 2
@@ -68,10 +63,10 @@ class _AdminNavBarState extends State<AdminNavBar> {
             });
           },
           items: const [
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.bar_chart_outlined),
-            //   label: "Thống kê",
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_outlined),
+              label: "Thanh toán",
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.chat_rounded),
               label: "Doanh thu",

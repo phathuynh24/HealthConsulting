@@ -271,4 +271,30 @@ class AppointmentSchedule {
       print('Error updating appointment feedback: $e');
     }
   }
+
+  // Hàm tạo phiếu khám mới từ phiếu cũ
+  static AppointmentSchedule createNewFromOld(AppointmentSchedule oldSchedule) {
+    return AppointmentSchedule(
+      doctorInfo: oldSchedule.doctorInfo,
+      userProfile: oldSchedule.userProfile,
+      reasonForExamination: oldSchedule.reasonForExamination,
+      listOfHealthInformationFiles: oldSchedule.listOfHealthInformationFiles,
+      selectedDate: oldSchedule.selectedDate,
+      time: oldSchedule.time,
+      isMorning: oldSchedule.isMorning,
+      status: 'Chờ duyệt', // Đặt lại trạng thái ban đầu
+      paymentStatus: 'Chờ xác nhận', // Đặt lại trạng thái thanh toán
+      appointmentCode: generateNewCode(), // Tạo mã phiếu mới
+      idDoc: FirebaseFirestore.instance
+          .collection('appointment_schedule')
+          .doc()
+          .id, // Tạo ID mới
+    );
+  }
+
+  // Hàm tạo mã phiếu khám mới (mã ngẫu nhiên)
+  static String generateNewCode() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return 'MDK$timestamp';
+  }
 }

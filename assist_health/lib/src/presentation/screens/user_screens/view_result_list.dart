@@ -17,10 +17,10 @@ class ViewResultListScreen extends StatefulWidget {
 }
 
 class _ViewResultListScreenState extends State<ViewResultListScreen> {
-  FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final TextEditingController _searchController = TextEditingController();
-  StreamController<List<Result>>? _resultController =
+  final StreamController<List<Result>> _resultController =
       StreamController<List<Result>>.broadcast();
 
   String _searchText = '';
@@ -28,7 +28,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
   @override
   void initState() {
     super.initState();
-    _resultController!.addStream(getResultAppointment(_auth.currentUser!.uid));
+    _resultController.addStream(getResultAppointment(_auth.currentUser!.uid));
   }
 
   @override

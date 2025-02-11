@@ -168,7 +168,7 @@ class _RegisterCallNowStep2State extends State<RegisterCallNowStep2> {
                                 // Xử lý sự kiện sao chép số tài khoản
                                 final data = ClipboardData(
                                     text:
-                                        '${appointmentSchedule!.doctorInfo!.serviceFee * 1.0083}');
+                                        '${appointmentSchedule!.doctorInfo!.serviceFee}');
                                 Clipboard.setData(data);
                                 showToastMessage(
                                     context, 'Số tiền đã được sao chép');
@@ -177,7 +177,7 @@ class _RegisterCallNowStep2State extends State<RegisterCallNowStep2> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${NumberFormat("#,##0", "en_US").format(int.parse((appointmentSchedule!.doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                    '${NumberFormat("#,##0", "en_US").format(int.parse((appointmentSchedule!.doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                                     style: const TextStyle(
                                       color: Themes.gradientDeepClr,
                                       fontWeight: FontWeight.w500,

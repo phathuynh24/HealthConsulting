@@ -66,40 +66,9 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
 
     _secondsRemaining =
         calculateSecondsFromNow(_appointmentSchedule!.paymentStartTime!);
-    startTimer();
     if (_appointmentSchedule!.paymentStatus == 'Đã duyệt') {
       checkOutOfDateApproved();
     }
-  }
-
-  void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _secondsRemaining = _secondsRemaining! - 1;
-
-        if (_secondsRemaining! > -1800 &&
-            _secondsRemaining! <= 0 &&
-            _appointmentSchedule!.paymentStatus != 'Hết hạn thanh toán') {
-          _appointmentSchedule!.paymentStatus = 'Hết hạn thanh toán';
-          _appointmentSchedule!
-              .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
-        }
-
-        if (_secondsRemaining! <= -1800 &&
-            _appointmentSchedule!.paymentStatus != 'Thanh toán thất bại') {
-          _appointmentSchedule!.paymentStatus = 'Thanh toán thất bại';
-          _appointmentSchedule!.status = 'Đã hủy';
-          _appointmentSchedule!.statusReasonCanceled = 'Quá hạn thanh toán';
-          _appointmentSchedule!
-              .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
-          _appointmentSchedule!
-              .updateAppointmentStatus(_appointmentSchedule!.status!);
-          _appointmentSchedule!.updateAppointmentStatusReasonCanceled(
-              _appointmentSchedule!.statusReasonCanceled!);
-          timer.cancel();
-        }
-      });
-    });
   }
 
   void checkOutOfDateApproved() {
@@ -132,7 +101,7 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: const Text(
-          'Chi tiêt lịch khám',
+          'Chi tiết lịch khám',
           style: TextStyle(fontSize: 20),
         ),
         elevation: 0,
@@ -985,60 +954,6 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         const Text(
-                                          'Phí khám',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse(_appointmentSchedule!.doctorInfo!.serviceFee.toString()))} VNĐ',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey.shade100,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'Phí tiện ích',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey.shade100,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
                                           'Tổng thanh toán',
                                           style: TextStyle(
                                               fontSize: 15,
@@ -1047,7 +962,7 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                          '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                                           style: const TextStyle(
                                               fontSize: 15,
                                               color: Colors.red,

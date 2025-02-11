@@ -19,23 +19,24 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 
-// ignore: must_be_immutable
 class RegisterCallStep1 extends StatefulWidget {
-  DoctorInfo doctorInfo;
-  DateTime? selectedDate;
-  String? time;
-  bool? isMorning;
-  bool isEdit;
-  AppointmentSchedule? appointmentSchedule;
+  final DoctorInfo doctorInfo;
+  final DateTime? selectedDate;
+  final String? time;
+  final bool? isMorning;
+  final bool isEdit;
+  final AppointmentSchedule? appointmentSchedule;
+  final bool skipPayment;
 
-  RegisterCallStep1(
+  const RegisterCallStep1(
       {super.key,
       this.appointmentSchedule,
       required this.isEdit,
       required this.doctorInfo,
       this.selectedDate,
       this.time,
-      this.isMorning});
+      this.isMorning,
+      this.skipPayment = false});
 
   @override
   State<RegisterCallStep1> createState() => _RegisterCallStep1();
@@ -196,6 +197,80 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
       }
     }
 
+    List<Widget> buildStepIndicators(
+        {required bool skipPayment, required int currentStep}) {
+      List<Map<String, String>> steps = [
+        {'number': '1', 'label': 'Chọn lịch tư vấn'},
+        {'number': '2', 'label': 'Xác nhận'},
+      ];
+
+      if (!skipPayment) {
+        steps.add({'number': '3', 'label': 'Thanh toán'});
+        steps.add({'number': '4', 'label': 'Nhận lịch hẹn'});
+      } else {
+        steps.add({'number': '3', 'label': 'Nhận lịch hẹn'});
+      }
+
+      return List.generate(steps.length * 2 - 1, (index) {
+        if (index.isOdd) {
+          return const Icon(
+            Icons.arrow_right_alt_outlined,
+            size: 30,
+            color: Colors.blueGrey,
+          );
+        } else {
+          final stepIndex = index ~/ 2;
+          final step = steps[stepIndex];
+
+          // Xác định màu sắc của bước
+          Color circleColor;
+          Color textColor;
+
+          if (stepIndex < currentStep) {
+            // Bước đã hoàn thành
+            circleColor = Colors.greenAccent.shade700;
+            textColor = Colors.greenAccent.shade700;
+          } else if (stepIndex == currentStep) {
+            // Bước hiện tại
+            circleColor = Colors.blueAccent.shade700;
+            textColor = Colors.blueAccent.shade700;
+          } else {
+            // Bước chưa đến
+            circleColor = Colors.blueGrey;
+            textColor = Colors.blueGrey;
+          }
+
+          return Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: circleColor,
+                ),
+                child: Text(
+                  step['number']!,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                step['label']!,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(width: 5),
+            ],
+          );
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
@@ -228,151 +303,10 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueAccent.shade700,
-                      ),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'Chọn lịch tư vấn',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueAccent.shade700,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueGrey,
-                      ),
-                      child: const Text(
-                        '2',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Xác nhận',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    (!widget.isEdit)
-                        ? Row(
-                            children: [
-                              const Icon(
-                                Icons.arrow_right_alt_outlined,
-                                size: 30,
-                                color: Colors.blueGrey,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.blueGrey,
-                                ),
-                                child: const Text(
-                                  '3',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                'Thanh toán',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.blueGrey,
-                                ),
-                              ),
-                            ],
-                          )
-                        : const SizedBox(),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueGrey,
-                      ),
-                      child: (!widget.isEdit)
-                          ? const Text(
-                              '4',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              '3',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Nhận lịch hẹn',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                  ],
+                  children: buildStepIndicators(
+                    skipPayment: widget.skipPayment,
+                    currentStep: 0, // Truyền thêm currentStep để xác định bước hiện tại
+                  ),
                 ),
               ),
             ),
@@ -1717,27 +1651,34 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
               _appointmentSchedule!.isMorning = isMorning;
 
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RegisterCallStep2(
-                            isEdit: true,
-                            appointmentSchedule: _appointmentSchedule,
-                          )));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegisterCallStep2(
+                    isEdit: true,
+                    appointmentSchedule: _appointmentSchedule,
+                    skipPayment: widget
+                        .skipPayment, // Truyền thêm biến kiểm soát thanh toán
+                  ),
+                ),
+              );
             } else {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RegisterCallStep2(
-                            isEdit: false,
-                            doctorInfo: _doctorInfo!,
-                            userProfile: _userProfile!,
-                            reasonForExamination:
-                                _reasonForExaminationController!.text,
-                            listOfHealthInformationFiles: _selectedFiles!,
-                            selectedDate: _selectedDate,
-                            time: _selectedTime!,
-                            isMorning: isMorning,
-                          )));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegisterCallStep2(
+                    isEdit: false,
+                    doctorInfo: _doctorInfo!,
+                    userProfile: _userProfile!,
+                    reasonForExamination: _reasonForExaminationController!.text,
+                    listOfHealthInformationFiles: _selectedFiles!,
+                    selectedDate: _selectedDate,
+                    time: _selectedTime!,
+                    isMorning: isMorning,
+                    skipPayment:
+                        false, // Mặc định không bỏ qua thanh toán khi đặt mới
+                  ),
+                ),
+              );
             }
           },
           child: Container(

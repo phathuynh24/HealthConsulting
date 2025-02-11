@@ -189,15 +189,15 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  Text(
-                                    '${DateTime.now().year - _appointmentSchedule!.doctorInfo!.graduationYear} năm kinh nghiệm',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      height: 1.5,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   '${DateTime.now().year - _appointmentSchedule!.doctorInfo!.graduationYear} năm kinh nghiệm',
+                                  //   style: const TextStyle(
+                                  //     color: Colors.black,
+                                  //     fontSize: 15,
+                                  //     height: 1.5,
+                                  //     overflow: TextOverflow.ellipsis,
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),

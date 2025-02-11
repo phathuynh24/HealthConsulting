@@ -77,25 +77,11 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     _transferContent = _generateTransferContent();
 
     _linkQRCode =
-        'https://img.vietqr.io/image/vietcombank-1017904862-compact.jpg?amount=${_doctorInfo!.serviceFee * 1.0083}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
+        'https://img.vietqr.io/image/bidv-6801195207-compact.jpg?amount=${_doctorInfo!.serviceFee}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
 
     _appointmentCode = _generateAppointmentCode();
 
     _paymentStartTime = DateTime.now();
-
-    startTimer();
-  }
-
-  void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_secondsRemaining > 0) {
-          _secondsRemaining--;
-        } else {
-          timer.cancel();
-        }
-      });
-    });
   }
 
   String formatTime(int seconds) {
@@ -103,6 +89,80 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
     int minutes = (seconds % 3600) ~/ 60;
     int remainingSeconds = seconds % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  List<Widget> buildStepIndicators(
+      {required bool skipPayment, required int currentStep}) {
+    List<Map<String, String>> steps = [
+      {'number': '1', 'label': 'Chọn lịch tư vấn'},
+      {'number': '2', 'label': 'Xác nhận'},
+    ];
+
+    if (!skipPayment) {
+      steps.add({'number': '3', 'label': 'Thanh toán'});
+      steps.add({'number': '4', 'label': 'Nhận lịch hẹn'});
+    } else {
+      steps.add({'number': '3', 'label': 'Nhận lịch hẹn'});
+    }
+
+    return List.generate(steps.length * 2 - 1, (index) {
+      if (index.isOdd) {
+        return const Icon(
+          Icons.arrow_right_alt_outlined,
+          size: 30,
+          color: Colors.blueGrey,
+        );
+      } else {
+        final stepIndex = index ~/ 2;
+        final step = steps[stepIndex];
+
+        // Xác định màu sắc của bước
+        Color circleColor;
+        Color textColor;
+
+        if (stepIndex < currentStep) {
+          // Bước đã hoàn thành
+          circleColor = Colors.greenAccent.shade700;
+          textColor = Colors.greenAccent.shade700;
+        } else if (stepIndex == currentStep) {
+          // Bước hiện tại
+          circleColor = Colors.blueAccent.shade700;
+          textColor = Colors.blueAccent.shade700;
+        } else {
+          // Bước chưa đến
+          circleColor = Colors.blueGrey;
+          textColor = Colors.blueGrey;
+        }
+
+        return Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: circleColor,
+              ),
+              child: Text(
+                step['number']!,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              step['label']!,
+              style: TextStyle(
+                fontSize: 13,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(width: 5),
+          ],
+        );
+      }
+    });
   }
 
   @override
@@ -138,137 +198,11 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                          child: const Text(
-                            '1',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Chọn lịch tư vấn',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                          child: const Text(
-                            '2',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Xác nhận',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.greenAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                          child: const Text(
-                            '3',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          'Thanh toán',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.blueAccent.shade700,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Icon(
-                          Icons.arrow_right_alt_outlined,
-                          size: 30,
-                          color: Colors.blueGrey,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.blueGrey,
-                          ),
-                          child: const Text(
-                            '4',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        const Text(
-                          'Nhận lịch hẹn',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.blueGrey,
-                          ),
-                        ),
-                      ],
+                      children: buildStepIndicators(
+                        skipPayment: false,
+                        currentStep:
+                            2, // Truyền thêm currentStep để xác định bước hiện tại
+                      ),
                     ),
                   ),
                 ),
@@ -389,8 +323,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                               onTap: () {
                                 // Xử lý sự kiện sao chép số tài khoản
                                 final data = ClipboardData(
-                                    text:
-                                        '${_doctorInfo!.serviceFee * 1.0083}');
+                                    text: '${_doctorInfo!.serviceFee}');
                                 Clipboard.setData(data);
                                 showToastMessage(
                                     context, 'Số tiền đã được sao chép');
@@ -399,7 +332,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                    '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                                     style: const TextStyle(
                                       color: Themes.gradientDeepClr,
                                       fontWeight: FontWeight.w500,
@@ -533,7 +466,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
             ),
           ),
           bottomNavigationBar: Container(
-            height: 110,
+            height: 70,
             padding: const EdgeInsets.symmetric(
               vertical: 8,
               horizontal: 10,
@@ -548,29 +481,29 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
             ),
             child: Column(
               children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  child: Row(
-                    children: [
-                      const Text(
-                        'Hạn thanh toán:',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Text(
-                        formatTime(_secondsRemaining),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                //   child: Row(
+                //     children: [
+                //       const Text(
+                //         'Hạn thanh toán:',
+                //         style: TextStyle(fontSize: 15),
+                //       ),
+                //       const SizedBox(
+                //         width: 6,
+                //       ),
+                //       Text(
+                //         formatTime(_secondsRemaining),
+                //         style: const TextStyle(
+                //           fontWeight: FontWeight.bold,
+                //           color: Colors.red,
+                //           fontSize: 15,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 GestureDetector(
                   onTap: () {
                     showConfirmationDialog(context);
@@ -635,9 +568,18 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text(
+                    'Phiếu khám này sẽ chỉ được duyệt khi quản trị viên xác nhận rằng khoản thanh toán của bạn đã được chuyển vào tài khoản hệ thống. '
+                    'Vui lòng kiểm tra kỹ trước khi tiếp tục.',
+                    style: TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 12),
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Nếu bạn đã thanh toán thì hãy tích vào'),
+                    title: const Text(
+                      'Tôi xác nhận rằng tôi đã hoàn tất thanh toán',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     value: isChecked,
                     onChanged: (bool? value) {
                       setState(() {
@@ -657,8 +599,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                 ElevatedButton(
                   onPressed: isChecked
                       ? () async {
-                          // Đóng hộp thoại xác nhận thanh toán
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(); // Đóng hộp thoại
 
                           try {
                             await _saveExaminationForm();
@@ -680,8 +621,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                   TextButton(
                                     child: const Text('Đã hiểu'),
                                     onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Đóng hộp thoại lỗi
+                                      Navigator.of(context).pop();
                                     },
                                   ),
                                 ],

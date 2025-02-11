@@ -18,6 +18,7 @@ import 'package:assist_health/src/models/user/user_weight.dart';
 import 'package:assist_health/src/presentation/screens/other_screens/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:intl/intl.dart';
@@ -72,7 +73,7 @@ Future<void> logOut(BuildContext context) async {
 }
 
 Future<String> getUrl(String fileName) async {
-  final ref = storage.ref().child('Doctors/$fileName');
+  final ref = FirebaseStorage.instance.ref().child('Doctors/$fileName');
   String url = await ref.getDownloadURL();
   return url;
 }

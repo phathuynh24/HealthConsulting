@@ -277,8 +277,12 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          // Lọc bỏ các bác sĩ có isDeleted = true
+          List<DoctorInfo> activeDoctors = snapshot.data!
+              .where((doctor) => doctor.isDeleted == false)
+              .toList();
+
           List<DoctorInfo> filterDoctorWithStatus;
-          // Xử lý lọc trạng thái
           String status = '';
 
           if (_selectedStatus == _statusOptions[0]) {
@@ -290,7 +294,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           }
 
           if (_selectedStatus == _statusOptions[2]) {
-            filterDoctorWithStatus = snapshot.data!.toList();
+            filterDoctorWithStatus = activeDoctors.toList();
 
             filterDoctorWithStatus.sort((a, b) {
               if (a.status == 'online' && b.status == 'offline') {
@@ -302,13 +306,11 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
               }
             });
           } else {
-            filterDoctorWithStatus = snapshot.data!
+            filterDoctorWithStatus = activeDoctors
                 .where((doctor) => doctor.status == status)
                 .toList();
           }
-          //---------------------------------------------------------
 
-          // Nếu trạng thái có danh sách trống
           if (filterDoctorWithStatus.isEmpty) {
             return Center(
               child: Container(
@@ -323,9 +325,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                       height: 250,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(
-                      height: 12,
-                    ),
+                    const SizedBox(height: 12),
                     const Text(
                       'Bạn chưa có lịch khám ở mục này',
                       style: TextStyle(
@@ -334,9 +334,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         fontSize: 16,
                       ),
                     ),
-                    const SizedBox(
-                      height: 6,
-                    ),
+                    const SizedBox(height: 6),
                     const Text(
                       'Lịch khám của bạn sẽ được hiển thị tại đây.',
                       textAlign: TextAlign.center,
@@ -351,9 +349,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
               ),
             );
           }
-          //---------------------------------------------------------
 
-          // Xử lý lọc chuyên khoa
           List<DoctorInfo> filterDoctorWithSpecialty = [];
           if (_selectedSpecialtyRadio == 'Tất cả') {
             filterDoctorWithSpecialty = filterDoctorWithStatus;
@@ -363,9 +359,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     (doctor) => doctor.specialty.contains(_selectedSpecialty))
                 .toList();
           }
-          //---------------------------------------------------------
 
-          // Nếu chuyên khoa có danh sách trống
           if (filterDoctorWithSpecialty.isEmpty) {
             return Center(
               child: Container(
@@ -380,9 +374,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                       height: 250,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(
-                      height: 12,
-                    ),
+                    const SizedBox(height: 12),
                     const Text(
                       'Không có dữ liệu',
                       style: TextStyle(
@@ -391,11 +383,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         fontSize: 16,
                       ),
                     ),
-                    const SizedBox(
-                      height: 6,
-                    ),
+                    const SizedBox(height: 6),
                     const Text(
-                      'Vui lòng chọn trạng thái hoặc chuyên khoa khác ',
+                      'Vui lòng chọn trạng thái hoặc chuyên khoa khác',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -408,9 +398,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
               ),
             );
           }
-          //---------------------------------------------------------
 
-          // Xử lý lọc tìm kiếm tên bác sĩ
           List<DoctorInfo> filterDoctorWithName;
           if (_searchName!.trim() != '') {
             filterDoctorWithName = filterDoctorWithSpecialty
@@ -421,9 +409,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           } else {
             filterDoctorWithName = filterDoctorWithSpecialty;
           }
-          //---------------------------------------------------------
 
-          // Xử lý không tìm ra kết quả
           if (filterDoctorWithName.isEmpty) {
             return SingleChildScrollView(
               child: Container(
@@ -445,9 +431,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         fontSize: 15,
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+                    const SizedBox(height: 10),
                     const Text(
                       'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
                       textAlign: TextAlign.center,
@@ -472,7 +456,6 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                 DoctorInfo doctor = filterDoctorWithName[index];
 
                 return Container(
-                  height: 210,
                   margin:
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                   padding: const EdgeInsets.only(
@@ -641,15 +624,15 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
-                                      Text(
-                                        '${DateTime.now().year - doctor.graduationYear} năm kinh nghiệm',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          height: 1.5,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
+                                      // Text(
+                                      //   '${DateTime.now().year - doctor.graduationYear} năm kinh nghiệm',
+                                      //   style: const TextStyle(
+                                      //     color: Colors.black,
+                                      //     fontSize: 14,
+                                      //     height: 1.5,
+                                      //     overflow: TextOverflow.ellipsis,
+                                      //   ),
+                                      // ),
                                       Row(
                                         children: [
                                           const Text(
@@ -719,7 +702,8 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '${NumberFormat("#,##0", "en_US").format(int.parse(doctor.serviceFee.toString()))} VNĐ/${doctor.consultingTime} phút',
+                                  // '${NumberFormat("#,##0", "en_US").format(int.parse(doctor.serviceFee.toString()))} VNĐ/${doctor.consultingTime} phút',
+                                  '${NumberFormat("#,##0", "en_US").format(int.parse(doctor.serviceFee.toString()))} VNĐ/15 phút',
                                   style: TextStyle(
                                       fontSize: 15,
                                       color: Colors.greenAccent.shade700,
@@ -730,83 +714,83 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                isOnline
-                                    ? Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                RegisterCallNowStep1(
-                                                  doctorInfo: doctor,
-                                                )))
-                                    : showNotificationDialog(context);
-                              },
-                              child: Container(
-                                height: 50,
-                                margin: const EdgeInsets.only(
-                                  right: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isOnline
-                                      ? Colors.greenAccent.shade700
-                                      : Colors.blueGrey.shade200,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Gọi video ngay',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => RegisterCallStep1(
-                                            isEdit: false,
-                                            doctorInfo: doctor)));
-                              },
-                              child: Container(
-                                height: 50,
-                                margin: const EdgeInsets.only(
-                                  left: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Themes.gradientDeepClr,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Đặt lịch gọi',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      //   children: [
+                      //     Expanded(
+                      //       child: GestureDetector(
+                      //         onTap: () {
+                      //           isOnline
+                      //               ? Navigator.push(
+                      //                   context,
+                      //                   MaterialPageRoute(
+                      //                       builder: (context) =>
+                      //                           RegisterCallNowStep1(
+                      //                             doctorInfo: doctor,
+                      //                           )))
+                      //               : showNotificationDialog(context);
+                      //         },
+                      //         child: Container(
+                      //           height: 50,
+                      //           margin: const EdgeInsets.only(
+                      //             right: 5,
+                      //           ),
+                      //           decoration: BoxDecoration(
+                      //             color: isOnline
+                      //                 ? Colors.greenAccent.shade700
+                      //                 : Colors.blueGrey.shade200,
+                      //             borderRadius: BorderRadius.circular(10),
+                      //           ),
+                      //           child: const Center(
+                      //             child: Text(
+                      //               'Gọi ngay',
+                      //               style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 color: Colors.white,
+                      //                 fontWeight: FontWeight.w500,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Expanded(
+                      //       child: InkWell(
+                      //         onTap: () {
+                      //           Navigator.push(
+                      //               context,
+                      //               MaterialPageRoute(
+                      //                   builder: (context) => RegisterCallStep1(
+                      //                       isEdit: false,
+                      //                       doctorInfo: doctor)));
+                      //         },
+                      //         child: Container(
+                      //           height: 50,
+                      //           margin: const EdgeInsets.only(
+                      //             left: 5,
+                      //           ),
+                      //           decoration: BoxDecoration(
+                      //             color: Themes.gradientDeepClr,
+                      //             borderRadius: BorderRadius.circular(10),
+                      //           ),
+                      //           child: const Center(
+                      //             child: Text(
+                      //               'Đặt lịch',
+                      //               style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 color: Colors.white,
+                      //                 fontWeight: FontWeight.w500,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // )
                     ],
                   ),
                 );

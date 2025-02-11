@@ -49,7 +49,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
     _userProfileStreamController = StreamController<DocumentSnapshot>();
     _transferContent = _generateTransferContent();
     _linkQRCode =
-        'https://img.vietqr.io/image/sacombank-070119955066-compact.jpg?amount=${_doctorInfo!.serviceFee * 1.0083}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
+        'https://img.vietqr.io/image/sacombank-070119955066-compact.jpg?amount=${_doctorInfo!.serviceFee}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
   }
 
   @override
@@ -74,7 +74,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
         foregroundColor: Colors.white,
         toolbarHeight: 50,
         centerTitle: true,
-        title: const Text('Gọi video ngay'),
+        title: const Text('Gọi ngay'),
         titleTextStyle: const TextStyle(fontSize: 16),
         elevation: 0,
         flexibleSpace: Container(
@@ -466,58 +466,58 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Phí khám',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Divider(
-                      thickness: 1,
-                      color: Colors.grey.shade100,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Phí tiện ích',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Divider(
-                      thickness: 1,
-                      color: Colors.grey.shade100,
-                    ),
-                    const SizedBox(height: 6),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text(
+                    //       'Phí khám',
+                    //       style: TextStyle(
+                    //           fontSize: 14,
+                    //           color: Colors.black87,
+                    //           fontWeight: FontWeight.w400),
+                    //     ),
+                    //     const SizedBox(height: 6),
+                    //     Text(
+                    //       '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
+                    //       style: const TextStyle(
+                    //           fontSize: 14,
+                    //           color: Colors.black87,
+                    //           fontWeight: FontWeight.w400),
+                    //     ),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 6),
+                    // Divider(
+                    //   thickness: 1,
+                    //   color: Colors.grey.shade100,
+                    // ),
+                    // const SizedBox(height: 6),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text(
+                    //       'Phí tiện ích',
+                    //       style: TextStyle(
+                    //           fontSize: 14,
+                    //           color: Colors.black87,
+                    //           fontWeight: FontWeight.w400),
+                    //     ),
+                    //     const SizedBox(height: 6),
+                    //     Text(
+                    //       '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
+                    //       style: const TextStyle(
+                    //           fontSize: 14,
+                    //           color: Colors.black87,
+                    //           fontWeight: FontWeight.w400),
+                    //     ),
+                    //   ],
+                    // ),
+                    // const SizedBox(height: 6),
+                    // Divider(
+                    //   thickness: 1,
+                    //   color: Colors.grey.shade100,
+                    // ),
+                    // const SizedBox(height: 6),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -530,7 +530,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                           style: const TextStyle(
                               fontSize: 15,
                               color: Colors.black87,

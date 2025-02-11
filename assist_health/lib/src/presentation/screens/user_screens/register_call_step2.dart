@@ -25,6 +25,8 @@ class RegisterCallStep2 extends StatefulWidget {
   bool isEdit;
   AppointmentSchedule? appointmentSchedule;
 
+  final bool skipPayment;
+
   RegisterCallStep2(
       {required this.isEdit,
       this.appointmentSchedule,
@@ -35,6 +37,7 @@ class RegisterCallStep2 extends StatefulWidget {
       this.selectedDate,
       this.time,
       this.isMorning,
+      this.skipPayment = false,
       super.key});
 
   @override
@@ -81,6 +84,80 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
     }
   }
 
+  List<Widget> buildStepIndicators(
+      {required bool skipPayment, required int currentStep}) {
+    List<Map<String, String>> steps = [
+      {'number': '1', 'label': 'Chọn lịch tư vấn'},
+      {'number': '2', 'label': 'Xác nhận'},
+    ];
+
+    if (!skipPayment) {
+      steps.add({'number': '3', 'label': 'Thanh toán'});
+      steps.add({'number': '4', 'label': 'Nhận lịch hẹn'});
+    } else {
+      steps.add({'number': '3', 'label': 'Nhận lịch hẹn'});
+    }
+
+    return List.generate(steps.length * 2 - 1, (index) {
+      if (index.isOdd) {
+        return const Icon(
+          Icons.arrow_right_alt_outlined,
+          size: 30,
+          color: Colors.blueGrey,
+        );
+      } else {
+        final stepIndex = index ~/ 2;
+        final step = steps[stepIndex];
+
+        // Xác định màu sắc của bước
+        Color circleColor;
+        Color textColor;
+
+        if (stepIndex < currentStep) {
+          // Bước đã hoàn thành
+          circleColor = Colors.greenAccent.shade700;
+          textColor = Colors.greenAccent.shade700;
+        } else if (stepIndex == currentStep) {
+          // Bước hiện tại
+          circleColor = Colors.blueAccent.shade700;
+          textColor = Colors.blueAccent.shade700;
+        } else {
+          // Bước chưa đến
+          circleColor = Colors.blueGrey;
+          textColor = Colors.blueGrey;
+        }
+
+        return Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: circleColor,
+              ),
+              child: Text(
+                step['number']!,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              step['label']!,
+              style: TextStyle(
+                fontSize: 13,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(width: 5),
+          ],
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,154 +189,11 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.greenAccent.shade700,
-                      ),
-                      child: const Text(
-                        '1',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'Chọn lịch tư vấn',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.greenAccent.shade700,
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueAccent.shade700,
-                      ),
-                      child: const Text(
-                        '2',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      'Xác nhận',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueAccent.shade700,
-                      ),
-                    ),
-                    (!widget.isEdit)
-                        ? Row(
-                            children: [
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Icon(
-                                Icons.arrow_right_alt_outlined,
-                                size: 30,
-                                color: Colors.blueGrey,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.blueGrey,
-                                ),
-                                child: const Text(
-                                  '3',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              const Text(
-                                'Thanh toán',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.blueGrey,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                            ],
-                          )
-                        : const SizedBox(),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Icon(
-                      Icons.arrow_right_alt_outlined,
-                      size: 30,
-                      color: Colors.blueGrey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.blueGrey,
-                      ),
-                      child: (!widget.isEdit)
-                          ? const Text(
-                              '4',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text(
-                              '3',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Text(
-                      'Nhận lịch hẹn',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                  ],
+                  children: buildStepIndicators(
+                    skipPayment: widget.skipPayment,
+                    currentStep:
+                        1, // Truyền thêm currentStep để xác định bước hiện tại
+                  ),
                 ),
               ),
             ),
@@ -876,58 +810,6 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Phí khám',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse(_doctorInfo!.serviceFee.toString()))} VNĐ',
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Divider(
-                      thickness: 1,
-                      color: Colors.grey.shade100,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Phí tiện ích',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Divider(
-                      thickness: 1,
-                      color: Colors.grey.shade100,
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
                           'Tổng thanh toán',
                           style: TextStyle(
                               fontSize: 15,
@@ -936,7 +818,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                           style: const TextStyle(
                               fontSize: 15,
                               color: Colors.black87,
@@ -997,7 +879,7 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                          '${NumberFormat("#,##0", "en_US").format(int.parse((_doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
                           style: const TextStyle(
                               fontSize: 16,
                               color: Colors.red,
@@ -1015,41 +897,72 @@ class _RegisterCallStep2 extends State<RegisterCallStep2> {
             GestureDetector(
               onTap: () {
                 if (widget.isEdit) {
+                  // Cập nhật thông tin phiếu khám
                   widget.userProfile = _userProfile!;
-                  widget.appointmentSchedule!.reasonForExamination !=
-                      _reasonForExamination!;
-                  widget.appointmentSchedule!.listOfHealthInformationFiles !=
+                  widget.appointmentSchedule!.reasonForExamination =
+                      _reasonForExamination;
+                  widget.appointmentSchedule!.listOfHealthInformationFiles =
                       _listOfHealthInformationFiles!;
                   widget.appointmentSchedule!.selectedDate = _selectedDate!;
                   widget.appointmentSchedule!.time = _time!;
                   widget.appointmentSchedule!.isMorning = _isMorning;
-                  widget.appointmentSchedule!.reasonForExamination =
-                      _reasonForExamination;
-                  widget.appointmentSchedule!.status = 'Đã duyệt';
-                  widget.appointmentSchedule!.updateAppointmentStatus(
-                      widget.appointmentSchedule!.status!);
-                  widget.appointmentSchedule!.updateAppointmentInFirestore(
-                      widget.appointmentSchedule!.idDoc!);
-                  Navigator.push(
+
+                  // Kiểm tra trạng thái hiện tại để xác định hướng đi tiếp
+                  if (widget.appointmentSchedule!.paymentStatus ==
+                          'Đã thanh toán' ||
+                      widget.appointmentSchedule!.paymentStatus ==
+                          'Thanh toán thành công' ||
+                      widget.appointmentSchedule!.status == 'Đã duyệt') {
+                    // Trường hợp đã thanh toán hoặc phiếu đã duyệt → Bỏ qua bước thanh toán
+                    widget.appointmentSchedule!.status = 'Đã duyệt';
+                    widget.appointmentSchedule!.updateAppointmentStatus(
+                        widget.appointmentSchedule!.status!);
+                    widget.appointmentSchedule!.updateAppointmentInFirestore(
+                        widget.appointmentSchedule!.idDoc!);
+
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => RegisterCallStep4(
-                              appointmentSchedule:
-                                  widget.appointmentSchedule!)));
+                        builder: (context) => RegisterCallStep4(
+                          appointmentSchedule: widget.appointmentSchedule!,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Nếu chưa thanh toán thì quay lại bước thanh toán
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegisterCallStep3(
+                          doctorInfo: _doctorInfo!,
+                          userProfile: _userProfile!,
+                          reasonForExamination: _reasonForExamination!,
+                          listOfHealthInformationFiles:
+                              _listOfHealthInformationFiles!,
+                          selectedDate: _selectedDate!,
+                          time: _time!,
+                          isMorning: _isMorning!,
+                        ),
+                      ),
+                    );
+                  }
                 } else {
+                  // Trường hợp đặt lịch mới luôn đi qua bước thanh toán
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RegisterCallStep3(
-                                doctorInfo: _doctorInfo!,
-                                userProfile: _userProfile!,
-                                reasonForExamination: _reasonForExamination!,
-                                listOfHealthInformationFiles:
-                                    _listOfHealthInformationFiles!,
-                                selectedDate: _selectedDate!,
-                                time: _time!,
-                                isMorning: _isMorning!,
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegisterCallStep3(
+                        doctorInfo: _doctorInfo!,
+                        userProfile: _userProfile!,
+                        reasonForExamination: _reasonForExamination!,
+                        listOfHealthInformationFiles:
+                            _listOfHealthInformationFiles!,
+                        selectedDate: _selectedDate!,
+                        time: _time!,
+                        isMorning: _isMorning!,
+                      ),
+                    ),
+                  );
                 }
               },
               child: Container(

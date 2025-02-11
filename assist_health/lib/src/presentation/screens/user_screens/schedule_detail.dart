@@ -41,7 +41,7 @@ class ScheduleDetail extends StatefulWidget {
 
 class _ScheduleDetailState extends State<ScheduleDetail> {
   AppointmentSchedule? _appointmentSchedule;
-  int? _secondsRemaining;
+  // int? _secondsRemaining;
 
   String? _buttonContext;
 
@@ -69,47 +69,47 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
     }
     if (_appointmentSchedule!.paymentStatus == 'Thanh toán thành công' ||
         _appointmentSchedule!.paymentStatus == 'Thanh toán thất bại') {
-      _secondsRemaining = 0;
+      // _secondsRemaining = 0;
       return;
     }
 
-    _secondsRemaining =
-        calculateSecondsFromNow(_appointmentSchedule!.paymentStartTime!);
-    startTimer();
+    // _secondsRemaining =
+    // calculateSecondsFromNow(_appointmentSchedule!.paymentStartTime!);
+    // startTimer();
     if (_appointmentSchedule!.paymentStatus == 'Đã duyệt') {
       checkOutOfDateApproved();
     }
   }
 
-  void startTimer() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _secondsRemaining = _secondsRemaining! - 1;
+  // void startTimer() {
+  //   Timer.periodic(const Duration(seconds: 1), (timer) {
+  //     setState(() {
+  //       _secondsRemaining = _secondsRemaining! - 1;
 
-        if (_secondsRemaining! > -1800 &&
-            _secondsRemaining! <= 0 &&
-            _appointmentSchedule!.paymentStatus != 'Hết hạn thanh toán') {
-          _appointmentSchedule!.paymentStatus = 'Hết hạn thanh toán';
-          _appointmentSchedule!
-              .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
-        }
+  //       if (_secondsRemaining! > -1800 &&
+  //           _secondsRemaining! <= 0 &&
+  //           _appointmentSchedule!.paymentStatus != 'Hết hạn thanh toán') {
+  //         _appointmentSchedule!.paymentStatus = 'Hết hạn thanh toán';
+  //         _appointmentSchedule!
+  //             .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
+  //       }
 
-        if (_secondsRemaining! <= -1800 &&
-            _appointmentSchedule!.paymentStatus != 'Thanh toán thất bại') {
-          _appointmentSchedule!.paymentStatus = 'Thanh toán thất bại';
-          _appointmentSchedule!.status = 'Đã hủy';
-          _appointmentSchedule!.statusReasonCanceled = 'Quá hạn thanh toán';
-          _appointmentSchedule!
-              .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
-          _appointmentSchedule!
-              .updateAppointmentStatus(_appointmentSchedule!.status!);
-          _appointmentSchedule!.updateAppointmentStatusReasonCanceled(
-              _appointmentSchedule!.statusReasonCanceled!);
-          timer.cancel();
-        }
-      });
-    });
-  }
+  //       if (_secondsRemaining! <= -1800 &&
+  //           _appointmentSchedule!.paymentStatus != 'Thanh toán thất bại') {
+  //         _appointmentSchedule!.paymentStatus = 'Thanh toán thất bại';
+  //         _appointmentSchedule!.status = 'Đã hủy';
+  //         _appointmentSchedule!.statusReasonCanceled = 'Quá hạn thanh toán';
+  //         _appointmentSchedule!
+  //             .updatePaymentStatus(_appointmentSchedule!.paymentStatus!);
+  //         _appointmentSchedule!
+  //             .updateAppointmentStatus(_appointmentSchedule!.status!);
+  //         _appointmentSchedule!.updateAppointmentStatusReasonCanceled(
+  //             _appointmentSchedule!.statusReasonCanceled!);
+  //         timer.cancel();
+  //       }
+  //     });
+  //   });
+  // }
 
   void checkOutOfDateApproved() {
     setState(() {
@@ -141,7 +141,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: const Text(
-          'Chi tiêt lịch khám',
+          'Chi tiết lịch khám',
           style: TextStyle(fontSize: 20),
         ),
         elevation: 0,
@@ -502,6 +502,7 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                         endIndent: 15,
                       ),
 
+                      // Thông tin bác sĩ
                       Container(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 15,
@@ -564,7 +565,12 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                                 const SizedBox(
                                   width: 6,
                                 ),
-                                MySeparator(color: Colors.grey.shade400),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child:
+                                      MySeparator(color: Colors.grey.shade400),
+                                ),
                                 const SizedBox(
                                   width: 6,
                                 ),
@@ -579,30 +585,30 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 15, vertical: 20),
                               child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const SizedBox(
-                                      width: 140,
-                                      child: Text(
-                                        'Chuyên khoa',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                        ),
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const SizedBox(
+                                    width: 140,
+                                    child: Text(
+                                      'Chuyên khoa',
+                                      style: TextStyle(
+                                        fontSize: 14,
                                       ),
                                     ),
-                                    Expanded(
-                                      child: Text(
-                                        getAllOfSpecialties(
-                                            _appointmentSchedule!
-                                                .doctorInfo!.specialty),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                        textAlign: TextAlign.right,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      getAllOfSpecialties(_appointmentSchedule!
+                                          .doctorInfo!.specialty),
+                                      style: const TextStyle(
+                                        fontSize: 14,
                                       ),
+                                      textAlign: TextAlign.right,
                                     ),
-                                  ]),
+                                  ),
+                                ],
+                              ),
                             ),
                             if (_appointmentSchedule!.status == 'Đã duyệt' ||
                                 _appointmentSchedule!.status == 'Quá hẹn')
@@ -905,263 +911,176 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
                       // Thanh toán
                       Container(
-                          padding: const EdgeInsets.only(
-                            top: 10,
-                          ),
-                          margin: const EdgeInsets.only(
-                              top: 5, bottom: 15, left: 15, right: 15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                  vertical: 10,
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      FontAwesomeIcons.wallet,
-                                      size: 18,
-                                      color: Colors.blue,
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    const Text(
-                                      'Thanh toán',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      _appointmentSchedule!.paymentStatus!,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: getPaymentStatusColor(
-                                            _appointmentSchedule!
-                                                .paymentStatus!),
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                        padding: const EdgeInsets.only(
+                          top: 10,
+                        ),
+                        margin: const EdgeInsets.only(
+                            top: 5, bottom: 15, left: 15, right: 15),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 10,
                               ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 15,
-                                  vertical: 10,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Phương thức thanh toán',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Text(
-                                      'Quét mã QR',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              (_secondsRemaining! > 0)
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 15,
-                                        vertical: 10,
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Text(
-                                            'Thời hạn thanh toán',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Text(
-                                            formatTime(_secondsRemaining!),
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                              (_secondsRemaining! > 0)
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ScheduleQRPage(
-                                                      serviceFee:
-                                                          _appointmentSchedule!
-                                                              .doctorInfo!
-                                                              .serviceFee,
-                                                      transferContent:
-                                                          _appointmentSchedule!
-                                                              .transferContent!,
-                                                      linkQRCode:
-                                                          _appointmentSchedule!
-                                                              .linkQRCode!,
-                                                    )));
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 15,
-                                            right: 15,
-                                            bottom: 10,
-                                            top: 5),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 15,
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blueAccent.shade100
-                                              .withOpacity(0.2),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: const Text(
-                                          'Nếu chưa thanh toán, hãy nhấn vào đây để tiếp tục thanh toán.',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.blueAccent,
-                                            height: 1.5,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Row(
                                 children: [
-                                  HalfCircle(
-                                      height: 14,
-                                      weight: 8,
-                                      color: const Color(0xFFECF9FF),
-                                      isLeft: true),
-                                  const SizedBox(
-                                    width: 6,
+                                  const Icon(
+                                    FontAwesomeIcons.wallet,
+                                    size: 18,
+                                    color: Colors.blue,
                                   ),
-                                  MySeparator(color: Colors.grey.shade400),
                                   const SizedBox(
-                                    width: 6,
+                                    width: 10,
                                   ),
-                                  HalfCircle(
-                                      height: 14,
-                                      weight: 8,
-                                      color: const Color(0xFFECF9FF),
-                                      isLeft: false),
+                                  const Text(
+                                    'Thanh toán',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    _appointmentSchedule!.paymentStatus!,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: getPaymentStatusColor(
+                                          _appointmentSchedule!.paymentStatus!),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              Container(
-                                width: double.infinity,
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Phương thức thanh toán',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    'Quét mã QR',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ScheduleQRPage(
+                                              serviceFee: _appointmentSchedule!
+                                                  .doctorInfo!.serviceFee,
+                                              transferContent:
+                                                  _appointmentSchedule!
+                                                      .transferContent!,
+                                              linkQRCode: _appointmentSchedule!
+                                                  .linkQRCode!,
+                                            )));
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    left: 15, right: 15, bottom: 10, top: 5),
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 15, horizontal: 15),
+                                  horizontal: 15,
+                                  vertical: 10,
+                                ),
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'Phí khám',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse(_appointmentSchedule!.doctorInfo!.serviceFee.toString()))} VNĐ',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey.shade100,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'Phí tiện ích',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee * 0.0083).toInt().toString()))} VNĐ',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Divider(
-                                      thickness: 1,
-                                      color: Colors.grey.shade100,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'Tổng thanh toán',
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black87,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee * 1.0083).toInt().toString()))} VNĐ',
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                  color: Colors.blueAccent.shade100
+                                      .withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Text(
+                                  'Nếu chưa thanh toán, hãy nhấn vào đây để tiếp tục thanh toán.',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blueAccent,
+                                    height: 1.5,
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                            ],
-                          )),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                HalfCircle(
+                                    height: 14,
+                                    weight: 8,
+                                    color: const Color(0xFFECF9FF),
+                                    isLeft: true),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child:
+                                      MySeparator(color: Colors.grey.shade400),
+                                ),
+                                const SizedBox(
+                                  width: 6,
+                                ),
+                                HalfCircle(
+                                    height: 14,
+                                    weight: 8,
+                                    color: const Color(0xFFECF9FF),
+                                    isLeft: false),
+                              ],
+                            ),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 15),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Tổng thanh toán',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${NumberFormat("#,##0", "en_US").format(int.parse((_appointmentSchedule!.doctorInfo!.serviceFee).toInt().toString()))} VNĐ',
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1191,6 +1110,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                                     // Thực hiện hành động khi xác nhận
                                     setState(() {
                                       _appointmentSchedule!.status = 'Đã hủy';
+                                      _appointmentSchedule!.statusReasonCanceled =
+                                          'Khách hàng hủy';
                                       _appointmentSchedule!
                                           .updateAppointmentStatus(
                                               _appointmentSchedule!.status!);
@@ -1247,17 +1168,51 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                     child: GestureDetector(
                       onTap: () {
                         if (_buttonContext == 'Đặt khám lại') {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegisterCallStep1(
-                                        isEdit: true,
-                                        appointmentSchedule:
-                                            _appointmentSchedule,
-                                        doctorInfo:
-                                            _appointmentSchedule!.doctorInfo!,
-                                      )));
-                        }
+  bool skipPayment = false;
+  AppointmentSchedule newAppointmentSchedule;
+
+  if (_appointmentSchedule!.status == 'Đã hủy') {
+    // Nếu phiếu đã hủy và chưa thanh toán hoặc thanh toán thất bại → Tạo phiếu mới
+    if (_appointmentSchedule!.paymentStatus == 'Chờ xác nhận' ||
+        _appointmentSchedule!.paymentStatus == 'Thanh toán thất bại') {
+      newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
+    } else {
+      // Nếu đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
+      skipPayment = true;
+      newAppointmentSchedule = _appointmentSchedule!;
+    }
+  } else if (_appointmentSchedule!.status == 'Quá hẹn') {
+    // Nếu quá hẹn và đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
+    if (_appointmentSchedule!.paymentStatus == 'Thanh toán thành công') {
+      skipPayment = true;
+      newAppointmentSchedule = _appointmentSchedule!;
+    } else {
+      // Chưa thanh toán → Tạo phiếu mới
+      newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
+    }
+  } else if (_appointmentSchedule!.status == 'Đã khám') {
+    // Đã khám → Luôn bỏ qua thanh toán, dùng phiếu cũ
+    skipPayment = true;
+    newAppointmentSchedule = _appointmentSchedule!;
+  } else {
+    // Trường hợp khác → Mặc định tạo phiếu mới
+    newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
+  }
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => RegisterCallStep1(
+        isEdit: true,
+        appointmentSchedule: newAppointmentSchedule,
+        doctorInfo: newAppointmentSchedule.doctorInfo!,
+        skipPayment: skipPayment,
+      ),
+    ),
+  );
+}
+
+
                         if (_buttonContext == 'Vào cuộc gọi') {
                           onJoin();
                         }
@@ -1835,7 +1790,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
   Future<void> onJoin() async {
     await _handleCameraAndMic(Permission.camera);
     await _handleCameraAndMic(Permission.microphone);
-    // ignore: use_build_context_synchronously
+    if (!mounted) return;
+
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -1868,6 +1824,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
         // Tài liệu đã tồn tại, lấy ID của tài liệu đầu tiên
         String chatRoomId = querySnapshot.docs[0].id;
 
+        if (!mounted) return;
+
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ChatRoomNew(
@@ -1890,6 +1848,8 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
 
         await docRef.update({'idDoc': chatRoomId});
 
+        if (!mounted) return;
+
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ChatRoomNew(
@@ -1901,9 +1861,9 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
         );
       }
 
-      print('Chatroom created successfully');
+      debugPrint('Chatroom created successfully');
     } catch (e) {
-      print('Error creating or accessing chatroom: $e');
+      debugPrint('Error creating or accessing chatroom: $e');
     }
   }
 }

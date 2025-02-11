@@ -2,7 +2,7 @@ import 'package:assist_health/src/models/user/user_profile.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_chart.dart';
-import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_info.dart';
+import 'package:assist_health/src/presentation/screens/doctor_screens/update_doctor_info_screen.dart';
 import 'package:assist_health/src/widgets/doctor_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -159,7 +159,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (_) =>
-                                              const DoctorInfoScreen()),
+                                              const UpdateDoctorInfoScreen(isEditScreen: true,)),
                                     );
                                   },
                                   leading: const Icon(

@@ -6,6 +6,7 @@ import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/schedule_detail.dart';
 import 'package:assist_health/src/widgets/user_navbar.dart';
 import 'package:assist_health/src/widgets/schedule_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -18,7 +19,8 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  StreamController<List<AppointmentSchedule>>? _appointmentScheduleController =
+  final StreamController<List<AppointmentSchedule>>
+      _appointmentScheduleController =
       StreamController<List<AppointmentSchedule>>.broadcast();
 
   int _buttonIndex = 0;
@@ -26,8 +28,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   String _searchText = '';
 
-  List<int> _secondsRemainingList = [];
-  List<Timer> _timers = [];
+  // List<int> _secondsRemainingList = [];
+  // List<Timer> _timers = [];
 
   final List<String> _statusList = [
     'Chờ duyệt',
@@ -35,12 +37,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     'Đã khám',
     'Quá hẹn',
     'Đã hủy',
+    'Đã hoàn tiền',
   ];
 
   @override
   void initState() {
     super.initState();
-    _appointmentScheduleController!.addStream(getAppointmentSchdedules());
+    _appointmentScheduleController.addStream(getAppointmentSchdedules());
+
+    // Kiểm tra trạng thái chờ duyệt ngay khi khởi tạo
+    getAppointmentSchdedules().listen((appointmentSchedules) {
+      checkPendingAppointments(appointmentSchedules);
+    });
   }
 
   @override
@@ -49,51 +57,53 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     super.dispose();
   }
 
-  void startTimersForPending(
+  void checkPendingAppointments(
       List<AppointmentSchedule> appointmentScheduleList) {
-    _timers.clear(); // Xóa danh sách timer hiện tại
-    _secondsRemainingList.clear();
-    for (var element in appointmentScheduleList) {
-      int secondsRemaining = calculateSecondsFromNow(element.paymentStartTime!);
-      _secondsRemainingList.add(secondsRemaining);
-    }
+    DateTime now = DateTime.now();
 
-    for (int index = 0; index < _secondsRemainingList.length; index++) {
-      Timer timer = Timer.periodic(const Duration(seconds: 1), (t) {
-        setState(() {
-          _secondsRemainingList[index]--;
+    for (var appointment in appointmentScheduleList) {
+      if (appointment.status == 'Chờ duyệt') {
+        try {
+          // Lấy giờ bắt đầu từ chuỗi time
+          String startTime = appointment.time!.split('-')[0]; // Ví dụ: "08:00"
 
-          // Cập nhật trạng thái thanh toán và trạng thái cuộc hẹn
-          if (_secondsRemainingList[index] > -1800 &&
-              _secondsRemainingList[index] <= 0 &&
-              appointmentScheduleList[index].paymentStatus !=
-                  'Hết hạn thanh toán') {
-            appointmentScheduleList[index].paymentStatus = 'Hết hạn thanh toán';
-            appointmentScheduleList[index].updatePaymentStatus(
-                appointmentScheduleList[index].paymentStatus!);
+          // Kiểm tra kiểu dữ liệu của selectedDate
+          DateTime selectedDate;
+          if (appointment.selectedDate is DateTime) {
+            selectedDate = appointment.selectedDate!;
+          } else if (appointment.selectedDate is Timestamp) {
+            selectedDate = (appointment.selectedDate as Timestamp).toDate();
+          } else {
+            throw Exception('Invalid date format in appointment data');
           }
 
-          if (_secondsRemainingList[index] <= -1800 &&
-              appointmentScheduleList[index].paymentStatus !=
-                  'Thanh toán thất bại') {
-            appointmentScheduleList[index].paymentStatus =
-                'Thanh toán thất bại';
-            appointmentScheduleList[index].status = 'Đã hủy';
-            appointmentScheduleList[index].statusReasonCanceled =
-                'Quá hạn thanh toán';
-            appointmentScheduleList[index].updatePaymentStatus(
-                appointmentScheduleList[index].paymentStatus!);
-            appointmentScheduleList[index].updateAppointmentStatus(
-                appointmentScheduleList[index].status!);
-            appointmentScheduleList[index]
-                .updateAppointmentStatusReasonCanceled(
-                    appointmentScheduleList[index].statusReasonCanceled!);
-            // Hủy timer tương ứng khi đạt điều kiện
-            t.cancel();
+          // Tạo DateTime đầy đủ với ngày và giờ bắt đầu
+          DateTime appointmentDateTime = DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
+            int.parse(startTime.split(':')[0]), // Giờ
+            int.parse(startTime.split(':')[1]), // Phút
+          );
+
+          // Kiểm tra nếu đã quá thời gian khám
+          if (now.isAfter(appointmentDateTime)) {
+            appointment.status = 'Đã hủy';
+            appointment.statusReasonCanceled =
+                'Quá thời gian khám mà chưa thanh toán';
+
+            // Cập nhật lên Firestore
+            appointment.updateAppointmentStatus(appointment.status!);
+            appointment.updateAppointmentStatusReasonCanceled(
+                appointment.statusReasonCanceled!);
+
+            debugPrint(
+                'Cuộc hẹn ${appointment.appointmentCode} đã bị hủy do quá hạn.');
           }
-        });
-      });
-      _timers.add(timer); // Lưu trữ timer vào danh sách _timers
+        } catch (e) {
+          debugPrint('Lỗi khi kiểm tra trạng thái cuộc hẹn: $e');
+        }
+      }
     }
   }
 
@@ -115,7 +125,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             tempAppointmentSchedule
                 .updateAppointmentStatus(tempAppointmentSchedule.status!);
           });
-        } catch (e) {}
+        } catch (e) {
+          debugPrint('Error: $e');
+        }
       }
     }
   }
@@ -291,7 +303,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               Container(
                 margin: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
                 child: StreamBuilder<List<AppointmentSchedule>>(
-                  stream: _appointmentScheduleController!.stream,
+                  stream: _appointmentScheduleController.stream,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       // Xử lý lỗi nếu có
@@ -299,15 +311,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     }
 
                     if (snapshot.hasData) {
-                      // Lọc theo mục
                       List<AppointmentSchedule> appointmentSchedulesStatus =
                           snapshot.data!
                               .where((element) => element.status == _status)
                               .toList()
                               .reversed
                               .toList();
-                      _timers.clear();
-                      _secondsRemainingList.clear();
+
+                      // Kiểm tra và cập nhật trạng thái cho các cuộc hẹn chờ duyệt
+                      checkPendingAppointments(appointmentSchedulesStatus);
+
                       // Nếu mục trống
                       if (appointmentSchedulesStatus.isEmpty) {
                         return Center(
@@ -353,7 +366,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       }
                       //--------------------------------
                       if (appointmentSchedulesStatus[0].status == 'Chờ duyệt') {
-                        startTimersForPending(appointmentSchedulesStatus);
+                        // startTimersForPending(appointmentSchedulesStatus);
                       }
 
                       if (appointmentSchedulesStatus[0].status == 'Đã duyệt') {

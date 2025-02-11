@@ -84,7 +84,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
                       SizedBox(width: 100, child: Text('Ngân hàng:')),
                       Expanded(
                           child: Text(
-                        'NH TMCP Sài Gòn Thương Tín (Sacombank)',
+                        'BIDV - Ngân hàng TMCP Đầu tư và Phát triển Việt Nam',
                         textAlign: TextAlign.right,
                       ))
                     ],
@@ -102,7 +102,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
                         child: GestureDetector(
                           onTap: () {
                             // Xử lý sự kiện sao chép số tài khoản
-                            const data = ClipboardData(text: '0711995629966');
+                            const data = ClipboardData(text: '6801195207');
                             Clipboard.setData(data);
                             showToastMessage(
                                 context, 'Số tài khoản đã được sao chép');
@@ -111,7 +111,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                '0711995629966',
+                                '6801195207',
                                 style: TextStyle(
                                   color: Themes.gradientDeepClr,
                                   fontWeight: FontWeight.w500,
@@ -162,7 +162,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
                           onTap: () {
                             // Xử lý sự kiện sao chép số tài khoản
                             final data =
-                                ClipboardData(text: '${_serviceFee * 1.0083}');
+                                ClipboardData(text: '$_serviceFee');
                             Clipboard.setData(data);
                             showToastMessage(
                                 context, 'Số tiền đã được sao chép');
@@ -171,7 +171,7 @@ class _ScheduleQRPageState extends State<ScheduleQRPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                '${NumberFormat("#,##0", "en_US").format(int.parse((_serviceFee * 1.0083).toInt().toString()))} VNĐ',
+                                '${NumberFormat("#,##0", "en_US").format(int.parse((_serviceFee).toInt().toString()))} VNĐ',
                                 style: const TextStyle(
                                   color: Themes.gradientDeepClr,
                                   fontWeight: FontWeight.w500,

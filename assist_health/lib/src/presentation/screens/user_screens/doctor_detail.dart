@@ -40,6 +40,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
   bool _isSpecialtyVisible = true;
   bool _isWorkPlaceVisible = true;
   bool _isExperienceVisible = true;
+  bool _isStudyVisible = true;
 
   int _currentYear = DateTime.now().year;
   int _currentMonth = DateTime.now().month;
@@ -292,7 +293,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  _doctorInfo!.careerTitiles,
+                                  "Chức danh: ${_doctorInfo!.careerTitiles}",
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
@@ -310,15 +311,15 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                Text(
-                                  '${DateTime.now().year - _doctorInfo!.graduationYear} năm kinh nghiệm',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    height: 1.5,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
+                                // Text(
+                                //   "Chức danh: ${_doctorInfo!.careerTitiles}",
+                                //   style: const TextStyle(
+                                //     color: Colors.black,
+                                //     fontSize: 15,
+                                //     height: 1.5,
+                                //     overflow: TextOverflow.ellipsis,
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
@@ -651,48 +652,6 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                           child: CircularProgressIndicator()),
                                     ),
                             ),
-                            // Container(
-                            //   width: 140,
-                            //   padding: const EdgeInsets.symmetric(
-                            //     horizontal: 8,
-                            //     vertical: 6,
-                            //   ),
-                            //   decoration: BoxDecoration(
-                            //     gradient: const LinearGradient(
-                            //       colors: [
-                            //         Themes.gradientDeepClr,
-                            //         Themes.gradientLightClr
-                            //       ],
-                            //       begin: Alignment.centerLeft,
-                            //       end: Alignment.centerRight,
-                            //     ),
-                            //     borderRadius: BorderRadius.circular(20),
-                            //   ),
-                            //   child: const Row(
-                            //     mainAxisAlignment: MainAxisAlignment.center,
-                            //     children: [
-                            //       Icon(
-                            //         CupertinoIcons.person_3_fill,
-                            //         size: 20,
-                            //         color: Colors.white,
-                            //       ),
-                            //       SizedBox(
-                            //         width: 8,
-                            //       ),
-                            //       Text(
-                            //         'Còn 48 slot',
-                            //         style: TextStyle(
-                            //           fontSize: 13,
-                            //           fontWeight: FontWeight.w500,
-                            //           color: Colors.white,
-                            //         ),
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
-                            // const SizedBox(
-                            //   height: 5,
-                            // ),
                             Column(
                               children: [
                                 (_isAnyTimeFrame(isMorning: true))
@@ -1152,92 +1111,6 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                // Giờ làm việc
-                Container(
-                  color: Colors.white,
-                  width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isWorkTimeVisible = !_isWorkTimeVisible;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                            bottom: 10,
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                FontAwesomeIcons.clock,
-                                color: Colors.blueGrey,
-                                size: 20,
-                              ),
-                              const SizedBox(
-                                width: 12,
-                              ),
-                              const Expanded(
-                                child: Text(
-                                  'Giờ làm việc',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                (_isWorkTimeVisible)
-                                    ? FontAwesomeIcons.angleDown
-                                    : FontAwesomeIcons.angleUp,
-                                size: 16,
-                                color: Colors.grey,
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (_isWorkTimeVisible)
-                        Container(
-                          padding: const EdgeInsets.only(
-                            top: 5,
-                            left: 4,
-                            right: 4,
-                            bottom: 6,
-                          ),
-                          child: const Center(
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Thứ 2 - Chủ nhật',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Spacer(),
-                                Text(
-                                  '8:00 - 20:00',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
                 // Giới thiệu
                 Container(
                   color: Colors.white,
@@ -1492,96 +1365,6 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                // // Quá trình đào tạo
-                // Container(
-                //   color: Colors.white,
-                //   width: double.infinity,
-                //   padding:
-                //       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                //   child: Column(
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: [
-                //       GestureDetector(
-                //         onTap: () {
-                //           setState(() {
-                //             _isStudyVisible = !_isStudyVisible;
-                //           });
-                //         },
-                //         child: Container(
-                //           padding: const EdgeInsets.only(
-                //             bottom: 10,
-                //           ),
-                //           child: Row(
-                //             children: [
-                //               const Icon(
-                //                 FontAwesomeIcons.graduationCap,
-                //                 size: 18,
-                //                 color: Colors.blueGrey,
-                //               ),
-                //               const SizedBox(
-                //                 width: 12,
-                //               ),
-                //               const Expanded(
-                //                 child: Text(
-                //                   'Quá trình đào tạo',
-                //                   style: TextStyle(
-                //                     color: Colors.black,
-                //                     fontSize: 15,
-                //                     fontWeight: FontWeight.w500,
-                //                     height: 1.5,
-                //                   ),
-                //                 ),
-                //               ),
-                //               Icon(
-                //                 (_isStudyVisible)
-                //                     ? FontAwesomeIcons.angleDown
-                //                     : FontAwesomeIcons.angleUp,
-                //                 size: 16,
-                //                 color: Colors.grey,
-                //               )
-                //             ],
-                //           ),
-                //         ),
-                //       ),
-                //       if (_isStudyVisible)
-                //         Container(
-                //           padding: const EdgeInsets.only(
-                //             top: 5,
-                //             bottom: 6,
-                //           ),
-                //           child: Column(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Row(
-                //                 children: [
-                //                   DotsIndicator(
-                //                     dotsCount: 1,
-                //                     decorator: const DotsDecorator(
-                //                       activeColor: Colors.grey,
-                //                       activeSize: Size(7, 7),
-                //                     ),
-                //                   ),
-                //                   const SizedBox(
-                //                     width: 5,
-                //                   ),
-                //                   Text(
-                //                     getAllOfSpecialties(
-                //                         _doctorInfo!.experiences),
-                //                     style: TextStyle(
-                //                       fontSize: 15,
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //     ],
-                //   ),
-                // ),
-                // const SizedBox(
-                //   height: 5,
-                // ),
                 // Kinh nghiệm
                 Container(
                   color: Colors.white,
@@ -1655,8 +1438,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                                     width: 5,
                                   ),
                                   Text(
-                                    getAllOfSpecialties(
-                                        _doctorInfo!.experiences),
+                                    _doctorInfo!.experienceText,
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
@@ -1672,108 +1454,152 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                 const SizedBox(
                   height: 5,
                 ),
-                // Hình ảnh
-                //   Container(
-                //     color: Colors.white,
-                //     width: double.infinity,
-                //     padding:
-                //         const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         GestureDetector(
-                //           onTap: () {
-                //             setState(() {
-                //               _isImageVisible = !_isImageVisible;
-                //             });
-                //           },
-                //           child: Container(
-                //             padding: const EdgeInsets.only(
-                //               bottom: 10,
-                //             ),
-                //             child: Row(
-                //               children: [
-                //                 const Icon(
-                //                   FontAwesomeIcons.image,
-                //                   size: 20,
-                //                   color: Colors.blueGrey,
-                //                 ),
-                //                 const SizedBox(
-                //                   width: 14,
-                //                 ),
-                //                 const Expanded(
-                //                   child: Text(
-                //                     'Hình ảnh',
-                //                     style: TextStyle(
-                //                       color: Colors.black,
-                //                       fontSize: 15,
-                //                       fontWeight: FontWeight.w500,
-                //                       height: 1.5,
-                //                     ),
-                //                   ),
-                //                 ),
-                //                 Icon(
-                //                   (_isImageVisible)
-                //                       ? FontAwesomeIcons.angleDown
-                //                       : FontAwesomeIcons.angleUp,
-                //                   size: 16,
-                //                   color: Colors.grey,
-                //                 )
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //         if (_isImageVisible)
-                //           Container(
-                //             height: 100,
-                //             width: 200,
-                //             color: Colors.green,
-                //             child: const Center(
-                //               child: Text(
-                //                 'Visible',
-                //                 style: TextStyle(
-                //                   color: Colors.white,
-                //                   fontSize: 16,
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
-                //       ],
-                //     ),
-                //   ),
-                //   GestureDetector(
-                //     onTap: () {
-                //       _scrollController.animateTo(
-                //         0,
-                //         duration: const Duration(milliseconds: 500),
-                //         curve: Curves.easeInOut,
-                //       );
-                //     },
-                //     child: Container(
-                //       width: double.infinity,
-                //       margin: const EdgeInsets.only(top: 15, bottom: 10),
-                //       child: Row(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: [
-                //           Icon(
-                //             Icons.arrow_upward_rounded,
-                //             color: Colors.blueGrey.shade300,
-                //             size: 15,
-                //           ),
-                //           const SizedBox(
-                //             width: 3,
-                //           ),
-                //           Text(
-                //             'LÊN ĐẦU TRANG',
-                //             style: TextStyle(
-                //                 color: Colors.blueGrey.shade300,
-                //                 fontSize: 10,
-                //                 height: 1.5),
-                //           )
-                //         ],
-                //       ),
-                //     ),
-                //   )
+                // Học vấn
+                Container(
+                  color: Colors.white,
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isStudyVisible = !_isStudyVisible;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.school,
+                                color: Colors.blueGrey,
+                                size: 20,
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  'Học vấn',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                (_isStudyVisible)
+                                    ? FontAwesomeIcons.angleDown
+                                    : FontAwesomeIcons.angleUp,
+                                size: 16,
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (_isStudyVisible)
+                        Container(
+                          padding: const EdgeInsets.only(
+                              top: 5, left: 4, right: 4, bottom: 6),
+                          child: Text(
+                            _doctorInfo!.studyText,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              height:
+                                  1.4, // Điều chỉnh chiều cao dòng cho đẹp hơn
+                            ),
+                            softWrap: true, // Tự động xuống dòng
+                            overflow: TextOverflow
+                                .visible, // Hiển thị đầy đủ nội dung
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                // Địa chỉ
+                Container(
+                  color: Colors.white,
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isWorkTimeVisible = !_isWorkTimeVisible;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.maps_home_work,
+                                color: Colors.blueGrey,
+                                size: 20,
+                              ),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  'Địa chỉ',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                (_isWorkTimeVisible)
+                                    ? FontAwesomeIcons.angleDown
+                                    : FontAwesomeIcons.angleUp,
+                                size: 16,
+                                color: Colors.grey,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (_isWorkTimeVisible)
+                        Container(
+                          padding: const EdgeInsets.only(
+                              top: 5, left: 4, right: 4, bottom: 6),
+                          child: Text(
+                            _doctorInfo!.address,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              height:
+                                  1.4, // Điều chỉnh chiều cao dòng cho đẹp hơn
+                            ),
+                            softWrap: true, // Tự động xuống dòng
+                            overflow: TextOverflow
+                                .visible, // Hiển thị đầy đủ nội dung
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
               ],
             ),
           ),
@@ -1791,74 +1617,41 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
           ),
           child: Column(
             children: [
-              // Container(
-              //   padding: const EdgeInsets.all(13),
-              //   margin: const EdgeInsets.symmetric(horizontal: 5),
-              //   decoration: BoxDecoration(
-              //     color: Colors.blue.shade100.withOpacity(0.5),
-              //     borderRadius: BorderRadius.circular(8),
-              //     border: Border.all(
-              //       color: Colors.blue,
-              //       width: 1,
-              //     ),
-              //   ),
-              //   child: const Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       Icon(
-              //         FontAwesomeIcons.solidCommentDots,
-              //         color: Colors.blue,
-              //       ),
-              //       SizedBox(
-              //         width: 10,
-              //       ),
-              //       Text(
-              //         'Chat với bác sĩ',
-              //         style: TextStyle(
-              //           color: Colors.blue,
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(
-              //   height: 10,
-              // ),
               Row(
                 children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        isOnline
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RegisterCallNowStep1(
-                                          doctorInfo: _doctorInfo!,
-                                        )))
-                            : showNotificationDialog(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(15),
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                          color: isOnline
-                              ? Colors.greenAccent.shade700
-                              : Colors.blueGrey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Gọi video ngay',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: GestureDetector(
+                  //     onTap: () {
+                  //       isOnline
+                  //           ? Navigator.push(
+                  //               context,
+                  //               MaterialPageRoute(
+                  //                   builder: (context) => RegisterCallNowStep1(
+                  //                         doctorInfo: _doctorInfo!,
+                  //                       )))
+                  //           : showNotificationDialog(context);
+                  //     },
+                  //     child: Container(
+                  //       padding: const EdgeInsets.all(15),
+                  //       margin: const EdgeInsets.symmetric(horizontal: 5),
+                  //       decoration: BoxDecoration(
+                  //         color: isOnline
+                  //             ? Colors.greenAccent.shade700
+                  //             : Colors.blueGrey.shade200,
+                  //         borderRadius: BorderRadius.circular(8),
+                  //       ),
+                  //       child: const Center(
+                  //         child: Text(
+                  //           'Gọi ngay',
+                  //           style: TextStyle(
+                  //             fontSize: 16,
+                  //             color: Colors.white,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -1877,7 +1670,7 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen> {
                         ),
                         child: const Center(
                           child: Text(
-                            'Đặt lịch gọi',
+                            'Đặt lịch',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white,

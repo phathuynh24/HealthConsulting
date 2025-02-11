@@ -30,15 +30,24 @@ class _DoctorChatState extends State<DoctorChatScreen> {
   final StreamController<List<DoctorInfo>> _doctorStreamController =
       StreamController<List<DoctorInfo>>.broadcast();
 
+  final TextEditingController _searchController = TextEditingController();
+  String _searchText = '';
+
   @override
   void initState() {
     super.initState();
     _uid = _auth.currentUser!.uid;
     _doctorStreamController.addStream(getInfoDoctors());
+    _searchController.addListener(() {
+      setState(() {
+        _searchText = _searchController.text.trim().toLowerCase();
+      });
+    });
   }
 
   @override
   void dispose() {
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -48,10 +57,81 @@ class _DoctorChatState extends State<DoctorChatScreen> {
       backgroundColor: Themes.backgroundClr,
       appBar: AppBar(
         foregroundColor: Colors.white,
-        toolbarHeight: 50,
+        toolbarHeight: 80,
+        title: Column(
+          children: [
+            const Text(
+              'Kết quả khám',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.9),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: 38,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey.shade800.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: TextFormField(
+                controller: _searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
+                  hintText: 'Tên bác sĩ, bệnh nhân, mã phiếu khám',
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 15,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.white70,
+                    size: 23,
+                  ),
+                  border: InputBorder.none,
+                  suffixIconConstraints:
+                      const BoxConstraints(maxHeight: 30, maxWidth: 30),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _searchText = '';
+                        _searchController.text = _searchText;
+                      });
+                    },
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      margin: const EdgeInsets.only(
+                        right: 10,
+                      ),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white70,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.clear,
+                          size: 15,
+                          color: Colors.blueGrey.shade700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchText = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
         centerTitle: true,
-        title: const Text('Chat với bác sĩ'),
-        titleTextStyle: const TextStyle(fontSize: 16),
+        automaticallyImplyLeading: false,
         elevation: 0,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -74,65 +154,49 @@ class _DoctorChatState extends State<DoctorChatScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          List<DoctorInfo> filterDoctorWithStatus;
+          List<DoctorInfo> doctors = snapshot.data ?? [];
 
-          filterDoctorWithStatus = snapshot.data!;
+          // ✅ Lọc bỏ các bác sĩ đã bị xóa (isDeleted = true)
+          doctors =
+              doctors.where((doctor) => doctor.isDeleted == false).toList();
 
-          // filterDoctorWithStatus = snapshot.data!
-          //     .where((doctor) => doctor.status == '')
-          //     .toList();
+          // 🔍 Filter by search text
+          List<DoctorInfo> filteredDoctors = _searchText.isNotEmpty
+              ? doctors
+                  .where((doctor) =>
+                      doctor.name.toLowerCase().contains(_searchText))
+                  .toList()
+              : doctors;
 
-          //---------------------------------------------------------
-
-          // Xử lý lọc tìm kiếm tên bác sĩ
-          List<DoctorInfo> filterDoctorWithName;
-          // if (_searchName!.trim() != '') {
-          //   filterDoctorWithName = filterDoctorWithStatus
-          //       .where((doctor) => doctor.name
-          //           .toLowerCase()
-          //           .contains(_searchName!.toLowerCase()))
-          //       .toList();
-          // } else {
-          filterDoctorWithName = filterDoctorWithStatus;
-          //}
-          //---------------------------------------------------------
-
-          // Xử lý kh không tìm ra kết quả
-          if (filterDoctorWithName.isEmpty) {
-            return SingleChildScrollView(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                height: 350,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Image.asset(
-                      'assets/no_result_search_icon.png',
-                      width: 250,
-                      height: 250,
-                      fit: BoxFit.contain,
+          // ❌ No results found
+          if (filteredDoctors.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/no_result_search_icon.png',
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Không tìm thấy kết quả',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                    const Text(
-                      'Không tìm thấy kết quả',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Hãy thử nhập từ khóa khác để tìm kiếm.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           }
@@ -140,9 +204,9 @@ class _DoctorChatState extends State<DoctorChatScreen> {
           return Container(
             color: Colors.blueAccent.withOpacity(0.1),
             child: ListView.builder(
-              itemCount: filterDoctorWithName.length,
+              itemCount: filteredDoctors.length,
               itemBuilder: (context, index) {
-                DoctorInfo doctor = filterDoctorWithName[index];
+                DoctorInfo doctor = filteredDoctors[index];
 
                 return Container(
                   height: 185,
@@ -233,15 +297,6 @@ class _DoctorChatState extends State<DoctorChatScreen> {
                                       ),
                                       Text(
                                         doctor.name,
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          height: 1.5,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${DateTime.now().year - doctor.graduationYear} năm kinh nghiệm',
                                         style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
