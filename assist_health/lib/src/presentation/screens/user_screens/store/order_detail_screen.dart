@@ -67,6 +67,7 @@ class OrderDetailsPage extends StatelessWidget {
           .collection('orders')
           .where('status', isEqualTo: status)
           .where('userId', isEqualTo: currentUserId)
+          .orderBy('time', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -123,14 +124,13 @@ class OrderDetailsPage extends StatelessWidget {
               }
 
               return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomeStoreScreen(),
-                    ),
-                  );
-                },
+                // onTap: () {
+                //   Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const HomeStoreScreen(),
+                //       ));
+                // },
                 child: Card(
                   elevation: 5,
                   margin: const EdgeInsets.all(8),

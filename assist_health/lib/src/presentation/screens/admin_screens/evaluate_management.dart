@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class ReviewManagementPage extends StatefulWidget {
+  const ReviewManagementPage({super.key});
+
   @override
   _ReviewManagementPageState createState() => _ReviewManagementPageState();
 }
@@ -32,17 +34,17 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Xác nhận'),
-          content: Text('Bạn có chắc chắn muốn xóa đánh giá này không?'),
+          title: const Text('Xác nhận'),
+          content: const Text('Bạn có chắc chắn muốn xóa đánh giá này không?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Hủy'),
+              child: const Text('Hủy'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Xác nhận'),
+              child: const Text('Xác nhận'),
               onPressed: () {
                 deleteReview(reviewId);
                 Navigator.of(context).pop();
@@ -76,14 +78,16 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance.collection('product_review').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('product_review')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Đã xảy ra lỗi: ${snapshot.error}'));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           return Padding(
@@ -103,7 +107,7 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                         AsyncSnapshot<String> userSnapshot) {
                       if (userSnapshot.connectionState ==
                           ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (userSnapshot.hasError) {
                         return Container(
@@ -114,7 +118,7 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: Colors.grey),
                           ),
-                          child: Column(
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Error loading user data'),
@@ -141,7 +145,7 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '$userName',
+                                  userName,
                                   style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),
@@ -150,14 +154,15 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                                   children: [
                                     Text(
                                       '${data['rating']}',
-                                      style: TextStyle(fontSize: 16),
+                                      style: const TextStyle(fontSize: 16),
                                     ),
-                                    Icon(Icons.star, color: Colors.yellow),
+                                    const Icon(Icons.star,
+                                        color: Colors.yellow),
                                   ],
                                 ),
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
                             Row(
@@ -174,9 +179,9 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                                     ),
                                     Row(
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Giá tiền: ',
-                                          style: const TextStyle(fontSize: 16),
+                                          style: TextStyle(fontSize: 16),
                                         ),
                                         Text(
                                           '${data['productPrice']} VND',
@@ -199,9 +204,9 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Nội dung: ',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -220,7 +225,7 @@ class _ReviewManagementPageState extends State<ReviewManagementPage> {
                                       fontSize: 16, color: Colors.grey),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete),
+                                  icon: const Icon(Icons.delete),
                                   onPressed: () {
                                     showDeleteConfirmationDialog(doc.id);
                                   },

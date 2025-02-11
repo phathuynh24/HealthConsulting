@@ -54,6 +54,7 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
     final imageTitle = blogData['imageTitle'] ?? '';
     final appendix = (blogData['appendix'] as List?) ?? [];
     final body = (blogData['body'] as List?) ?? [];
+    final content = blogData['content'] ?? '';
     final status = blogData['status'] ?? false;
 
     for (int i = 0; i < body.length; i++) {
@@ -76,7 +77,7 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.check_circle_outline),
+            icon: const Icon(Icons.check_circle_outline),
             onPressed: () {
               _showConfirmationDialog(context, widget.blogData);
             },
@@ -95,127 +96,133 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  category,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                if (status)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text('Kiểm duyệt: '),
-                          Text('$verifiedName',
-                              style: const TextStyle(
-                                  color: Themes.gradientDeepClr,
-                                  fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text('Ngày kiểm duyệt: '),
-                          Text('$verifiedDay',
-                              style: const TextStyle(
-                                  color: Themes.gradientDeepClr,
-                                  fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ],
-                  ),
-                const SizedBox(height: 8.0),
-                const SizedBox(height: 16.0),
-                const Text(
-                  'Mục lục',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                ...appendix.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  String item = entry.value;
-                  String romanNumeral = intToRoman(index + 1);
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: InkWell(
-                      onTap: () => _scrollToSection(index),
-                      child: Text(
-                        '$romanNumeral. $item',
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                        style:
-                            const TextStyle(fontSize: 18.0, color: Colors.blue),
-                      ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
                     ),
-                  );
-                }).toList(),
-                const SizedBox(height: 16.0),
-                const Text(
-                  'Nội dung',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                const SizedBox(height: 8.0),
-                ...body.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final section = entry.value;
-                  final header = section['header'] ?? 'No header';
-                  final content = section['content'] ?? 'No content';
-                  final imageUrl = section['imageUrl'] ?? '';
-
-                  return Column(
-                    key: _sectionKeys[index],
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        header,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (imageUrl.isNotEmpty)
-                        Column(
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  if (status)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            SizedBox(height: 8),
-                            Center(
-                              child: Image.network(imageUrl),
-                            ),
+                            const Text('Kiểm duyệt: '),
+                            Text('$verifiedName',
+                                style: const TextStyle(
+                                    color: Themes.gradientDeepClr,
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
-                      const SizedBox(height: 4.0),
-                      Text(
-                        processContent(content),
-                        textAlign: TextAlign.justify,
-                        style: TextStyle(fontSize: 16),
+                        Row(
+                          children: [
+                            const Text('Ngày kiểm duyệt: '),
+                            Text(verifiedDay,
+                                style: const TextStyle(
+                                    color: Themes.gradientDeepClr,
+                                    fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 8.0),
+                  const SizedBox(height: 16.0),
+                  if (appendix.isNotEmpty) ...[
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Mục lục',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 16.0),
-                    ],
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    ...appendix.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      String item = entry.value;
+                      String romanNumeral = intToRoman(index + 1);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: InkWell(
+                          onTap: () => _scrollToSection(index),
+                          child: Text(
+                            '$romanNumeral. $item',
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                            style: const TextStyle(
+                                fontSize: 18.0, color: Colors.blue),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'Nội dung',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    content,
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                  ...body.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final section = entry.value;
+                    final header = section['header'] ?? 'No header';
+                    final content = section['content'] ?? 'No content';
+                    final imageUrl = section['imageUrl'] ?? '';
+
+                    return Column(
+                      key: _sectionKeys[index],
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          header,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (imageUrl.isNotEmpty)
+                          Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              Center(
+                                child: Image.network(imageUrl),
+                              ),
+                            ],
+                          ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          processContent(content),
+                          textAlign: TextAlign.justify,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 16.0),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              )),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -228,7 +235,7 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
         },
         backgroundColor: Themes.gradientDeepClr,
         foregroundColor: Colors.white,
-        child: Icon(Icons.arrow_upward),
+        child: const Icon(Icons.arrow_upward),
       ),
     );
   }
@@ -239,18 +246,18 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(child: Text("Duyệt bài viết")),
-          content: Text("Bạn có muốn duyệt bài viết này không?"),
+          title: const Center(child: Text("Duyệt bài viết")),
+          content: const Text("Bạn có muốn duyệt bài viết này không?"),
           actions: [
             TextButton.icon(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              icon: Icon(Icons.cancel, color: Colors.red),
+              icon: const Icon(Icons.cancel, color: Colors.red),
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.white),
               ),
-              label: Text("Hủy", style: TextStyle(color: Colors.red)),
+              label: const Text("Hủy", style: TextStyle(color: Colors.red)),
             ),
             TextButton.icon(
               onPressed: () {
@@ -282,11 +289,11 @@ class _DoctorBlogPageState extends State<DoctorBlogPage> {
                   }
                 });
               },
-              icon: Icon(Icons.check_circle, color: Colors.white),
+              icon: const Icon(Icons.check_circle, color: Colors.white),
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
               ),
-              label: Text("Duyệt", style: TextStyle(color: Colors.white)),
+              label: const Text("Duyệt", style: TextStyle(color: Colors.white)),
             ),
           ],
         );

@@ -4,6 +4,7 @@ import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/add_blog.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/doctor_profile_list.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/evaluate_management.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/excercies/excercise_manager.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
@@ -71,7 +72,7 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                       children: [
                         GestureDetector(
                           child: Container(
-                            padding: EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.white,
@@ -236,7 +237,40 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                ReviewManagementPage()));
+                                                const ExerciseManagerScreen()));
+                                  },
+                                  leading: const Icon(
+                                    Icons.sports_gymnastics,
+                                    color: Colors.yellowAccent,
+                                    size: 30,
+                                  ),
+                                  title: const Text(
+                                    "Quản lý bài tập",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                height: 30,
+                                indent: 15,
+                                endIndent: 15,
+                                color: Colors.grey.shade100,
+                              ),
+                              Container(
+                                height: 50,
+                                margin: const EdgeInsets.only(
+                                  left: 8,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ReviewManagementPage()));
                                   },
                                   leading: const Icon(
                                     Icons.reviews_sharp,
@@ -269,7 +303,7 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                ProductListScreen()));
+                                                const ProductListScreen()));
                                   },
                                   leading: const Icon(
                                     Icons.store,
@@ -302,7 +336,7 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                DoctorProfileList()));
+                                                const DoctorProfileList()));
                                   },
                                   leading: const Icon(
                                     FontAwesomeIcons.userDoctor,
@@ -335,7 +369,7 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                CreateBlogPostPage()));
+                                                const CreateBlogPostPage()));
                                   },
                                   leading: const Icon(
                                     FontAwesomeIcons.blog,

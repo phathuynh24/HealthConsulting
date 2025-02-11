@@ -61,6 +61,7 @@ class AdminOrderManagementScreen extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('orders')
           .where('status', isEqualTo: status)
+          .orderBy('time', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {

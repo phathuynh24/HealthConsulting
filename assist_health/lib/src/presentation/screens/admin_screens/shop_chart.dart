@@ -22,7 +22,8 @@ class _ShopChartState extends State<ShopChart> {
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: isStartDate ? startDate ?? DateTime.now() : endDate ?? DateTime.now(),
+      initialDate:
+          isStartDate ? startDate ?? DateTime.now() : endDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
     );
@@ -52,7 +53,8 @@ class _ShopChartState extends State<ShopChart> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text('Thống kê đơn hàng', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Thống kê đơn hàng',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -74,10 +76,26 @@ class _ShopChartState extends State<ShopChart> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _selectDate(context, true),
-                    child: Text(
-                      startDate == null
-                          ? "Chọn ngày bắt đầu"
-                          : "Bắt đầu: ${DateFormat('dd/MM/yyyy').format(startDate!)}",
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Themes.gradientDeepClr, // Màu nền
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.calendar_today,
+                            color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          startDate == null
+                              ? "Chọn ngày bắt đầu"
+                              : "Bắt đầu: ${DateFormat('dd/MM/yyyy').format(startDate!)}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -85,10 +103,25 @@ class _ShopChartState extends State<ShopChart> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _selectDate(context, false),
-                    child: Text(
-                      endDate == null
-                          ? "Chọn ngày kết thúc"
-                          : "Kết thúc: ${DateFormat('dd/MM/yyyy').format(endDate!)}",
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Themes.gradientLightClr, // Màu nền khác
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.event, color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          endDate == null
+                              ? "Chọn ngày kết thúc"
+                              : "Kết thúc: ${DateFormat('dd/MM/yyyy').format(endDate!)}",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -98,7 +131,9 @@ class _ShopChartState extends State<ShopChart> {
           if (errorMessage != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: Text(errorMessage!, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: Text(errorMessage!,
+                  style: const TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold)),
             ),
           Expanded(
             child: OrderList(startDate: startDate, endDate: endDate),
@@ -108,7 +143,6 @@ class _ShopChartState extends State<ShopChart> {
     );
   }
 }
-
 
 class OrderList extends StatelessWidget {
   final DateTime? startDate;
@@ -127,11 +161,14 @@ class OrderList extends StatelessWidget {
     }
 
     if (startDate!.isAfter(endDate!)) {
-      return const Center(child: Text("Lỗi: Ngày bắt đầu không được lớn hơn ngày kết thúc!", style: TextStyle(color: Colors.red)));
+      return const Center(
+          child: Text("Lỗi: Ngày bắt đầu không được lớn hơn ngày kết thúc!",
+              style: TextStyle(color: Colors.red)));
     }
 
     Timestamp startTimestamp = Timestamp.fromDate(startDate!);
-    Timestamp endTimestamp = Timestamp.fromDate(endDate!.add(const Duration(days: 1)));
+    Timestamp endTimestamp =
+        Timestamp.fromDate(endDate!.add(const Duration(days: 1)));
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -170,14 +207,14 @@ class OrderList extends StatelessWidget {
         double totalPrice = 0.0;
         double totalPriceFinal = 0.0;
 
-        snapshot.data!.docs.forEach((DocumentSnapshot document) {
+        for (var document in snapshot.data!.docs) {
           for (var cartItem in (document['userCart'] as List<dynamic>)) {
             totalQuantity += (cartItem['quantity'] as num).toInt();
             totalPrice += (cartItem['quantity'] as num) *
                 (cartItem['productPrice'] as num);
           }
           totalPriceFinal += document['totalPrice'] as num;
-        });
+        }
 
         return SingleChildScrollView(
           child: Column(
@@ -198,8 +235,8 @@ class OrderList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ListTile(
-                        title: Center(
-                          child: const Text(
+                        title: const Center(
+                          child: Text(
                             'Thống kê theo tháng',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -212,9 +249,9 @@ class OrderList extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Tổng số lượng: ',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -230,9 +267,9 @@ class OrderList extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Tổng giá: ',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -249,9 +286,9 @@ class OrderList extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                Text(
+                                const Text(
                                   'Thành tiền:',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
                                   ),
@@ -300,7 +337,7 @@ class OrderList extends StatelessWidget {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
+                                SizedBox(
                                   width: 80,
                                   height: 80,
                                   child: CachedNetworkImage(
@@ -308,9 +345,10 @@ class OrderList extends StatelessWidget {
                                         [0], // Lấy URL hình ảnh đầu tiên
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) =>
-                                        CircularProgressIndicator(), // Optional placeholder widget
-                                    errorWidget: (context, url, error) => Icon(
-                                        Icons.error), // Optional error widget
+                                        const CircularProgressIndicator(), // Optional placeholder widget
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons
+                                            .error), // Optional error widget
                                   ),
                                 ),
                                 const SizedBox(width: 8),

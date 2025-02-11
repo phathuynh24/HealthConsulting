@@ -36,20 +36,30 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  void fetchCartItems() {
-    FirebaseFirestore.instance
-        .collection('user_carts')
-        .where('userId', isEqualTo: currentUserId)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var document in querySnapshot.docs) {
-        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-        setState(() {
-          cartItems.add(CartItem.fromJson(data));
-          calculateTotalPrice();
-        });
+  void fetchCartItems() async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('user_carts')
+          .where('userId', isEqualTo: currentUserId)
+          .orderBy('timestamp', descending: true)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        print("Không có sản phẩm nào trong giỏ hàng.");
       }
-    });
+
+      List<CartItem> fetchedItems = querySnapshot.docs
+          .map((doc) => CartItem.fromJson(doc.data()))
+          .toList();
+
+      setState(() {
+        cartItems.clear(); // Xóa danh sách cũ để tránh trùng lặp
+        cartItems.addAll(fetchedItems);
+        calculateTotalPrice();
+      });
+    } catch (error) {
+      print('Lỗi khi lấy dữ liệu giỏ hàng: $error');
+    }
   }
 
   void calculateTotalPrice() {
@@ -78,6 +88,26 @@ class _CartScreenState extends State<CartScreen> {
 
     setState(() {
       cartItems.removeAt(index);
+      calculateTotalPrice();
+    });
+  }
+
+  void updateCartItemQuantity(CartItem item) {
+    FirebaseFirestore.instance
+        .collection('user_carts')
+        .where('id', isEqualTo: item.id)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var document in querySnapshot.docs) {
+        document.reference
+            .update({'quantity': item.quantity}).catchError((error) {
+          print("Failed to update quantity: $error");
+        });
+      }
+    });
+
+    // Cập nhật lại trạng thái UI
+    setState(() {
       calculateTotalPrice();
     });
   }
@@ -123,23 +153,23 @@ class _CartScreenState extends State<CartScreen> {
             );
           }
           return ListTile(
-            leading: Container(
+            leading: SizedBox(
               width: 80,
               child: Row(
                 children: [
                   Text(
                     '${index + 1}',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   CachedNetworkImage(
                     imageUrl: cartItems[index].imageUrls[0],
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    placeholder: (context, url) => Center(
-                      child:
-                          CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator(),
                     ),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
@@ -156,16 +186,34 @@ class _CartScreenState extends State<CartScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () {
+                    setState(() {
+                      if (cartItems[index].quantity > 1) {
+                        cartItems[index].quantity--;
+                        updateCartItemQuantity(cartItems[index]);
+                        calculateTotalPrice();
+                      } else {
+                        removeItem(index);
+                      }
+                    });
+                  },
+                ),
                 Text(
-                  'x${cartItems[index].quantity}',
+                  '${cartItems[index].quantity}',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 IconButton(
-                  icon: const Icon(
-                    Icons.remove_shopping_cart,
-                  ),
-                  onPressed: () => removeItem(index),
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      cartItems[index].quantity++;
+                      updateCartItemQuantity(cartItems[index]);
+                      calculateTotalPrice();
+                    });
+                  },
                 ),
               ],
             ),
@@ -181,9 +229,9 @@ class _CartScreenState extends State<CartScreen> {
                   children: [
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Tổng tiền:',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         Text(

@@ -4,6 +4,8 @@ import 'package:assist_health/src/presentation/screens/user_screens/excercise/hi
 import 'package:flutter/material.dart';
 
 class DailyWorkoutScreen extends StatefulWidget {
+  const DailyWorkoutScreen({super.key});
+
   @override
   State<DailyWorkoutScreen> createState() => _DailyWorkoutScreenState();
 }
@@ -145,12 +147,12 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
           padding: const EdgeInsets.all(8),
           child: Text(
             header,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
         ),
         ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: workouts.length,
           itemBuilder: (context, index) {
             final workout = workouts[index];
@@ -177,15 +179,15 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                   children: [
                     Text(
                       workout['title']!,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: Colors.white),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       '${workout['time']} • ${workout['exercises']}',
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ],
                 ),
@@ -204,7 +206,7 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
         home: Scaffold(
           appBar: AppBar(
             foregroundColor: Colors.white,
-            title: Text('Tập luyện tại nhà'),
+            title: const Text('Tập luyện tại nhà'),
             centerTitle: true,
             flexibleSpace: Container(
               decoration: const BoxDecoration(
@@ -221,7 +223,7 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -240,7 +242,7 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                             color: Colors.black,
                           ),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(7, (index) {
@@ -274,29 +276,29 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                     ),
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'THỬ THÁCH 7x4',
+                      const Text(
+                        'THỬ THÁCH',
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 18),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
-                        padding: EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.blue,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Column(
+                        child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'TOÀN THÂN THỬ THÁCH 7x4',
+                              'TOÀN THÂN THỬ THÁCH',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -305,77 +307,66 @@ class _DailyWorkoutScreenState extends State<DailyWorkoutScreen> {
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn trong 4 tuần!',
+                              'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn!',
                               style: TextStyle(color: Colors.white),
                             ),
                             SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                              ),
-                              child: Text(
-                                'KHỞI ĐẦU',
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 // Beginner Section
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: () => scrollToSection(beginnerKey),
-                            child: Expanded(
-                              child: Text(
-                                'Người bắt đầu',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => scrollToSection(intermediateKey),
-                            child: Expanded(
-                              child: Text(
-                                'Trung bình',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => scrollToSection(advancedKey),
-                            child: Expanded(
-                              child: Text(
-                                'Nâng cao',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //   children: [
+                      //     GestureDetector(
+                      //       onTap: () => scrollToSection(beginnerKey),
+                      //       child: const Expanded(
+                      //         child: Text(
+                      //           'Người bắt đầu',
+                      //           style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.blue,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     GestureDetector(
+                      //       onTap: () => scrollToSection(intermediateKey),
+                      //       child: const Expanded(
+                      //         child: Text(
+                      //           'Trung bình',
+                      //           style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.grey,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     GestureDetector(
+                      //       onTap: () => scrollToSection(advancedKey),
+                      //       child: const Expanded(
+                      //         child: Text(
+                      //           'Nâng cao',
+                      //           style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.grey,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                       Column(
                         key: beginnerKey,
                         crossAxisAlignment: CrossAxisAlignment.start,

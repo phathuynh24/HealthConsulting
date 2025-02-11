@@ -56,6 +56,7 @@ class _BlogPageState extends State<BlogPage> {
     final imageTitle = blogData['imageTitle'] ?? '';
     final appendix = (blogData['appendix'] as List?) ?? [];
     final body = (blogData['body'] as List?) ?? [];
+    final content = blogData['content'] ?? 'No content';
 
     for (int i = 0; i < body.length; i++) {
       _sectionKeys[i] = GlobalKey();
@@ -110,7 +111,7 @@ class _BlogPageState extends State<BlogPage> {
                 const SizedBox(height: 8.0),
                 Row(
                   children: [
-                    Text('Kiểm duyệt: '),
+                    const Text('Kiểm duyệt: '),
                     Text('$verifiedName',
                         style: const TextStyle(
                             color: Themes.gradientDeepClr,
@@ -119,8 +120,8 @@ class _BlogPageState extends State<BlogPage> {
                 ),
                 Row(
                   children: [
-                    Text('Ngày kiểm duyệt: '),
-                    Text('$verifiedDay',
+                    const Text('Ngày kiểm duyệt: '),
+                    Text(verifiedDay,
                         style: const TextStyle(
                             color: Themes.gradientDeepClr,
                             fontWeight: FontWeight.bold)),
@@ -128,32 +129,35 @@ class _BlogPageState extends State<BlogPage> {
                 ),
                 const SizedBox(height: 8.0),
                 const SizedBox(height: 16.0),
-                const Text(
-                  'Mục lục',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                ...appendix.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  String item = entry.value;
-                  String romanNumeral = intToRoman(index + 1);
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: InkWell(
-                      onTap: () => _scrollToSection(index),
-                      child: Text(
-                        '$romanNumeral. $item',
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                        style:
-                            const TextStyle(fontSize: 18.0, color: Colors.blue),
-                      ),
+                if (appendix.isNotEmpty) ...[
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'Mục lục',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(height: 8.0),
+                  ...appendix.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    String item = entry.value;
+                    String romanNumeral = intToRoman(index + 1);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: InkWell(
+                        onTap: () => _scrollToSection(index),
+                        child: Text(
+                          '$romanNumeral. $item',
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: const TextStyle(
+                              fontSize: 18.0, color: Colors.blue),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ],
                 const SizedBox(height: 16.0),
                 const Text(
                   'Nội dung',
@@ -163,6 +167,10 @@ class _BlogPageState extends State<BlogPage> {
                   ),
                 ),
                 const SizedBox(height: 8.0),
+                Text(
+                  content,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
                 ...body.asMap().entries.map((entry) {
                   final index = entry.key;
                   final section = entry.value;
@@ -184,7 +192,7 @@ class _BlogPageState extends State<BlogPage> {
                       if (imageUrl.isNotEmpty)
                         Column(
                           children: [
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Center(
                               child: Image.network(imageUrl),
                             ),
@@ -194,7 +202,7 @@ class _BlogPageState extends State<BlogPage> {
                       Text(
                         processContent(content),
                         textAlign: TextAlign.justify,
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 16.0),
                     ],
@@ -215,7 +223,7 @@ class _BlogPageState extends State<BlogPage> {
         },
         backgroundColor: Themes.gradientDeepClr,
         foregroundColor: Colors.white,
-        child: Icon(Icons.arrow_upward),
+        child: const Icon(Icons.arrow_upward),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:assist_health/src/presentation/screens/user_screens/store/addres
 import 'package:assist_health/src/presentation/screens/user_screens/store/online_payment.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/payment_method.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/store/voucher/voucher_screen.dart';
+import 'package:assist_health/src/widgets/top_snackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -577,8 +578,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                   if (widget.address != null &&
                       _selectedPaymentMethodNotifier.value != 0) {
                     if (_selectedPaymentMethodNotifier.value == 1) {
-                      // placeOrder();
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OnLinePaymentScreen(
@@ -591,7 +591,6 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                       // Handle COD payment logic here
                       // Navigator.pop(context);
                       placeOrder();
-                      Navigator.popUntil(context, (route) => route.isFirst);
                     }
                     // placeOrder();
                   } else {
@@ -662,15 +661,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         .then((value) async {
       print('Đơn hàng đã được lưu vào Firestore');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đơn hàng của bạn đã được đặt thành công!'),
-          duration: Duration(seconds: 2), // Show Snackbar for 2 seconds
-          backgroundColor: Colors.green,
-        ),
-      );
-      await Future.delayed(const Duration(seconds: 3));
       await clearUserCart();
+      Navigator.popUntil(context, (route) => route.isFirst);
+
+      _showSnackBar('Đặt đơn hàng thành công', Colors.green);
     }).catchError((error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -681,6 +675,12 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         ),
       );
     });
+  }
+
+  void _showSnackBar(String message, Color color) {
+    final overlay = Overlay.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    TopSnackBar.show(overlay, mediaQuery, message, color);
   }
 
   void _showDeleteConfirmationDialog(QueryDocumentSnapshot voucher) {

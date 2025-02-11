@@ -111,6 +111,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'userId': currentUserId,
         'imageUrls': newItem.imageUrls,
         'category': newItem.category,
+        'timestamp': FieldValue.serverTimestamp(),
       });
     }
 
@@ -230,7 +231,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ? selectedImageUrl
                             : ProductDetailScreen.defaultImageUrl,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(
+                        placeholder: (context, url) => const Center(
                           child:
                               CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
                         ),
@@ -271,7 +272,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 child: CachedNetworkImage(
                                   imageUrl: widget.imageUrls[index],
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => Center(
+                                  placeholder: (context, url) => const Center(
                                     child:
                                         CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
                                   ),
@@ -294,18 +295,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Row(
                 children: [
                   Text(
-                    '${averageRating.toStringAsFixed(1)}',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    averageRating.toStringAsFixed(1),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  Icon(Icons.star, color: Colors.yellow),
+                  const Icon(Icons.star, color: Colors.yellow),
                   Text(
-                    '(${voteCount} đánh giá)',
+                    '($voteCount đánh giá)',
                     style: const TextStyle(fontSize: 20),
                   ),
                 ],
@@ -405,7 +407,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 height: 100,
                                 width: 100, // Đảm bảo kích thước của ảnh
                                 fit: BoxFit.cover,
-                                placeholder: (context, url) => Center(
+                                placeholder: (context, url) => const Center(
                                   child:
                                       CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
                                 ),
@@ -443,7 +445,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 },
               ),
               // const SizedBox(height: 10),
-              Divider(
+              const Divider(
                 // Đường kẻ ngang
                 color: Colors.grey,
                 thickness: 1,
@@ -497,9 +499,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 children: [
                                   Text(
                                     '${data['rating']}',
-                                    style: TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16),
                                   ),
-                                  Icon(Icons.star, color: Colors.yellow),
+                                  const Icon(Icons.star, color: Colors.yellow),
                                 ],
                               ),
                             ],
@@ -513,7 +515,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     );
                   }).toList();
-                  return Container(
+                  return SizedBox(
                     height: 150,
                     child: SingleChildScrollView(
                       child: Column(

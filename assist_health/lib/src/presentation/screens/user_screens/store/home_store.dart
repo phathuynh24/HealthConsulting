@@ -135,7 +135,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                       ),
                       child: TextField(
                         controller: _searchController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Tìm kiếm sản phẩm...',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(horizontal: 16),
@@ -301,7 +301,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                   child: CachedNetworkImage(
                                     imageUrl: firstImageUrl,
                                     fit: BoxFit.cover,
-                                    placeholder: (context, url) => Center(
+                                    placeholder: (context, url) => const Center(
                                       child:
                                           CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
                                     ),
@@ -446,6 +446,12 @@ class _FilterScreenState extends State<FilterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         foregroundColor: Colors.white,
         title: const Text(
           'Chọn khoảng giá',
@@ -489,10 +495,10 @@ class _FilterScreenState extends State<FilterScreen> {
                   });
                 },
                 style: ButtonStyle(
-                  minimumSize: MaterialStateProperty.all(const Size(150, 40)),
+                  minimumSize: WidgetStateProperty.all(const Size(150, 40)),
                   backgroundColor:
-                      MaterialStateProperty.all(Themes.gradientDeepClr),
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                      WidgetStateProperty.all(Themes.gradientDeepClr),
+                  foregroundColor: WidgetStateProperty.all(Colors.white),
                 ),
                 child: const Text('Reset'),
               ),
@@ -501,10 +507,10 @@ class _FilterScreenState extends State<FilterScreen> {
                     Navigator.pop(context, [_lowerValue, _upperValue]);
                   },
                   style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(const Size(150, 40)),
+                    minimumSize: WidgetStateProperty.all(const Size(150, 40)),
                     backgroundColor:
-                        MaterialStateProperty.all(Themes.gradientDeepClr),
-                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                        WidgetStateProperty.all(Themes.gradientDeepClr),
+                    foregroundColor: WidgetStateProperty.all(Colors.white),
                   ),
                   child: const Text('OK')),
             ],

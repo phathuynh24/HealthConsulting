@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class AdminBlog extends StatefulWidget {
+  const AdminBlog({super.key});
+
   @override
   _AdminBlogState createState() => _AdminBlogState();
 }
@@ -47,7 +49,7 @@ class _AdminBlogState extends State<AdminBlog> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
               _showCategoryFilterDialog(context).then((selectedCategories) {
                 if (selectedCategories != null) {
@@ -79,7 +81,7 @@ class _AdminBlogState extends State<AdminBlog> {
           return ListView.separated(
             itemCount: blogPosts.length,
             separatorBuilder: (BuildContext context, int index) {
-              return Divider();
+              return const Divider();
             },
             itemBuilder: (context, index) {
               final blogData = blogPosts[index].data();
@@ -137,7 +139,7 @@ class _AdminBlogState extends State<AdminBlog> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Container(
@@ -169,7 +171,7 @@ class _AdminBlogState extends State<AdminBlog> {
                                 Container(width: 5),
                                 Text(
                                   status ? 'Đã duyệt' : 'Chờ duyệt',
-                                  style: TextStyle(fontSize: 13),
+                                  style: const TextStyle(fontSize: 13),
                                 ),
                                 const SizedBox(width: 8),
                               ],
@@ -268,7 +270,7 @@ class _AdminBlogState extends State<AdminBlog> {
                           children: [
                             Text(
                               category,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
                             ),
@@ -305,24 +307,24 @@ class _AdminBlogState extends State<AdminBlog> {
                     Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
-                    shadowColor: MaterialStateProperty.all<Color>(Colors.red),
+                    shadowColor: WidgetStateProperty.all<Color>(Colors.red),
                   ),
-                  icon: Icon(Icons.cancel, color: Colors.red),
-                  label: Text("Hủy", style: TextStyle(color: Colors.red)),
+                  icon: const Icon(Icons.cancel, color: Colors.red),
+                  label: const Text("Hủy", style: TextStyle(color: Colors.red)),
                 ),
                 TextButton.icon(
-                  icon: Icon(Icons.check_circle, color: Colors.white),
+                  icon: const Icon(Icons.check_circle, color: Colors.white),
                   onPressed: () {
                     Navigator.of(context).pop(selectedCategoriesCopy);
                   },
                   style: ButtonStyle(
                     fixedSize:
-                        MaterialStateProperty.all<Size>(const Size(130, 30)),
+                        WidgetStateProperty.all<Size>(const Size(130, 30)),
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.blue),
+                        WidgetStateProperty.all<Color>(Colors.blue),
                   ),
-                  label:
-                      Text("Xác nhận", style: TextStyle(color: Colors.white)),
+                  label: const Text("Xác nhận",
+                      style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

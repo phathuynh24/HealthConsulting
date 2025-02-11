@@ -208,12 +208,12 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Thời gian còn lại: ',
-                    style: const TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18),
                   ),
                   Text(
-                    '${formatTime(_secondsRemaining)}',
+                    formatTime(_secondsRemaining),
                     style: const TextStyle(
                         fontSize: 18,
                         color: Colors.red,
@@ -225,7 +225,7 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
               CachedNetworkImage(
                 imageUrl: _linkQRCode,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Center(
+                placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
                 ),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -243,16 +243,9 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _savePaymentData,
-                child: const Text(
-                  'Xác nhận thanh toán',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 18),
-                ),
                 style: ButtonStyle(
-                  padding:
-                      WidgetStateProperty.all<EdgeInsets>(EdgeInsets.all(12)),
+                  padding: WidgetStateProperty.all<EdgeInsets>(
+                      const EdgeInsets.all(12)),
                   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius:
@@ -261,6 +254,13 @@ class _OnlinePaymentScreenState extends State<OnLinePaymentScreen> {
                   ),
                   backgroundColor:
                       WidgetStateProperty.all<Color>(Themes.gradientDeepClr),
+                ),
+                child: const Text(
+                  'Xác nhận thanh toán',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18),
                 ),
               ),
               const SizedBox(height: 20),
