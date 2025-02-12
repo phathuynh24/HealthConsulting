@@ -414,8 +414,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                                           height: 100,
                                         ),
                                         title: Text(
-                                          voucher[
-                                              'voucherCode'], // Giả sử voucherCode là trường chứa mã giảm giá
+                                          voucher['voucherCode'],
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -585,31 +584,32 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (widget.address != null &&
-                      _selectedPaymentMethodNotifier.value != 0) {
-                    if (_selectedPaymentMethodNotifier.value == 1) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OnLinePaymentScreen(
-                            totalPriceAfterDiscount:
-                                calculateFinalPrice(), // Pass the appropriate value
-                          ),
-                        ),
-                      );
-                    } else if (_selectedPaymentMethodNotifier.value == 2) {
-                      // Handle COD payment logic here
-                      // Navigator.pop(context);
-                      placeOrder();
-                    }
-                    // placeOrder();
+                  // if (widget.address != null &&
+                  //     _selectedPaymentMethodNotifier.value != 0) {
+                  //   if (_selectedPaymentMethodNotifier.value == 1) {
+                  //     Navigator.pushReplacement(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => OnLinePaymentScreen(
+                  //           totalPriceAfterDiscount:
+                  //               calculateFinalPrice(), // Pass the appropriate value
+                  //         ),
+                  //       ),
+                  //     );
+                  //   } else if (_selectedPaymentMethodNotifier.value == 2) {
+                  //     // Handle COD payment logic here
+                  //     // Navigator.pop(context);
+                  //     placeOrder();
+                  //   }
+                  if (widget.address != null) {
+                    placeOrder();
                   } else {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Lỗi'),
                         content: const Text(
-                            'Vui lòng chọn phương thức thanh toán và có địa chỉ nhận hàng trước khi đặt hàng.'),
+                            'Vui lòng chọn địa chỉ nhận hàng trước khi đặt hàng.'),
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {

@@ -16,6 +16,10 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
   final String doctorId = FirebaseAuth.instance.currentUser!.uid;
   double? selectedRating;
 
+  void _deleteFeedback(String feedbackId) {
+    FirebaseFirestore.instance.collection('feedback').doc(feedbackId).delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,14 +28,14 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
         title: const Text('Phản hồi từ bệnh nhân'),
         centerTitle: true,
         flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
           ),
+        ),
       ),
       body: Column(
         children: [
@@ -72,10 +76,12 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
               stream: FirebaseFirestore.instance
                   .collection('feedback')
                   .where('idDoctor', isEqualTo: doctorId)
+                  .orderBy('rateDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return const Center(child: Text('Đã xảy ra lỗi khi tải dữ liệu.'));
+                  return const Center(
+                      child: Text('Đã xảy ra lỗi khi tải dữ liệu.'));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,7 +99,8 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
 
                 var feedbackList = snapshot.data!.docs.where((doc) {
                   var feedback = doc.data() as Map<String, dynamic>;
-                  return selectedRating == null || feedback['rating'] == selectedRating;
+                  return selectedRating == null ||
+                      feedback['rating'] == selectedRating;
                 }).toList();
 
                 if (feedbackList.isEmpty) {
@@ -108,15 +115,18 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
                 return ListView.builder(
                   itemCount: feedbackList.length,
                   itemBuilder: (context, index) {
-                    var feedback = feedbackList[index].data() as Map<String, dynamic>;
-                    var formattedDate = DateFormat('HH:mm:ss, dd/MM/yyyy').format(
+                    var feedbackDoc = feedbackList[index];
+                    var feedback = feedbackDoc.data() as Map<String, dynamic>;
+                    var formattedDate =
+                        DateFormat('HH:mm:ss, dd/MM/yyyy').format(
                       DateTime.fromMillisecondsSinceEpoch(
                         feedback['rateDate'].millisecondsSinceEpoch,
                       ).toLocal(),
                     );
 
                     return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -135,7 +145,8 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
                           CircleAvatar(
                             child: Text(
                               feedback['username'][0],
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -166,10 +177,15 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
                                 const SizedBox(height: 4),
                                 Text(
                                   'Ngày đánh giá: $formattedDate',
-                                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
                                 ),
                               ],
                             ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteFeedback(feedbackDoc.id),
                           ),
                         ],
                       ),

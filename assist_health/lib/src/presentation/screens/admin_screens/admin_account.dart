@@ -8,6 +8,7 @@ import 'package:assist_health/src/presentation/screens/admin_screens/excercies/e
 import 'package:assist_health/src/presentation/screens/admin_screens/revenue_chart.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/order.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product_list.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/voucher/add_voucher_screen.dart';
 import 'package:assist_health/src/widgets/admin_navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -319,6 +320,39 @@ class _AdminAccountScreenState extends State<AdminAccountScreen> {
                                 ),
                                 title: const Text(
                                   "Tạo bài viết",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Divider(
+                              height: 30,
+                              indent: 15,
+                              endIndent: 15,
+                              color: Colors.grey.shade100,
+                            ),
+                            Container(
+                              height: 50,
+                              margin: const EdgeInsets.only(
+                                left: 8,
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AddVoucherScreen()));
+                                },
+                                leading: const Icon(
+                                  Icons.card_giftcard,
+                                  color: Colors.blueAccent,
+                                  size: 30,
+                                ),
+                                title: const Text(
+                                  "Vouchers",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 15,

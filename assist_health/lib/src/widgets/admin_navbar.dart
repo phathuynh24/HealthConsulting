@@ -24,8 +24,8 @@ class _AdminNavBarState extends State<AdminNavBar> {
     // const RevenueChartScreen(),
     // ReviewManagementPage(),
     const ShopChart(),
-    AdminBlog(),
-    const AddVoucherScreen(),
+    const AdminBlog(),
+    // const AddVoucherScreen(),
     // Screen 2
     const ContentTopBar(),
     // Screen 3
@@ -75,10 +75,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
               icon: Icon(Icons.article_outlined),
               label: "Bài viết",
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.card_giftcard),
-              label: "Vouchers",
-            ),
+
             BottomNavigationBarItem(
               icon: Icon(Icons.my_library_books_rounded),
               label: "Nội dung",
@@ -95,14 +92,6 @@ class _AdminNavBarState extends State<AdminNavBar> {
               icon: Icon(Icons.settings),
               label: "Tài khoản",
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.store),
-            //   label: "Thêm sản phẩm",
-            // ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.shopping_bag),
-            //   label: "Đơn hàng",
-            // ),
           ],
         ),
       ),

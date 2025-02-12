@@ -145,7 +145,7 @@ class _MessageAdminScreenState extends State<MessageAdminScreen> {
                     children: [
                       const TabBar(
                         tabs: [
-                          Tab(text: 'Bệnh nhân'),
+                          Tab(text: 'Người dùng'),
                           Tab(text: 'Bác sĩ'),
                         ],
                       ),
