@@ -1,5 +1,6 @@
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/add_product.dart';
+import 'package:assist_health/src/presentation/screens/admin_screens/store/edit_product.dart';
 import 'package:assist_health/src/presentation/screens/admin_screens/store/product.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -155,6 +156,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 price: data['price'],
                 oldPrice: data['old_price'],
                 quantity: data['quantity'],
+                description: data['description'],
                 imageUrls: List<String>.from(data['imageUrls']),
                 category: data['category']);
           }).toList();
@@ -178,7 +180,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 ),
                 child: InkWell(
                   onTap: () {
-                    // Xử lý khi người dùng nhấn vào ListTile
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditProductScreen(product: product),
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(

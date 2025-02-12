@@ -10,16 +10,18 @@ class ProductDetailScreen extends StatefulWidget {
   final String productName;
   final int productPrice;
   final int productOldPrice;
-
   final List<String> imageUrls;
   final String category;
+  final String description;
   static const String defaultImageUrl = 'assets/empty-box.png';
+
   const ProductDetailScreen({
     super.key,
     required this.productName,
     required this.productPrice,
     required this.productOldPrice,
     required this.imageUrls,
+    required this.description,
     required this.category,
   });
 
@@ -28,12 +30,14 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  int quantity = 1;
+  final ValueNotifier<int> quantityNotifier = ValueNotifier<int>(1);
   List<CartItem> cartItems = [];
   late String selectedImageUrl;
   late String currentUserId;
   double averageRating = 0.0;
   int voteCount = 0;
+  int availableQuantity = 1;
+
   Future<String> getUserName(String userId) async {
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('users').doc(userId).get();
@@ -54,33 +58,64 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
     getCurrentUserId();
     fetchProductRatingAndVoteCount();
+    fetchAvailableQuantity();
   }
 
   void getCurrentUserId() {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       currentUserId = user.uid;
-    } else {}
-  }
-
-  void decreaseQuantity() {
-    if (quantity > 0) {
-      setState(() {
-        quantity--;
-      });
     }
   }
 
-  void increaseQuantity() {
-    setState(() {
-      quantity++;
+  void fetchAvailableQuantity() {
+    FirebaseFirestore.instance
+        .collection('products')
+        .where('name', isEqualTo: widget.productName)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        final data = querySnapshot.docs.first.data() as Map<String, dynamic>;
+        setState(() {
+          availableQuantity = data['quantity'];
+        });
+      }
+    }).catchError((error) {
+      print('Error fetching available quantity: $error');
     });
+  }
+
+  void decreaseQuantity() {
+    if (quantityNotifier.value > 0) {
+      quantityNotifier.value--;
+    }
+  }
+
+  bool isSnackBarVisible = false;
+
+  void increaseQuantity() {
+    if (quantityNotifier.value < availableQuantity) {
+      quantityNotifier.value++;
+    } else if (!isSnackBarVisible) {
+      isSnackBarVisible = true;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+            const SnackBar(
+              content: Text('Số lượng sản phẩm đã đạt tối đa.'),
+              duration: Duration(seconds: 2), // Đặt thời gian tự động ẩn
+              behavior: SnackBarBehavior.floating,
+            ),
+          )
+          .closed
+          .then((_) {
+        isSnackBarVisible = false; // Reset khi SnackBar biến mất
+      });
+    }
   }
 
   void addToCart() async {
     final cartCollection = FirebaseFirestore.instance.collection('user_carts');
 
-    // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng hay chưa
     final existingCartItem = await cartCollection
         .where('userId', isEqualTo: currentUserId)
         .where('productName', isEqualTo: widget.productName)
@@ -89,7 +124,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     if (existingCartItem.docs.isNotEmpty) {
       final docId = existingCartItem.docs.first.id;
       cartCollection.doc(docId).update({
-        'quantity': FieldValue.increment(quantity),
+        'quantity': FieldValue.increment(quantityNotifier.value),
       });
     } else {
       CartItem newItem = CartItem(
@@ -97,7 +132,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         productName: widget.productName,
         productPrice: widget.productPrice,
         productOldPrice: widget.productOldPrice,
-        quantity: quantity,
+        quantity: quantityNotifier.value,
         imageUrls: widget.imageUrls,
         category: widget.category,
       );
@@ -107,7 +142,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'productName': widget.productName,
         'productPrice': widget.productPrice,
         'productOldPrice': widget.productOldPrice,
-        'quantity': quantity,
+        'quantity': quantityNotifier.value,
         'userId': currentUserId,
         'imageUrls': newItem.imageUrls,
         'category': newItem.category,
@@ -132,11 +167,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       if (documentSnapshot.exists) {
-        // Lấy dữ liệu của sản phẩm từ DocumentSnapshot
         Map<String, dynamic> data =
             documentSnapshot.data() as Map<String, dynamic>;
 
-        // Chuyển đến trang chi tiết sản phẩm với các thông tin của sản phẩm
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -146,6 +179,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               productPrice: data['price'],
               imageUrls: (data['imageUrls'] as List<dynamic>).cast<String>(),
               category: data['category'],
+              description: data['description'],
             ),
           ),
         );
@@ -198,354 +232,369 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    height: 265,
-                    width: 275,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    // child: ClipRRect(
-                    //   borderRadius: BorderRadius.circular(10),
-                    //   child: Image.network(
-                    //     selectedImageUrl.isNotEmpty
-                    //         ? selectedImageUrl
-                    //         : ProductDetailScreen.defaultImageUrl,
-                    //     fit: BoxFit.cover,
-                    //   ),
-                    // ),
+              _buildProductImageSection(),
+              const SizedBox(height: 20),
+              _buildProductInfoSection(),
+              const SizedBox(height: 20),
+              _buildQuantitySection(),
+              const SizedBox(height: 20),
+              _buildRelatedProductsSection(),
+              const SizedBox(height: 20),
+              _buildProductReviewsSection(),
+              const SizedBox(height: 20),
+              _buildAddToCartButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProductImageSection() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          height: 265,
+          width: 275,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: selectedImageUrl.isNotEmpty
+                  ? selectedImageUrl
+                  : ProductDetailScreen.defaultImageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: List.generate(widget.imageUrls.length, (index) {
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedImageUrl = widget.imageUrls[index];
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: SizedBox(
+                    height: 80,
+                    width: 80,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
-                        imageUrl: selectedImageUrl.isNotEmpty
-                            ? selectedImageUrl
-                            : ProductDetailScreen.defaultImageUrl,
+                        imageUrl: widget.imageUrls[index],
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
-                          child:
-                              CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
+                          child: CircularProgressIndicator(),
                         ),
                         errorWidget: (context, url, error) =>
                             const Icon(Icons.error),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.productName,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 10),
+        Row(
+          children: [
+            Text(
+              averageRating.toStringAsFixed(1),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const Icon(Icons.star, color: Colors.yellow),
+            Text(
+              '($voteCount đánh giá)',
+              style: const TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
+          style: const TextStyle(
+              fontSize: 20, color: Colors.blue, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          '${NumberFormat('#,###').format(widget.productOldPrice)} VNĐ',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+            decoration: TextDecoration.lineThrough,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'Số lượng tồn kho: $availableQuantity',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        const Text(
+          'Mô tả sản phẩm:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          widget.description,
+          style: const TextStyle(fontSize: 16),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuantitySection() {
+    return ValueListenableBuilder<int>(
+      valueListenable: quantityNotifier,
+      builder: (context, value, child) {
+        return Row(
+          children: [
+            const Text(
+              'Số lượng:',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(width: 10),
+            IconButton(
+              onPressed: decreaseQuantity,
+              icon: const Icon(Icons.remove),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              value.toString(),
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(width: 10),
+            IconButton(
+              onPressed: increaseQuantity,
+              icon: const Icon(Icons.add),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildRelatedProductsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Sản phẩm cùng loại',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('products')
+              .where('category', isEqualTo: widget.category)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Đã xảy ra lỗi: ${snapshot.error}');
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final List<Widget> productWidgets =
+                snapshot.data!.docs.map((DocumentSnapshot doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              if (data['name'] != widget.productName) {
+                String firstImageUrl =
+                    (data['imageUrls'] as List<dynamic>).isEmpty
+                        ? ProductDetailScreen.defaultImageUrl
+                        : (data['imageUrls'] as List<dynamic>).first;
+                return GestureDetector(
+                  onTap: () {
+                    navigateToProductDetail(doc.id);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List.generate(widget.imageUrls.length, (index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedImageUrl = widget.imageUrls[index];
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: SizedBox(
-                              height: 80,
-                              width: 80,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: CachedNetworkImage(
-                                  imageUrl: widget.imageUrls[index],
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                    child:
-                                        CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                              ),
-                            ),
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: firstImageUrl,
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
                           ),
-                        );
-                      }),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-              Text(
-                widget.productName,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Row(
-                children: [
-                  Text(
-                    averageRating.toStringAsFixed(1),
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const Icon(Icons.star, color: Colors.yellow),
-                  Text(
-                    '($voteCount đánh giá)',
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${NumberFormat('#,###').format(widget.productPrice)} VNĐ',
-                style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '${NumberFormat('#,###').format(widget.productOldPrice)} VNĐ',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                  decoration: TextDecoration.lineThrough,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Mô tả sản phẩm:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Đây là mô tả chi tiết về sản phẩm.',
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  const Text(
-                    'Số lượng:',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: decreaseQuantity,
-                    icon: const Icon(Icons.remove),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    quantity.toString(),
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  IconButton(
-                    onPressed: increaseQuantity,
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Sản phẩm cùng loại',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('products')
-                    .where('category', isEqualTo: widget.category)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final List<Widget> productWidgets =
-                      snapshot.data!.docs.map((DocumentSnapshot doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    if (data['name'] != widget.productName) {
-                      // Kiểm tra xem sản phẩm có trùng với sản phẩm hiện tại không
-                      String firstImageUrl =
-                          (data['imageUrls'] as List<dynamic>).isEmpty
-                              ? ProductDetailScreen.defaultImageUrl
-                              : (data['imageUrls'] as List<dynamic>).first;
-                      return GestureDetector(
-                        onTap: () {
-                          navigateToProductDetail(doc.id);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 8), // Khoảng cách giữa các sản phẩm
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CachedNetworkImage(
-                                imageUrl:
-                                    firstImageUrl, // Sử dụng hình ảnh đầu tiên trong danh sách
-                                height: 100,
-                                width: 100, // Đảm bảo kích thước của ảnh
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Center(
-                                  child:
-                                      CircularProgressIndicator(), // Hiển thị vòng tròn xoay khi tải ảnh
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                data['name'],
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                '${NumberFormat('#,###').format(
-                                  data['price'],
-                                )} VNĐ',
-                                style: const TextStyle(
-                                    fontSize: 18, color: Colors.blue),
-                              ),
-                            ],
-                          ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         ),
-                      );
-                    } else {
-                      return const SizedBox(); // Trả về widget trống nếu là sản phẩm hiện tại
-                    }
-                  }).toList();
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal, // Cuộn theo chiều ngang
-                    child: Row(
-                      children: productWidgets,
+                        const SizedBox(height: 10),
+                        Text(
+                          data['name'],
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          '${NumberFormat('#,###').format(data['price'])} VNĐ',
+                          style:
+                              const TextStyle(fontSize: 18, color: Colors.blue),
+                        ),
+                      ],
                     ),
-                  );
-                },
+                  ),
+                );
+              } else {
+                return const SizedBox();
+              }
+            }).toList();
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: productWidgets,
               ),
-              // const SizedBox(height: 10),
-              const Divider(
-                // Đường kẻ ngang
-                color: Colors.grey,
-                thickness: 1,
-              ),
-              const Text(
-                'Đánh giá sản phẩm',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('product_review')
-                    .where('productName', isEqualTo: widget.productName)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final List<Widget> reviewWidgets =
-                      snapshot.data!.docs.map((DocumentSnapshot doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    final DateTime reviewDate =
-                        (data['timestamp'] as Timestamp).toDate();
-                    final formattedDate =
-                        DateFormat('dd/MM/yyyy').format(reviewDate);
+            );
+          },
+        ),
+      ],
+    );
+  }
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Ngày: $formattedDate',
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.grey),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data['rating']}',
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  const Icon(Icons.star, color: Colors.yellow),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            data['review'],
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList();
-                  return SizedBox(
-                    height: 150,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: reviewWidgets,
-                      ),
+  Widget _buildProductReviewsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Đánh giá sản phẩm',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('product_review')
+              .where('productName', isEqualTo: widget.productName)
+              .snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) {
+              return Text('Đã xảy ra lỗi: ${snapshot.error}');
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final List<Widget> reviewWidgets =
+                snapshot.data!.docs.map((DocumentSnapshot doc) {
+              final data = doc.data() as Map<String, dynamic>;
+              final DateTime reviewDate =
+                  (data['timestamp'] as Timestamp).toDate();
+              final formattedDate = DateFormat('dd/MM/yyyy').format(reviewDate);
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.grey),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ngày: $formattedDate',
+                          style:
+                              const TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              '${data['rating']}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const Icon(Icons.star, color: Colors.yellow),
+                          ],
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  onPressed: addToCart,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Themes.gradientLightClr,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 16),
-                  ),
-                  child: const Text(
-                    'Thêm vào giỏ hàng',
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
+                    const SizedBox(height: 5),
+                    Text(
+                      data['review'],
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              );
+            }).toList();
+            return SizedBox(
+              height: 150,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: reviewWidgets,
                 ),
               ),
-            ],
-          ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddToCartButton() {
+    return Align(
+      alignment: Alignment.center,
+      child: ElevatedButton(
+        onPressed: addToCart,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Themes.gradientLightClr,
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+        ),
+        child: const Text(
+          'Thêm vào giỏ hàng',
+          style: TextStyle(
+              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -561,14 +610,16 @@ class CartItem {
   final List<String> imageUrls;
   final String category;
 
-  CartItem(
-      {required this.id,
-      required this.productName,
-      required this.productPrice,
-      required this.productOldPrice,
-      required this.imageUrls,
-      required this.category,
-      this.quantity = 1});
+  CartItem({
+    required this.id,
+    required this.productName,
+    required this.productPrice,
+    required this.productOldPrice,
+    required this.imageUrls,
+    required this.category,
+    this.quantity = 1,
+  });
+
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       id: json['id'],

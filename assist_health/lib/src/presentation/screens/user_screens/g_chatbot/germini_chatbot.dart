@@ -1,10 +1,10 @@
+import 'package:assist_health/src/presentation/screens/user_screens/g_chatbot/model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
-
-import 'model.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Thêm Firebase Authentication
 
 class GeminiChatBot extends StatefulWidget {
   const GeminiChatBot({super.key});
@@ -23,6 +23,8 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
 
   final ScrollController scrollController = ScrollController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String currentUserId =
+      FirebaseAuth.instance.currentUser!.uid; // Thêm Firebase Auth
 
   @override
   void initState() {
@@ -31,14 +33,20 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
   }
 
   Future<void> loadMessages() async {
-    final snapshot =
-        await _firestore.collection('gchatbot').orderBy('time').get();
+    final snapshot = await _firestore
+        .collection('gchatbot')
+        .where('userId', isEqualTo: currentUserId) // Lọc theo userId
+        .orderBy('time')
+        .get();
+
     setState(() {
+      messages.clear(); // Xóa các tin nhắn cũ
       for (var doc in snapshot.docs) {
         messages.add(ModelMessage(
           isPrompt: doc['isPrompt'],
           message: doc['message'],
           time: (doc['time'] as Timestamp).toDate(),
+          userId: doc['userId'], // Thêm userId vào ModelMessage
         ));
       }
     });
@@ -47,6 +55,7 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
 
   Future<void> sendMessage() async {
     final message = promptController.text;
+
     setState(() {
       promptController.clear();
       messages.add(
@@ -54,16 +63,22 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
           isPrompt: true,
           message: message,
           time: DateTime.now(),
+          userId: currentUserId, // Thêm userId vào ModelMessage
         ),
       );
       isGeneratingResponse = true;
     });
+
     await _firestore.collection('gchatbot').add({
       'isPrompt': true,
       'message': message,
       'time': DateTime.now(),
+      'userId': currentUserId, // Thêm userId vào Firestore
     });
+
     _scrollToBottom();
+
+    // Xử lý các trường hợp đặc biệt
     if (message.toLowerCase().contains("xin chào") ||
         message.toLowerCase().contains("xin chao")) {
       setState(() {
@@ -73,19 +88,24 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
             message:
                 "Xin chào bạn! Tôi là một trợ lý ảo trong ứng dụng tư vấn sức khỏe. Tôi có thể giúp gì cho bạn?",
             time: DateTime.now(),
+            userId: currentUserId, // Thêm userId vào ModelMessage
           ),
         );
         isGeneratingResponse = false;
       });
+
       await _firestore.collection('gchatbot').add({
         'isPrompt': false,
         'message':
             "Xin chào bạn! Tôi là một trợ lý ảo trong ứng dụng tư vấn sức khỏe. Tôi có thể giúp gì cho bạn?",
         'time': DateTime.now(),
+        'userId': currentUserId, // Thêm userId vào Firestore
       });
+
       _scrollToBottom();
       return;
     }
+
     if (message.toLowerCase().contains("bac si trong ung dung") ||
         message.toLowerCase().contains("bác sĩ trong ứng dụng")) {
       setState(() {
@@ -95,16 +115,20 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
             message:
                 "Dưới đây là danh sách các bác sĩ trong ứng dụng:\nBS. Trương Văn H (huyết học, hô hấp)\nBS. Nguyễn Văn B (nội thần kinh)\nBS. Nguyễn Văn A (mắt)\nBS. Huỳnh Tiến P (tim mạch)",
             time: DateTime.now(),
+            userId: currentUserId, // Thêm userId vào ModelMessage
           ),
         );
         isGeneratingResponse = false;
       });
+
       await _firestore.collection('gchatbot').add({
         'isPrompt': false,
         'message':
             "Dưới đây là danh sách các bác sĩ trong ứng dụng:\nBS. Trương Văn H (huyết học, hô hấp)\nBS. Nguyễn Văn B (nội thần kinh)\nBS. Nguyễn Văn A (mắt)\nBS. Huỳnh Tiến P (tim mạch)",
         'time': DateTime.now(),
+        'userId': currentUserId, // Thêm userId vào Firestore
       });
+
       _scrollToBottom();
       return;
     }
@@ -118,19 +142,24 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
             message:
                 "Xin lỗi tôi chỉ trả lời các câu hỏi trong phạm vi sức khỏe của ứng dụng",
             time: DateTime.now(),
+            userId: currentUserId, // Thêm userId vào ModelMessage
           ),
         );
         isGeneratingResponse = false;
       });
+
       await _firestore.collection('gchatbot').add({
         'isPrompt': false,
         'message':
             "Xin lỗi tôi chỉ trả lời các câu hỏi trong phạm vi sức khỏe của ứng dụng",
         'time': DateTime.now(),
+        'userId': currentUserId, // Thêm userId vào Firestore
       });
+
       _scrollToBottom();
       return;
     }
+
     if (message.toLowerCase().contains("quan") ||
         message.toLowerCase().contains("quận")) {
       String response;
@@ -149,42 +178,52 @@ class _GeminiChatBotState extends State<GeminiChatBot> {
       } else {
         response = "Hiện tại khu vực trên chưa có bác sĩ nào trong ứng dụng";
       }
+
       setState(() {
         messages.add(
           ModelMessage(
             isPrompt: false,
             message: response,
             time: DateTime.now(),
+            userId: currentUserId, // Thêm userId vào ModelMessage
           ),
         );
         isGeneratingResponse = false;
       });
+
       await _firestore.collection('gchatbot').add({
         'isPrompt': false,
         'message': response,
         'time': DateTime.now(),
+        'userId': currentUserId, // Thêm userId vào Firestore
       });
+
       _scrollToBottom();
       return;
     }
 
     final content = [Content.text(message)];
     final response = await model.generateContent(content);
+
     setState(() {
       messages.add(
         ModelMessage(
           isPrompt: false,
           message: response.text ?? "",
           time: DateTime.now(),
+          userId: currentUserId, // Thêm userId vào ModelMessage
         ),
       );
       isGeneratingResponse = false;
     });
+
     await _firestore.collection('gchatbot').add({
       'isPrompt': false,
       'message': response.text ?? "",
       'time': DateTime.now(),
+      'userId': currentUserId, // Thêm userId vào Firestore
     });
+
     _scrollToBottom();
   }
 

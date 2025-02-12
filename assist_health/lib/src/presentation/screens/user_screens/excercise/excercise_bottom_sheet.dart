@@ -44,7 +44,7 @@ void showExerciseDetailBottomSheet(BuildContext context, Exercise exercise) {
                         ),
                         child: selectedOption == 0
                             ? Center(
-                                child: Image.asset(
+                                child: Image.network(
                                   exercise.imageUrl, // First image URL
                                   fit: BoxFit.contain,
                                   errorBuilder: (context, error, stackTrace) {

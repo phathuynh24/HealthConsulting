@@ -111,10 +111,10 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
               },
               icon: const Icon(Icons.shopping_cart),
             ),
-            IconButton(
-              onPressed: _openFilterScreen,
-              icon: const Icon(Icons.filter_list),
-            )
+            // IconButton(
+            //   onPressed: _openFilterScreen,
+            //   icon: const Icon(Icons.filter_list),
+            // )
           ],
         ),
         body: Column(
@@ -379,6 +379,7 @@ class _HomeStoreScreenState extends State<HomeStoreScreen> {
                                                       as List<dynamic>)
                                                   .cast<String>(),
                                               category: data['category'],
+                                              description: data['description'],
                                             ),
                                           ),
                                         );

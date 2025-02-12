@@ -97,6 +97,8 @@ class _ExerciseManagerScreenState extends State<ExerciseManagerScreen> {
             builder: (context) => const ExerciseFormScreen(),
           ),
         ),
+        backgroundColor: Themes.gradientLightClr,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
     );

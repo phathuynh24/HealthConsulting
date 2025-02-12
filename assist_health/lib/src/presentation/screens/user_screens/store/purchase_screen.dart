@@ -225,26 +225,36 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                                   ],
                                 ),
                                 InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SavedAddressesScreen()),
-                                    );
-                                  },
-                                  child: ListTile(
-                                    title: Text(
-                                      '${widget.address?['name'] ?? snapshot.data!.docs.first['name']} - ${widget.address?['phone'] ?? snapshot.data!.docs.first['phone']}',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Text(
-                                        widget.address?['fullAddress'] ??
-                                            snapshot.data!.docs
-                                                .first['fullAddress']),
-                                  ),
-                                ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SavedAddressesScreen()),
+                                      );
+                                    },
+                                    child: (widget.address != null)
+                                        ? ListTile(
+                                            title: Text(
+                                              '${widget.address?['name'] ?? snapshot.data!.docs.first['name']} - ${widget.address?['phone'] ?? snapshot.data!.docs.first['phone']}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            subtitle: Text(widget
+                                                    .address?['fullAddress'] ??
+                                                snapshot.data!.docs
+                                                    .first['fullAddress']),
+                                          )
+                                        : Container(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Text(
+                                              'Chọn địa chỉ',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey[700],
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ))),
                               ],
                             ),
                           ),
@@ -641,7 +651,8 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     }
   }
 
-  void placeOrder() {
+  void placeOrder() async {
+    // Tạo đơn hàng
     Order order = Order(
       userId: currentUserId,
       orderId: const Uuid().v4(),
@@ -651,21 +662,67 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       status: "Chờ xác nhận",
       time: Timestamp.now(),
     );
-    saveOrderToFirestore(order);
+
+    // Lưu đơn hàng vào Firestore
+    await saveOrderToFirestore(order);
+
+    // Cập nhật số lượng sản phẩm trong Firestore
+    await updateProductQuantities();
   }
 
-  void saveOrderToFirestore(Order order) {
-    FirebaseFirestore.instance
-        .collection('orders')
-        .add(order.toMap())
-        .then((value) async {
-      print('Đơn hàng đã được lưu vào Firestore');
+  Future<void> updateProductQuantities() async {
+    try {
+      for (var item in cartItems) {
+        String productName = item['productName'];
+        int orderedQuantity = item['quantity'];
 
-      await clearUserCart();
-      Navigator.popUntil(context, (route) => route.isFirst);
+        // Lấy thông tin sản phẩm từ Firestore
+        final productQuery = await FirebaseFirestore.instance
+            .collection('products')
+            .where('name', isEqualTo: productName)
+            .get();
 
-      _showSnackBar('Đặt đơn hàng thành công', Colors.green);
-    }).catchError((error) {
+        if (productQuery.docs.isNotEmpty) {
+          final productDoc = productQuery.docs.first;
+          int currentQuantity = productDoc['quantity'];
+
+          // Tính toán số lượng mới
+          int newQuantity = currentQuantity - orderedQuantity;
+          print('Số lượng mới của sản phẩm $productName: $newQuantity');
+
+          // Cập nhật số lượng mới vào Firestore
+          await FirebaseFirestore.instance
+              .collection('products')
+              .doc(productDoc.id)
+              .update({'quantity': newQuantity});
+        }
+      }
+    } catch (error) {
+      print('Lỗi khi cập nhật số lượng sản phẩm: $error');
+    }
+  }
+
+  Future<void> saveOrderToFirestore(Order order) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .add(order.toMap())
+          .then((value) async {
+        print('Đơn hàng đã được lưu vào Firestore');
+        await updateProductQuantities();
+
+        // Xóa giỏ hàng sau khi đặt hàng thành công
+        await clearUserCart();
+
+        // Cập nhật số lượng sản phẩm
+
+        // Hiển thị thông báo thành công
+        _showSnackBar('Đặt đơn hàng thành công', Colors.green);
+
+        // Quay về màn hình chính
+        Navigator.popUntil(context, (route) => route.isFirst);
+      });
+    } catch (error) {
       print('Đã xảy ra lỗi khi lưu đơn hàng: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -674,7 +731,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           backgroundColor: Colors.red,
         ),
       );
-    });
+    }
   }
 
   void _showSnackBar(String message, Color color) {

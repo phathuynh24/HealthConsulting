@@ -230,7 +230,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Image.asset(
+                // Image.asset(
+                //   widget.exercise.imageUrl,
+                //   width: 400,
+                //   fit: BoxFit.contain,
+                // ),
+                Image.network(
                   widget.exercise.imageUrl,
                   width: 400,
                   fit: BoxFit.contain,
@@ -405,7 +410,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                       if (isResting)
                         Column(
                           children: [
-                            SizedBox(height: 24),
+                            const SizedBox(height: 24),
                             SizedBox(
                               width: 300,
                               child: ElevatedButton(

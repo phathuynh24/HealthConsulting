@@ -20,6 +20,7 @@ class _CartScreenState extends State<CartScreen> {
   int totalPrice = 0;
   late List<CartItem> cartItems = [];
   late String currentUserId = '';
+  bool isSnackBarVisible = false;
 
   @override
   void initState() {
@@ -112,6 +113,23 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  Future<int> fetchAvailableQuantity(String productName) async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: productName)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final data = querySnapshot.docs.first.data();
+        return data['quantity'] ?? 0;
+      }
+    } catch (error) {
+      print('Lỗi khi lấy số lượng sản phẩm: $error');
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,70 +170,106 @@ class _CartScreenState extends State<CartScreen> {
               ),
             );
           }
-          return ListTile(
-            leading: SizedBox(
-              width: 80,
-              child: Row(
-                children: [
-                  Text(
-                    '${index + 1}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  const SizedBox(width: 10),
-                  CachedNetworkImage(
-                    imageUrl: cartItems[index].imageUrls[0],
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const Center(
-                      child: CircularProgressIndicator(),
+
+          return Dismissible(
+            key: Key(cartItems[index].id),
+            direction:
+                DismissDirection.endToStart, // Vuốt từ phải sang trái để xóa
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Icon(Icons.delete, color: Colors.white, size: 30),
+            ),
+            onDismissed: (direction) {
+              removeItem(index);
+            },
+            child: ListTile(
+              leading: SizedBox(
+                width: 80,
+                child: Row(
+                  children: [
+                    Text(
+                      '${index + 1}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15),
                     ),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                    const SizedBox(width: 10),
+                    CachedNetworkImage(
+                      imageUrl: cartItems[index].imageUrls[0],
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
+                  ],
+                ),
+              ),
+              title: Text(cartItems[index].productName),
+              subtitle: Text(
+                '${NumberFormat('#,###').format(cartItems[index].productPrice)} VNĐ',
+                style: const TextStyle(
+                    color: Themes.gradientDeepClr, fontSize: 16),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: () {
+                      setState(() {
+                        if (cartItems[index].quantity > 1) {
+                          cartItems[index].quantity--;
+                          updateCartItemQuantity(cartItems[index]);
+                          calculateTotalPrice();
+                        } else {
+                          removeItem(index);
+                        }
+                      });
+                    },
+                  ),
+                  Text(
+                    '${cartItems[index].quantity}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      int availableQuantity = await fetchAvailableQuantity(
+                          cartItems[index].productName);
+
+                      if (cartItems[index].quantity < availableQuantity) {
+                        setState(() {
+                          cartItems[index].quantity++;
+                          updateCartItemQuantity(cartItems[index]);
+                          calculateTotalPrice();
+                        });
+                      } else if (!isSnackBarVisible) {
+                        isSnackBarVisible = true;
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Số lượng sản phẩm đã đạt tối đa.'),
+                                duration: Duration(seconds: 2),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            )
+                            .closed
+                            .then((_) {
+                          isSnackBarVisible =
+                              false; // Reset lại trạng thái khi SnackBar đóng
+                        });
+                      }
+                    },
                   ),
                 ],
               ),
-            ),
-            title: Text(cartItems[index].productName),
-            subtitle: Text(
-              '${NumberFormat('#,###').format(cartItems[index].productPrice)} VNĐ',
-              style:
-                  const TextStyle(color: Themes.gradientDeepClr, fontSize: 16),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () {
-                    setState(() {
-                      if (cartItems[index].quantity > 1) {
-                        cartItems[index].quantity--;
-                        updateCartItemQuantity(cartItems[index]);
-                        calculateTotalPrice();
-                      } else {
-                        removeItem(index);
-                      }
-                    });
-                  },
-                ),
-                Text(
-                  '${cartItems[index].quantity}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () {
-                    setState(() {
-                      cartItems[index].quantity++;
-                      updateCartItemQuantity(cartItems[index]);
-                      calculateTotalPrice();
-                    });
-                  },
-                ),
-              ],
             ),
           );
         },

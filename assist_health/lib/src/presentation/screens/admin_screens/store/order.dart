@@ -170,6 +170,7 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   late String selectedStatus;
+  bool isLoading = false; // Biến trạng thái loading
 
   @override
   void initState() {
@@ -181,6 +182,44 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     setState(() {
       selectedStatus = newStatus;
     });
+  }
+
+  void _confirmOrder() async {
+    setState(() {
+      isLoading = true; // Bật trạng thái loading
+    });
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(widget.orderId)
+          .update({'status': selectedStatus});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã cập nhật trạng thái đơn hàng.')),
+        );
+
+        // Đợi 1 giây để hiển thị Snackbar rồi chuyển màn hình
+        await Future.delayed(const Duration(seconds: 1));
+
+        if (mounted) {
+          Navigator.pop(context); // Quay lại màn hình trước đó
+        }
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi cập nhật trạng thái: $error')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false; // Tắt loading
+        });
+      }
+    }
   }
 
   @override
@@ -235,9 +274,59 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                Text('Tên khách hàng: ${data['address']['name']}'),
-                Text('Địa chỉ: ${data['address']['fullAddress']}'),
-                Text('Tổng tiền: ${data['totalPrice']} VNĐ'),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tên khách hàng:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      data['address']['name'],
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      'Địa chỉ:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      data['address']['fullAddress'],
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      'Tổng tiền:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      '${NumberFormat('#,###').format(data['totalPrice'])} VNĐ',
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16.0),
                 const Text(
                   'Sản phẩm đã đặt hàng:',
@@ -300,51 +389,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
                 const SizedBox(height: 16.0),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        FirebaseFirestore.instance
-                            .collection('orders')
-                            .doc(widget.orderId)
-                            .update({
-                          'status': selectedStatus,
-                        }).then((value) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Đã cập nhật trạng thái đơn hàng thành công.'),
-                            ),
-                          );
-                        }).catchError((error) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Đã xảy ra lỗi khi cập nhật trạng thái đơn hàng: $error'),
-                            ),
-                          );
-                        });
-                      },
+                      onPressed: isLoading
+                          ? null
+                          : _confirmOrder, // Vô hiệu hóa khi loading
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(250, 50),
                         backgroundColor: Themes.gradientDeepClr,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text(
-                        'Xác nhận đơn hàng',
-                        style: TextStyle(fontSize: 20),
-                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text(
+                              'Xác nhận đơn hàng',
+                              style: TextStyle(fontSize: 20),
+                            ),
                     ),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     // Xử lý xóa đơn hàng
-                    //   },
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Colors.red,
-                    //     foregroundColor: Colors.white,
-                    //   ),
-                    //   child: const Text('Xóa đơn hàng'),
-                    // ),
                   ],
                 ),
               ],
