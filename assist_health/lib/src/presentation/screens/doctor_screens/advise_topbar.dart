@@ -1,4 +1,5 @@
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_appointment_screen.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/message_doctor.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/public_questions_doctor.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/schedule_doctor.dart';
@@ -18,9 +19,9 @@ class _AdviseTopBarState extends State<AdviseTopBar> {
     // Tab 1
     const ScheduleDoctor(),
     // Tab 2
-    const MessageDoctorScreen(),
+    const DoctorAppointmentScreen(),
     // Tab 3
-    const PublicQuestionsDoctorScreen(),
+    const MessageDoctorScreen(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -80,7 +81,7 @@ class _AdviseTopBarState extends State<AdviseTopBar> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'Lịch tư vấn',
+                        'Lịch khám',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: (countIndex == 0)
@@ -112,7 +113,7 @@ class _AdviseTopBarState extends State<AdviseTopBar> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'Tin nhắn',
+                        'Phiếu khám',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: (countIndex == 1)
@@ -144,7 +145,7 @@ class _AdviseTopBarState extends State<AdviseTopBar> {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'Cộng đồng',
+                        'Tin nhắn',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: (countIndex == 2)

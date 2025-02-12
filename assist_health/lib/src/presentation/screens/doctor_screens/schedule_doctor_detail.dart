@@ -122,143 +122,192 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
           child: Column(
             children: [
               Container(
-                  color: Colors.white,
-                  margin: const EdgeInsets.only(
-                    bottom: 5,
-                  ),
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 15, right: 15, bottom: 10),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.folder_shared,
+                color: Colors.white,
+                margin: const EdgeInsets.only(
+                  bottom: 5,
+                ),
+                padding: const EdgeInsets.only(
+                    top: 10, left: 15, right: 15, bottom: 10),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.folder_shared,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            _appointmentSchedule!.appointmentCode!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              final data = ClipboardData(
+                                  text: _appointmentSchedule!.appointmentCode!);
+                              Clipboard.setData(data);
+                              showToastMessage(
+                                  context, 'Mã lịch khám đã được sao chép');
+                            },
+                            child: const Icon(
+                              Icons.content_copy,
                               size: 18,
-                              color: Colors.grey,
                             ),
-                            const SizedBox(
-                              width: 10,
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                                color: getStatusColor(
+                                        _appointmentSchedule!.status!)
+                                    .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Text(
+                              _appointmentSchedule!.status!,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: getStatusColor(
+                                    _appointmentSchedule!.status!),
+                              ),
                             ),
-                            Text(
-                              _appointmentSchedule!.appointmentCode!,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 10, bottom: 15, left: 10, right: 10),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.solidPenToSquare,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const Text(
+                            'Ngày tạo phiếu',
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                          const Spacer(),
+                          Center(
+                            child: Text(
+                              _appointmentSchedule!.receivedAppointmentTime!,
                               style: const TextStyle(
                                 fontSize: 14,
                               ),
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                final data = ClipboardData(
-                                    text:
-                                        _appointmentSchedule!.appointmentCode!);
-                                Clipboard.setData(data);
-                                showToastMessage(
-                                    context, 'Mã lịch khám đã được sao chép');
-                              },
-                              child: const Icon(
-                                Icons.content_copy,
-                                size: 18,
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                  color: getStatusColor(
-                                          _appointmentSchedule!.status!)
-                                      .withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(30)),
-                              child: Text(
-                                _appointmentSchedule!.status!,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: getStatusColor(
-                                      _appointmentSchedule!.status!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 10, bottom: 15, left: 10, right: 10),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              FontAwesomeIcons.solidPenToSquare,
-                              size: 16,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            const Text(
-                              'Ngày tạo phiếu',
-                              style: TextStyle(
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.person,
+                            size: 18,
+                            color: Colors.deepOrange,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              // _showDetailProfileBottomSheet(context,
+                              //     _appointmentSchedule!.userProfile!);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      HealthProfileDetailScreen(
+                                    profile: _appointmentSchedule!
+                                        .userProfile!, // Hồ sơ cần truyền
+                                    isUserOfProfile:
+                                        false, // Trạng thái quyền sở hữu
+                                    isDoctorViewing:
+                                        true, // Trạng thái xem của bác sĩ
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              _appointmentSchedule!.userProfile!.name,
+                              style: const TextStyle(
                                 fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepOrange,
                               ),
                             ),
-                            const Spacer(),
-                            Center(
-                              child: Text(
-                                _appointmentSchedule!.receivedAppointmentTime!,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
+                          ),
+                          const Spacer(),
+                          Center(
+                            child: Text(
+                              'STT ${findIntervalIndex(_appointmentSchedule!.time!)}',
+                              style: const TextStyle(
+                                color: Themes.gradientDeepClr,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
+                    ),
+                    // if (_appointmentSchedule!.status == 'Đã duyệt' ||
+                    //     _appointmentSchedule!.status == 'Quá hẹn')
+                    GestureDetector(
+                      onTap: () {
+                        goToChatRoom();
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: Colors.lightBlueAccent.withOpacity(0.1),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.person,
-                              size: 18,
-                              color: Colors.grey,
+                            Icon(
+                              FontAwesomeIcons.solidCommentDots,
+                              color: Themes.gradientDeepClr,
                             ),
-                            const SizedBox(
-                              width: 8,
+                            SizedBox(
+                              width: 10,
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                _showDetailProfileBottomSheet(context,
-                                    _appointmentSchedule!.userProfile!);
-                              },
-                              child: Text(
-                                _appointmentSchedule!.userProfile!.name,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                            Center(
-                              child: Text(
-                                'STT ${findIntervalIndex(_appointmentSchedule!.time!)}',
-                                style: const TextStyle(
-                                  color: Themes.gradientDeepClr,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            Text(
+                              'Nhắn tin với bệnh nhân',
+                              style: TextStyle(
+                                color: Themes.gradientDeepClr,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
               Container(
                   color: Colors.white,
                   margin: const EdgeInsets.only(
@@ -382,140 +431,103 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                         endIndent: 15,
                       ),
 
-                      Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${_appointmentSchedule!.doctorInfo!.careerTitiles != '' ? _appointmentSchedule!.doctorInfo!.careerTitiles : 'Bác sĩ'} ${_appointmentSchedule!.doctorInfo!.name}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 50,
-                                      height: 50,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(15),
-                                        child: Image.network(
-                                          _appointmentSchedule!
-                                              .doctorInfo!.imageURL,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                HalfCircle(
-                                    height: 14,
-                                    weight: 8,
-                                    color: const Color(0xFFECF9FF),
-                                    isLeft: true),
-                                const SizedBox(
-                                  width: 6,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  child:
-                                      MySeparator(color: Colors.grey.shade400),
-                                ),
-                                const SizedBox(
-                                  width: 6,
-                                ),
-                                HalfCircle(
-                                    height: 14,
-                                    weight: 8,
-                                    color: const Color(0xFFECF9FF),
-                                    isLeft: false),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 20),
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const SizedBox(
-                                      width: 140,
-                                      child: Text(
-                                        'Chuyên khoa',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        getAllOfSpecialties(
-                                            _appointmentSchedule!
-                                                .doctorInfo!.specialty),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                        textAlign: TextAlign.right,
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                            if (_appointmentSchedule!.status == 'Đã duyệt' ||
-                                _appointmentSchedule!.status == 'Quá hẹn')
-                              GestureDetector(
-                                onTap: () {
-                                  goToChatRoom();
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(
-                                      bottom: 16, left: 16, right: 16),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    color:
-                                        Colors.lightBlueAccent.withOpacity(0.1),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.solidCommentDots,
-                                        color: Themes.gradientDeepClr,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Nhắn tin với bệnh nhân',
-                                        style: TextStyle(
-                                          color: Themes.gradientDeepClr,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
+                      // Container(
+                      //   margin: const EdgeInsets.symmetric(
+                      //     horizontal: 15,
+                      //     vertical: 5,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(10),
+                      //   ),
+                      //   child: Column(
+                      //     children: [
+                      //       Container(
+                      //         padding: const EdgeInsets.symmetric(
+                      //             horizontal: 15, vertical: 10),
+                      //         child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment.spaceBetween,
+                      //             children: [
+                      //               Text(
+                      //                 '${_appointmentSchedule!.doctorInfo!.careerTitiles != '' ? _appointmentSchedule!.doctorInfo!.careerTitiles : 'Bác sĩ'} ${_appointmentSchedule!.doctorInfo!.name}',
+                      //                 style: const TextStyle(
+                      //                   fontSize: 14,
+                      //                 ),
+                      //               ),
+                      //               SizedBox(
+                      //                 width: 50,
+                      //                 height: 50,
+                      //                 child: ClipRRect(
+                      //                   borderRadius: BorderRadius.circular(15),
+                      //                   child: Image.network(
+                      //                     _appointmentSchedule!
+                      //                         .doctorInfo!.imageURL,
+                      //                     fit: BoxFit.cover,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ]),
+                      //       ),
+                      //       Row(
+                      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //         children: [
+                      //           HalfCircle(
+                      //               height: 14,
+                      //               weight: 8,
+                      //               color: const Color(0xFFECF9FF),
+                      //               isLeft: true),
+                      //           const SizedBox(
+                      //             width: 6,
+                      //           ),
+                      //           SizedBox(
+                      //             width:
+                      //                 MediaQuery.of(context).size.width * 0.7,
+                      //             child:
+                      //                 MySeparator(color: Colors.grey.shade400),
+                      //           ),
+                      //           const SizedBox(
+                      //             width: 6,
+                      //           ),
+                      //           HalfCircle(
+                      //               height: 14,
+                      //               weight: 8,
+                      //               color: const Color(0xFFECF9FF),
+                      //               isLeft: false),
+                      //         ],
+                      //       ),
+                      //       Container(
+                      //         padding: const EdgeInsets.symmetric(
+                      //             horizontal: 15, vertical: 20),
+                      //         child: Row(
+                      //             mainAxisAlignment:
+                      //                 MainAxisAlignment.spaceBetween,
+                      //             children: [
+                      //               const SizedBox(
+                      //                 width: 140,
+                      //                 child: Text(
+                      //                   'Chuyên khoa',
+                      //                   style: TextStyle(
+                      //                     fontSize: 14,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //               Expanded(
+                      //                 child: Text(
+                      //                   getAllOfSpecialties(
+                      //                       _appointmentSchedule!
+                      //                           .doctorInfo!.specialty),
+                      //                   style: const TextStyle(
+                      //                     fontSize: 14,
+                      //                   ),
+                      //                   textAlign: TextAlign.right,
+                      //                 ),
+                      //               ),
+                      //             ]),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
                       // Lý do khám
                       if (_isNotEmptyReasonForExamination())

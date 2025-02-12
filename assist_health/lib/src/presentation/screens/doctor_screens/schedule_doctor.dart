@@ -17,14 +17,14 @@ class ScheduleDoctor extends StatefulWidget {
 class _ScheduleDoctorState extends State<ScheduleDoctor> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
-  DateTime _firstDay = DateTime.utc(2018, 10, 16);
-  DateTime _lastDay = DateTime.utc(2030, 3, 14);
+  final DateTime _firstDay = DateTime.utc(2018, 10, 16);
+  final DateTime _lastDay = DateTime.utc(2030, 3, 14);
   DateTime? _selectedDay;
 
   Map<DateTime, List<Event>> events = {};
   late final ValueNotifier<List<Event>> _selectedEvents;
 
-  StreamController<List<AppointmentSchedule>>? _appointmentScheduleController =
+  final StreamController<List<AppointmentSchedule>> _appointmentScheduleController =
       StreamController<List<AppointmentSchedule>>.broadcast();
 
   List<DateTime> dateList = [];
@@ -35,7 +35,7 @@ class _ScheduleDoctorState extends State<ScheduleDoctor> {
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
 
-    _appointmentScheduleController!
+    _appointmentScheduleController
         .addStream(getAppointmentSchdedulesForDocotr());
 
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -118,7 +118,7 @@ class _ScheduleDoctorState extends State<ScheduleDoctor> {
                 Container(
                   margin: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
                   child: StreamBuilder<List<AppointmentSchedule>>(
-                    stream: _appointmentScheduleController!.stream,
+                    stream: _appointmentScheduleController.stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         // Xử lý lỗi nếu có
@@ -148,6 +148,31 @@ class _ScheduleDoctorState extends State<ScheduleDoctor> {
                                 .toList()
                                 .reversed
                                 .toList();
+
+                        // Sắp xếp theo ưu tiên trạng thái
+                        tempAppointmentSchedulesStatus.sort((a, b) {
+                          int getStatusPriority(String status, bool isResult) {
+                            if (status == 'Đã duyệt') return 1;
+                            if (status == 'Đã khám' && !isResult) return 2;
+                            if (status == 'Đã khám' && isResult) return 3;
+                            if (status == 'Quá hẹn') return 4;
+                            if (status == 'Đã hủy') return 5;
+                            if (status == 'Đã hoàn tiền') return 6;
+                            return 7;
+                          }
+
+                          int priorityA =
+                              getStatusPriority(a.status!, a.isResult!);
+                          int priorityB =
+                              getStatusPriority(b.status!, b.isResult!);
+
+                          if (priorityA == priorityB) {
+                            return b.selectedDate!.compareTo(a.selectedDate!);
+                          }
+
+                          return priorityA.compareTo(priorityB);
+                        });
+
 
                         // Nếu mục trống
                         if (tempAppointmentSchedulesStatus.isEmpty) {
@@ -195,49 +220,7 @@ class _ScheduleDoctorState extends State<ScheduleDoctor> {
                         }
                         //--------------------------------
 
-                        if (tempAppointmentSchedulesStatus.isEmpty) {
-                          return Center(
-                            child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              height: 500,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/empty-box.png',
-                                    width: 250,
-                                    height: 250,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  const SizedBox(
-                                    height: 12,
-                                  ),
-                                  const Text(
-                                    'Bạn chưa có lịch khám ở mục này',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueGrey,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-                                  const Text(
-                                    'Lịch khám của bạn sẽ được hiển thị tại đây.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.blueGrey,
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }
+                        
 
                         //Hiển thị danh sách cuộc hẹn
                         return ListView.builder(

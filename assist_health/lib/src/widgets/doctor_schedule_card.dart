@@ -109,6 +109,32 @@ class DoctorScheduleCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          'Mã phiếu khám',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        Text(
+                          appointmentSchedule.appointmentCode!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'Bệnh nhân',
                           style: TextStyle(
                             fontSize: 14,
@@ -183,6 +209,79 @@ class DoctorScheduleCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (appointmentSchedule.status == 'Đã khám')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 8, right: 8, top: 4, bottom: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                appointmentSchedule.isResult!
+                                    ? Icons.check_circle
+                                    : Icons.hourglass_empty,
+                                color: appointmentSchedule.isResult!
+                                    ? Colors.green
+                                    : Colors.deepOrange,
+                                size: 16,
+                              ),
+                              Text(
+                                appointmentSchedule.isResult!
+                                    ? 'Đã trả kết quả'
+                                    : 'Chưa trả kết quả',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: appointmentSchedule.isResult!
+                                      ? Colors.green
+                                      : Colors.deepOrange,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 8, right: 8, top: 4, bottom: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                appointmentSchedule.idFeedback != ''
+                                    ? Icons.check_circle
+                                    : Icons.edit,
+                                color: appointmentSchedule.idFeedback != ''
+                                    ? Colors.green
+                                    : Colors.blue,
+                                size: 16,
+                              ),
+                              Text(
+                                appointmentSchedule.idFeedback != ''
+                                    ? 'Đã đánh giá'
+                                    : 'Chưa đánh giá',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: appointmentSchedule.idFeedback != ''
+                                      ? Colors.green
+                                      : Colors.blue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 5),
                   (appointmentSchedule.status == 'Đã duyệt' &&
                           isWithinTimeRange(appointmentSchedule.time!,

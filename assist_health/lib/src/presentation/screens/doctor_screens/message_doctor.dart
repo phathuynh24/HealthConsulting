@@ -487,7 +487,7 @@ class _MessageDoctorScreenState extends State<MessageDoctorScreen> {
                                             width: 8,
                                           ),
                                           Text(
-                                            "Người tạo: ${userProfile.ownerName}",
+                                            "Tài khoản: ${userProfile.ownerName}",
                                             style: const TextStyle(
                                               color: Colors.blueGrey,
                                               height: 1.5,

@@ -3,6 +3,7 @@ import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_acc
 import 'package:assist_health/src/presentation/screens/doctor_screens/advise_topbar.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/doctor_blog.dart';
 import 'package:assist_health/src/presentation/screens/doctor_screens/home_doctor.dart';
+import 'package:assist_health/src/presentation/screens/doctor_screens/public_questions_doctor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -21,8 +22,11 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
     const HomeDoctor(),
     // Screen 2
     const AdviseTopBar(),
+    // Screen 3
+    const PublicQuestionsDoctorScreen(),
+    // Screen 4
     Doctor_Blog(),
-    //Screen 3
+    // Screen 5
     const DoctorAccountScreen(),
   ];
 
@@ -56,6 +60,10 @@ class _DoctorNavBarState extends State<DoctorNavBar> {
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.phone_fill),
               label: "Tư vấn",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              label: "Cộng đồng",
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.article_outlined),

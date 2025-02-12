@@ -330,7 +330,7 @@ class _ExaminationResultsScreenState extends State<ExaminationResultsScreen> {
                             (route) => false,
                           );
                         } else {
-                          Navigator.of(context).pop(true);
+                          Navigator.of(context).pop(false);
                         }
                       },
                       child: Container(

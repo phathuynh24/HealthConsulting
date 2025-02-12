@@ -610,43 +610,43 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                                 ],
                               ),
                             ),
-                            if (_appointmentSchedule!.status == 'Đã duyệt' ||
-                                _appointmentSchedule!.status == 'Quá hẹn')
-                              GestureDetector(
-                                onTap: () {
-                                  goToChatRoom();
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(
-                                      bottom: 16, left: 16, right: 16),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 16),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    color:
-                                        Colors.lightBlueAccent.withOpacity(0.1),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.solidCommentDots,
-                                        color: Themes.gradientDeepClr,
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Nhắn tin với bác sĩ',
-                                        style: TextStyle(
-                                          color: Themes.gradientDeepClr,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                            // if (_appointmentSchedule!.status == 'Đã duyệt' ||
+                            //     _appointmentSchedule!.status == 'Quá hẹn')
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     goToChatRoom();
+                            //   },
+                            //   child: Container(
+                            //     width: double.infinity,
+                            //     margin: const EdgeInsets.only(
+                            //         bottom: 16, left: 16, right: 16),
+                            //     padding: const EdgeInsets.symmetric(
+                            //         horizontal: 16, vertical: 16),
+                            //     decoration: BoxDecoration(
+                            //       borderRadius: BorderRadius.circular(30),
+                            //       color:
+                            //           Colors.lightBlueAccent.withOpacity(0.1),
+                            //     ),
+                            //     child: const Row(
+                            //       mainAxisAlignment: MainAxisAlignment.center,
+                            //       children: [
+                            //         Icon(
+                            //           FontAwesomeIcons.solidCommentDots,
+                            //           color: Themes.gradientDeepClr,
+                            //         ),
+                            //         SizedBox(
+                            //           width: 10,
+                            //         ),
+                            //         Text(
+                            //           'Nhắn tin với bác sĩ',
+                            //           style: TextStyle(
+                            //             color: Themes.gradientDeepClr,
+                            //           ),
+                            //         ),
+                            //       ],
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),

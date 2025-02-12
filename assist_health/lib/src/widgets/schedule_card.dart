@@ -71,68 +71,6 @@ class ScheduleCard extends StatelessWidget {
                             color: Themes.gradientDeepClr,
                           ),
                         ),
-                        if (appointmentSchedule.status == 'Đã khám')
-                          Container(
-                            padding: const EdgeInsets.only(
-                                left: 2, right: 8, top: 4, bottom: 4),
-                            decoration: BoxDecoration(
-                                color:
-                                    getStatusColor(appointmentSchedule.status!)
-                                        .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Row(
-                              children: [
-                                DotsIndicator(
-                                  dotsCount: 1,
-                                  decorator: DotsDecorator(
-                                    activeColor: getStatusColor(
-                                        appointmentSchedule.status!),
-                                    activeSize: const Size(10, 10),
-                                  ),
-                                ),
-                                Text(
-                                  appointmentSchedule.status!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: getStatusColor(
-                                        appointmentSchedule.status!),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (appointmentSchedule.status == 'Đã khám')
-                          Container(
-                            padding: const EdgeInsets.only(
-                                left: 2, right: 8, top: 4, bottom: 4),
-                            decoration: BoxDecoration(
-                                color:
-                                    getStatusColor(appointmentSchedule.status!)
-                                        .withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Row(
-                              children: [
-                                DotsIndicator(
-                                  dotsCount: 1,
-                                  decorator: DotsDecorator(
-                                    activeColor: getStatusColor(
-                                        appointmentSchedule.status!),
-                                    activeSize: const Size(10, 10),
-                                  ),
-                                ),
-                                Text(
-                                  appointmentSchedule.status!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: getStatusColor(
-                                        appointmentSchedule.status!),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         Container(
                           padding: const EdgeInsets.only(
                               left: 2, right: 8, top: 4, bottom: 4),
@@ -272,6 +210,79 @@ class ScheduleCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (appointmentSchedule.status == 'Đã khám')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 8, right: 8, top: 4, bottom: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                appointmentSchedule.isResult!
+                                    ? Icons.check_circle
+                                    : Icons.hourglass_empty,
+                                color: appointmentSchedule.isResult!
+                                    ? Colors.green
+                                    : Colors.deepOrange,
+                                size: 16,
+                              ),
+                              Text(
+                                appointmentSchedule.isResult!
+                                    ? 'Đã trả kết quả'
+                                    : 'Chưa trả kết quả',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: appointmentSchedule.isResult!
+                                      ? Colors.green
+                                      : Colors.deepOrange,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 8, right: 8, top: 4, bottom: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                appointmentSchedule.idFeedback != ''
+                                    ? Icons.check_circle
+                                    : Icons.edit,
+                                color: appointmentSchedule.idFeedback != ''
+                                    ? Colors.green
+                                    : Colors.blue,
+                                size: 16,
+                              ),
+                              Text(
+                                appointmentSchedule.idFeedback != ''
+                                    ? 'Đã đánh giá'
+                                    : 'Chưa đánh giá',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: appointmentSchedule.idFeedback != ''
+                                      ? Colors.green
+                                      : Colors.blue,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 5),
                   (appointmentSchedule.status == 'Đã duyệt' &&
                           isWithinTimeRange(appointmentSchedule.time!,

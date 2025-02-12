@@ -75,6 +75,24 @@ class _PublicQuestionsDoctorScreenState
       },
       child: Scaffold(
         backgroundColor: Themes.backgroundClr,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          title: const Text(
+            'Hỏi đáp cộng đồng',
+            style: TextStyle(fontSize: 20),
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+            ),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [

@@ -306,7 +306,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   stream: _appointmentScheduleController.stream,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      // Xử lý lỗi nếu có
                       return Text('Đã xảy ra lỗi: ${snapshot.error}');
                     }
 
@@ -314,14 +313,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       List<AppointmentSchedule> appointmentSchedulesStatus =
                           snapshot.data!
                               .where((element) => element.status == _status)
-                              .toList()
-                              .reversed
                               .toList();
 
-                      // Kiểm tra và cập nhật trạng thái cho các cuộc hẹn chờ duyệt
+                      // Đưa các phiếu có isResult = false lên trên, sau đó sắp xếp theo ngày gần nhất
+                      appointmentSchedulesStatus.sort((a, b) {
+                        if (a.isResult == b.isResult) {
+                          return b.selectedDate!.compareTo(a.selectedDate!);
+                        }
+                        return a.isResult! ? 1 : -1;
+                      });
+
                       checkPendingAppointments(appointmentSchedulesStatus);
 
-                      // Nếu mục trống
                       if (appointmentSchedulesStatus.isEmpty) {
                         return Center(
                           child: Container(
@@ -336,9 +339,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                   height: 250,
                                   fit: BoxFit.contain,
                                 ),
-                                const SizedBox(
-                                  height: 12,
-                                ),
+                                const SizedBox(height: 12),
                                 const Text(
                                   'Bạn chưa có lịch khám ở mục này',
                                   style: TextStyle(
@@ -347,9 +348,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                     fontSize: 16,
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
+                                const SizedBox(height: 6),
                                 const Text(
                                   'Lịch khám của bạn sẽ được hiển thị tại đây.',
                                   textAlign: TextAlign.center,
@@ -364,59 +363,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           ),
                         );
                       }
-                      //--------------------------------
-                      // if (appointmentSchedulesStatus[0].status == 'Chờ duyệt') {
-                      // startTimersForPending(appointmentSchedulesStatus);
-                      // }
 
                       if (appointmentSchedulesStatus[0].status == 'Đã duyệt') {
                         checkOutOfDateApproved(appointmentSchedulesStatus);
                       }
 
-                      if (appointmentSchedulesStatus.isEmpty) {
-                        return Center(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                            height: 500,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/empty-box.png',
-                                  width: 250,
-                                  height: 250,
-                                  fit: BoxFit.contain,
-                                ),
-                                const SizedBox(
-                                  height: 12,
-                                ),
-                                const Text(
-                                  'Bạn chưa có lịch khám ở mục này',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blueGrey,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 6,
-                                ),
-                                const Text(
-                                  'Lịch khám của bạn sẽ được hiển thị tại đây.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.blueGrey,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }
-
-                      // Lọc theo search
                       List<AppointmentSchedule> appointmentSchedulesSearch = [];
                       if (_searchText == '') {
                         appointmentSchedulesSearch = appointmentSchedulesStatus;
@@ -435,7 +386,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                     .contains(searchText))
                             .toList();
                       }
-                      // Xử lý không tìm ra kết quả
+
                       if (appointmentSchedulesSearch.isEmpty) {
                         return SingleChildScrollView(
                           child: Container(
@@ -457,9 +408,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                     fontSize: 15,
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                const SizedBox(height: 10),
                                 const Text(
                                   'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
                                   textAlign: TextAlign.center,
