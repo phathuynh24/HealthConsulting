@@ -49,7 +49,9 @@ class _PublicQuestionsAdminScreenState
           .collection('questions')
           .doc(questionId)
           .delete();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
   }
 
   Future<int> _countAnswers(String questionId) async {
@@ -64,7 +66,9 @@ class _PublicQuestionsAdminScreenState
             List<Map<String, dynamic>>.from(docSnapshot.get('answers') ?? []);
         count = answers.length;
       }
-    } catch (error) {}
+    } catch (error) {
+      debugPrint('Error: $error');
+    }
     return count;
   }
 
@@ -107,6 +111,7 @@ class _PublicQuestionsAdminScreenState
                   for (var document in documents) {
                     Timestamp timestampDate = document['date'];
                     DateTime date = timestampDate.toDate();
+                    final data = document.data() as Map<String, dynamic>?;
 
                     final List<dynamic> categories = document['categories'];
 
@@ -114,7 +119,9 @@ class _PublicQuestionsAdminScreenState
                     try {
                       tempAnswers = List<Map<String, dynamic>>.from(
                           document.get('answers'));
-                    } catch (e) {}
+                    } catch (e) {
+                      debugPrint('Error: $e');
+                    }
 
                     final question = Question(
                       id: document.id,
@@ -127,6 +134,9 @@ class _PublicQuestionsAdminScreenState
                       questionUserId: document['questionUserId'],
                       date: date,
                       answers: tempAnswers,
+                      imageUrls: data!.containsKey('imageUrls')
+                          ? List<String>.from(data['imageUrls'])
+                          : [],
                     );
                     questions.add(question);
                     isLikedList.add(false);

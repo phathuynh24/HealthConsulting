@@ -10,6 +10,12 @@ class FeedbackList extends StatefulWidget {
 }
 
 class _FeedbackListState extends State<FeedbackList> {
+  double? selectedRating;
+  final TextEditingController _searchController = TextEditingController();
+  Map<String, String> doctorNameCache = {};
+
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -19,168 +25,210 @@ class _FeedbackListState extends State<FeedbackList> {
     return FirebaseFirestore.instance.collection('feedback').snapshots();
   }
 
+  Future<String> getDoctorName(String doctorId) async {
+    if (doctorNameCache.containsKey(doctorId)) {
+      return doctorNameCache[doctorId]!;
+    }
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(doctorId)
+        .get();
+    final doctorName = docSnapshot.data()?['name'] ?? 'Không rõ';
+    doctorNameCache[doctorId] = doctorName;
+    return doctorName;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        // Đánh giá bác sĩ
-        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: getFeedbackDocumentStream(),
-          builder: (BuildContext context,
-              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-            if (snapshot.hasData) {
-              List<FeedbackDoctor> feedback = snapshot.data!.docs
-                  .map((doc) => FeedbackDoctor.fromJson(doc.data()))
-                  .toList();
-              feedback.sort((a, b) => b.rateDate!.compareTo(a.rateDate!));
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: feedback.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final feedbackDoctor = feedback[index];
-                  String formattedDate =
-                      DateFormat('dd/MM/yyyy').format(feedbackDoctor.rateDate!);
+      backgroundColor: Colors.grey[100],
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                hintText: 'Tìm kiếm theo tên bác sĩ...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RatingBar.builder(
+              initialRating: selectedRating ?? 0,
+              minRating: 1,
+              direction: Axis.horizontal,
+              allowHalfRating: true,
+              itemCount: 5,
+              itemSize: 50,
+              itemPadding: const EdgeInsets.symmetric(horizontal: 3.0),
+              itemBuilder: (context, _) => const Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              onRatingUpdate: (rating) {
+                setState(() {
+                  selectedRating = rating;
+                });
+              },
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                selectedRating = null;
+                _searchController.clear();
+              });
+            },
+            child: const Text(
+              'Xóa bộ lọc',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: getFeedbackDocumentStream(),
+              builder: (BuildContext context, snapshot) {
+                if (snapshot.hasData) {
+                  List<FeedbackDoctor> feedback = snapshot.data!.docs
+                      .map((doc) => FeedbackDoctor.fromJson(doc.data()))
+                      .toList();
 
-                  return Stack(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        margin: const EdgeInsets.only(
-                          top: 10,
-                          bottom: 10,
-                          left: 15,
-                          right: 15,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              feedbackDoctor.username.toString().toUpperCase(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                height: 1.3,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            RatingBar.builder(
-                              initialRating: feedbackDoctor.rating!,
-                              minRating: 1,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemSize: 20,
-                              itemPadding:
-                                  const EdgeInsets.symmetric(horizontal: 1),
-                              itemBuilder: (context, _) => const Icon(
-                                Icons.star,
-                                color: Colors.amber,
-                              ),
-                              ignoreGestures: true,
-                              onRatingUpdate: (rating) {},
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              feedbackDoctor.content!,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                height: 1.5,
-                              ),
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              formattedDate,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                  fontStyle: FontStyle.italic),
-                            ),
-                          ],
-                        ),
+                  if (selectedRating != null) {
+                    feedback = feedback
+                        .where((f) => f.rating == selectedRating)
+                        .toList();
+                  }
+
+                  if (_searchController.text.isNotEmpty) {
+                    feedback = feedback.where((f) {
+                      final doctorName = doctorNameCache[f.idDoctor] ?? '';
+                      return doctorName
+                          .toLowerCase()
+                          .contains(_searchController.text.toLowerCase());
+                    }).toList();
+                  }
+
+                  feedback.sort((a, b) => b.rateDate!.compareTo(a.rateDate!));
+
+                  if (feedback.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Không có phản hồi với bộ lọc hiện tại.',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
-                      Positioned(
-                        top: 20,
-                        right: 30,
-                        child: GestureDetector(
-                          onTap: () {
-                            _showDeleteConfirmationDialog(
-                                context, feedbackDoctor.idDoc!);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                        ),
-                      )
-                    ],
+                    );
+                  }
+
+                  return FutureBuilder<Map<String, String>>(
+                    future: Future.wait(
+                      feedback.map((f) async {
+                        final name = await getDoctorName(f.idDoctor!);
+                        return MapEntry(f.idDoctor!, name);
+                      }),
+                    ).then((entries) => Map.fromEntries(entries)),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      final doctorNames = snapshot.data!;
+
+                      return ListView.builder(
+                        itemCount: feedback.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final feedbackDoctor = feedback[index];
+                          String formattedDate =
+                              DateFormat('HH:mm:ss, dd/MM/yyyy')
+                                  .format(feedbackDoctor.rateDate!);
+
+                          return Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Bác sĩ: ${doctorNames[feedbackDoctor.idDoctor] ?? "Không rõ"}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  feedbackDoctor.username
+                                      .toString()
+                                      .toUpperCase(),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                RatingBar.builder(
+                                  initialRating: feedbackDoctor.rating!,
+                                  minRating: 1,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 5,
+                                  itemSize: 20,
+                                  itemPadding:
+                                      const EdgeInsets.symmetric(horizontal: 1),
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                                  ignoreGestures: true,
+                                  onRatingUpdate: (rating) {},
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  feedbackDoctor.content!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
                   );
-                },
-              );
-            } else if (snapshot.hasError) {
-              return Text('Đã xảy ra lỗi: ${snapshot.error}');
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+                } else if (snapshot.hasError) {
+                  return Text('Đã xảy ra lỗi: ${snapshot.error}');
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  void _showDeleteConfirmationDialog(BuildContext context, String id) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Xác nhận xóa đánh giá'),
-          content: const Text('Bạn có chắc chắn muốn xóa đánh giá này?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Hủy'),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteFeedback(id);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Xóa'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteFeedback(String id) async {
-    try {
-      await FirebaseFirestore.instance.collection('feedback').doc(id).delete();
-    } catch (e) {
-      print('Error deleting doctor: $e');
-    }
   }
 }

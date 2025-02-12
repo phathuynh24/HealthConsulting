@@ -347,6 +347,45 @@ class _AdminPaymentManagementScreenState
                   return b.paymentStartTime!.compareTo(a.paymentStartTime!);
                 });
 
+                if (filteredAppointments.isEmpty) {
+                  return Center(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      height: 500,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/empty-box.png',
+                            width: 250,
+                            height: 250,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Chưa có phiếu khám ở mục này',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueGrey,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Phiếu khám phù hợp sẽ được hiển thị tại đây.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.blueGrey,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 return ListView.builder(
                   itemCount: filteredAppointments.length,
                   itemBuilder: (context, index) {

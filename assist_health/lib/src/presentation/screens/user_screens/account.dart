@@ -167,15 +167,15 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               _buildFeatureItem(
                 icon: Icons.rate_review,
-                color: Colors.yellow,
-                title: "Đánh giá",
+                color: Colors.deepOrange,
+                title: "Đánh giá sản phẩm",
                 onTap: () => _navigateTo(EvaluatePage()),
               ),
               _buildFeatureItem(
                 icon: Icons.fitness_center,
                 color: Colors.blueAccent,
                 title: "Tập luyện",
-                onTap: () => _navigateTo(DailyWorkoutScreen()),
+                onTap: () => _navigateTo(const DailyWorkoutScreen()),
                 showDivider: false,
               ),
             ],
@@ -183,36 +183,36 @@ class _AccountScreenState extends State<AccountScreen> {
           const SizedBox(height: 10),
           _buildFeatureSection(
             items: [
-              _buildFeatureItem(
-                icon: Icons.info,
-                color: Colors.deepPurple,
-                title: "Điều khoản và dịch vụ",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: CupertinoIcons.person_3_fill,
-                color: Colors.lightGreen,
-                title: "Tham gia cộng đồng",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.share,
-                color: Colors.orange,
-                title: "Chia sẻ ứng dụng",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.contact_support,
-                color: Colors.indigoAccent,
-                title: "Liên hệ và hỗ trợ",
-                onTap: () {},
-              ),
-              _buildFeatureItem(
-                icon: Icons.settings,
-                color: Colors.black54,
-                title: "Cài đặt",
-                onTap: () {},
-              ),
+              // _buildFeatureItem(
+              //   icon: Icons.info,
+              //   color: Colors.deepPurple,
+              //   title: "Điều khoản và dịch vụ",
+              //   onTap: () {},
+              // ),
+              // _buildFeatureItem(
+              //   icon: CupertinoIcons.person_3_fill,
+              //   color: Colors.lightGreen,
+              //   title: "Tham gia cộng đồng",
+              //   onTap: () {},
+              // ),
+              // _buildFeatureItem(
+              //   icon: Icons.share,
+              //   color: Colors.orange,
+              //   title: "Chia sẻ ứng dụng",
+              //   onTap: () {},
+              // ),
+              // _buildFeatureItem(
+              //   icon: Icons.contact_support,
+              //   color: Colors.indigoAccent,
+              //   title: "Liên hệ và hỗ trợ",
+              //   onTap: () {},
+              // ),
+              // _buildFeatureItem(
+              //   icon: Icons.settings,
+              //   color: Colors.black54,
+              //   title: "Cài đặt",
+              //   onTap: () {},
+              // ),
               _buildFeatureItem(
                 icon: Icons.logout,
                 color: Colors.redAccent,

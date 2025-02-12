@@ -114,6 +114,22 @@ class _ChatRoomState extends State<ChatRoom> {
     }
   }
 
+  Widget _buildTitle(String name) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          (name != 'Chăm Sóc Khách Hàng')
+              ? (widget.isUser)
+                  ? 'Bệnh nhân $name'
+                  : 'Bác sĩ $name'
+              : name,
+          style: const TextStyle(fontSize: 18),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -136,27 +152,50 @@ class _ChatRoomState extends State<ChatRoom> {
               .doc(widget.userMap['uid'])
               .snapshots(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              var userData = snapshot.data!.data() as Map<String, dynamic>;
-              String name = widget.userMap['name'];
-              if (userData['role'] == 'admin') {
-                name = 'Chăm Sóc Khách Hàng';
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasData && snapshot.data!.exists) {
+              var userData = snapshot.data!.data() as Map<String, dynamic>?;
+              String name = widget.userMap['name'] ?? 'Không rõ';
+
+              if (userData != null) {
+                if (userData['role'] == 'admin') {
+                  name = 'Chăm Sóc Khách Hàng';
+                } else if (userData['role'] == 'user') {
+                  // Lấy tên từ main_profile nếu là user
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: _firestore
+                        .collection("users")
+                        .doc(widget.userMap['uid'])
+                        .collection("health_profiles")
+                        .doc("main_profile")
+                        .get(),
+                    builder: (context, profileSnapshot) {
+                      if (profileSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (profileSnapshot.hasData &&
+                          profileSnapshot.data!.exists) {
+                        var profileData = profileSnapshot.data!.data()
+                            as Map<String, dynamic>?;
+                        name = profileData?['name'] ?? 'Không rõ';
+                      }
+
+                      return _buildTitle(name);
+                    },
+                  );
+                }
               }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    (name != 'Chăm Sóc Khách Hàng')
-                        ? (widget.isUser)
-                            ? 'Bệnh nhân $name'
-                            : 'Bác sĩ $name'
-                        : name,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              );
+
+              return _buildTitle(name);
+            } else if (snapshot.hasError) {
+              return const Text('Lỗi khi tải dữ liệu');
             } else {
-              return Container();
+              return const Text('Không tìm thấy dữ liệu');
             }
           },
         ),
@@ -164,7 +203,7 @@ class _ChatRoomState extends State<ChatRoom> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).viewInsets.bottom > 0
                   ? size.height -
                       MediaQuery.of(context).viewInsets.bottom -

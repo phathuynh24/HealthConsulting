@@ -47,6 +47,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: password,
       );
 
+      await userCredential.user!.updateDisplayName(name);
+      await userCredential.user!.reload(); // Load lại dữ liệu để đồng bộ
+
       final docId = userCredential.user!.uid;
 
       // Create collection `users` and document with `docId`

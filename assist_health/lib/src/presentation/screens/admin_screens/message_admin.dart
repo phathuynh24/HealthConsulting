@@ -1,10 +1,10 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously
 
-import 'package:assist_health/src/models/doctor/doctor_info.dart';
+import 'dart:async';
+
 import 'package:assist_health/src/models/other/chat.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/chatroom.dart';
-import 'package:assist_health/src/widgets/doctor_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,628 +18,310 @@ class MessageAdminScreen extends StatefulWidget {
 
 class _MessageAdminScreenState extends State<MessageAdminScreen> {
   List<Chat> chatRoomList = [];
-  List<Chat> tempChatRoomList = [];
-  List<DoctorInfo> doctorList = [];
-  List<Map<String, dynamic>> userProfiles = [];
-  List<Map<String, dynamic>> adminList = [];
+  List<Map<String, dynamic>> userRooms = [];
+  List<Map<String, dynamic>> doctorRooms = [];
   bool isLoading = false;
+  bool isGoToChatRoom = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final TextEditingController _searchController = TextEditingController();
-  String _searchText = '';
+  bool _isActive = true; // Track widget status
 
-  bool showDoctorMassage = false;
+  StreamSubscription? _chatRoomSubscription;
 
   @override
   void initState() {
     super.initState();
-    getChatRoom();
-    tempChatRoomList = chatRoomList;
+    getChatRooms();
   }
 
   @override
   void dispose() {
+    _isActive = false;
+    _chatRoomSubscription?.cancel(); // Cancel Stream
     _searchController.dispose();
     super.dispose();
   }
 
-  void getChatRoom() async {
+  Future<void> getChatRooms() async {
+    if (!_isActive) return;
+
     setState(() {
       isLoading = true;
     });
 
-    // Lấy danh sách bác sĩ
-    await getDoctors();
-
-    // Lấy danh sách admin
-    await getAdmins();
-
-    // Lấy danh sách chatroom của bác sĩ này
-    List<Chat> tempChatRoomList = [];
-    await _firestore
-        .collection('chatroom')
-        .where('idDoctor', isEqualTo: _auth.currentUser!.uid)
-        .get()
-        .then((value) {
-      if (value.docs.isNotEmpty) {
-        tempChatRoomList =
-            value.docs.map((doc) => Chat.fromJson(doc.data())).toList();
-        setState(() {
-          chatRoomList = tempChatRoomList
-              .where((element) => element.idDoctor == _auth.currentUser!.uid)
-              .toList();
-        });
-      }
-    });
-    // Lấy danh sách hồ sơ sức khỏe đã chat với bác sĩ này
-    await getUserProfiles();
-
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future<void> getUserProfiles() async {
-    List<Map<String, dynamic>> tempUserProfiles = [];
     try {
-      final userQuerySnapshot = await _firestore
-          .collection('users')
-          .where("role", whereIn: ["user"]).get();
+      _chatRoomSubscription = _firestore
+          .collection('chatroom')
+          .where('idDoctor', isEqualTo: _auth.currentUser!.uid)
+          .snapshots()
+          .listen((snapshot) async {
+        chatRoomList =
+            snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList();
 
-      if (userQuerySnapshot.docs.isNotEmpty) {
-        tempUserProfiles =
-            userQuerySnapshot.docs.map((doc) => doc.data()).toList();
+        await classifyChatRooms();
+
+        if (_isActive) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      });
+    } catch (error) {
+      print("Error loading chat rooms: $error");
+      if (_isActive) {
         setState(() {
-          userProfiles = tempUserProfiles
-              .where((element1) => chatRoomList
-                  .any((element2) => element2.idProfile == element1['uid']))
-              .toList();
-        });
-      } else {
-        setState(() {
-          userProfiles = [];
+          isLoading = false;
         });
       }
-    } catch (error) {
-      print("Lỗi khi truy xuất dữ liệu: $error");
     }
   }
 
-  Future<void> getDoctors() async {
-    try {
-      // Lấy danh sách bác sĩ
-      final userDocs = await _firestore
-          .collection('users')
-          .where('role', isEqualTo: 'doctor')
-          .get();
-      if (userDocs.docs.isNotEmpty) {
-        setState(() {
-          doctorList = userDocs.docs
-              .map((doc) => DoctorInfo.fromJson(doc.data()))
-              .toList();
-        });
-      } else {
-        setState(() {
-          doctorList = [];
-        });
-      }
-    } catch (error) {
-      // Xử lý lỗi nếu có
-      print('Lỗi khi lấy danh sách bác sĩ: $error');
-    }
-  }
+  Future<void> classifyChatRooms() async {
+    List<Map<String, dynamic>> tempUserRooms = [];
+    List<Map<String, dynamic>> tempDoctorRooms = [];
 
-  getAdmins() async {
-    // Lấy danh sách admin
-    await _firestore
-        .collection('users')
-        .where("role", whereIn: ["admin"])
-        .get()
-        .then((value) {
-          if (value.docs.isNotEmpty) {
-            setState(() {
-              adminList = value.docs
-                  .where((doc) => doc['role'] == 'admin')
-                  .map((doc) => doc.data())
-                  .toList();
-            });
-          } else {
-            setState(() {
-              adminList = [];
-            });
-          }
-        });
+    for (var chat in chatRoomList) {
+      final userSnapshot =
+          await _firestore.collection('users').doc(chat.idUser).get();
+
+      final role = userSnapshot.data()?['role'] ?? 'unknown';
+      final userData = userSnapshot.data();
+      String name = 'Không rõ';
+
+      if (role == 'user') {
+        // Lấy name từ main_profile của user
+        final mainProfileSnapshot = await _firestore
+            .collection('users')
+            .doc(chat.idUser)
+            .collection('health_profiles')
+            .doc('main_profile')
+            .get();
+
+        name = mainProfileSnapshot.data()?['name'] ?? 'Không rõ';
+
+        tempUserRooms.add({'chat': chat, 'userData': userData, 'name': name});
+      } else if (role == 'doctor') {
+        // Lấy name từ document của doctor
+        name = userData?['name'] ?? 'Không rõ';
+        tempDoctorRooms.add({'chat': chat, 'userData': userData, 'name': name});
+      }
+    }
+
+    if (_isActive) {
+      setState(() {
+        userRooms = tempUserRooms;
+        doctorRooms = tempDoctorRooms;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const DoctorNavBar()),
-          (route) => false,
-        );
-        return true;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          foregroundColor: Colors.white,
-          toolbarHeight: 80,
-          title: Column(
-            children: [
-              const Text(
-                'Tin nhắn',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.9),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                height: 38,
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey.shade800.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(30),
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            foregroundColor: Colors.white,
+            title: const Text('Tin nhắn'),
+            centerTitle: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                child: TextFormField(
-                  controller: _searchController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.all(10),
-                    hintText: 'Tên bác sĩ, bệnh nhân...',
-                    hintStyle: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 15,
-                    ),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: Colors.white70,
-                      size: 23,
-                    ),
-                    border: InputBorder.none,
-                    suffixIconConstraints:
-                        const BoxConstraints(maxHeight: 30, maxWidth: 30),
-                    suffixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _searchText = '';
-                          _searchController.text = _searchText;
-                        });
-                      },
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        margin: const EdgeInsets.only(
-                          right: 10,
-                        ),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white70,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.clear,
-                            size: 15,
-                            color: Colors.blueGrey.shade700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _searchText = value;
-                      _searchController.text = _searchText;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
               ),
             ),
           ),
-        ),
-        body: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 15),
-                      decoration: BoxDecoration(
-                          border: Border(
-                        bottom: BorderSide(color: Colors.blueGrey.shade100),
-                      )),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  showDoctorMassage = false;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: !showDoctorMassage
-                                      ? Themes.gradientDeepClr
-                                      : Colors.white,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Bệnh nhân',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: !showDoctorMassage
-                                          ? Colors.white
-                                          : Colors.grey.shade600,
-                                      fontWeight: !showDoctorMassage
-                                          ? FontWeight.w500
-                                          : FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  showDoctorMassage = true;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: showDoctorMassage
-                                      ? Themes.gradientDeepClr
-                                      : Colors.white,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Bác sĩ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: showDoctorMassage
-                                          ? Colors.white
-                                          : Colors.grey.shade600,
-                                      fontWeight: showDoctorMassage
-                                          ? FontWeight.w500
-                                          : FontWeight.w400,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+          body: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : DefaultTabController(
+                  length: 2,
+                  child: Column(
+                    children: [
+                      const TabBar(
+                        tabs: [
+                          Tab(text: 'Bệnh nhân'),
+                          Tab(text: 'Bác sĩ'),
                         ],
                       ),
-                    ),
-
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    // Display list
-                    if (chatRoomList.isNotEmpty)
-                      if (showDoctorMassage)
-                        SingleChildScrollView(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: chatRoomList.length,
-                            itemBuilder: (context, index) {
-                              Chat chatRoom = chatRoomList[index];
-                              List<Chat> tempChatRoomList = chatRoomList;
-                              List<DoctorInfo> tempDoctorList = [];
-                              for (var element1 in doctorList) {
-                                if (tempChatRoomList.any((element2) =>
-                                    element2.idUser == element1.uid)) {
-                                  tempDoctorList.add(element1);
-                                }
-                              }
-
-                              DoctorInfo doctor;
-                              try {
-                                doctor = tempDoctorList.firstWhere(
-                                  (element) => element.uid == chatRoom.idUser,
-                                );
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 8),
-                                      onTap: () {
-                                        goToChatRoomDoctor(doctor);
-                                      },
-                                      leading: CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                          doctor.imageURL,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        'Bác sĩ ${doctor.name}',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          height: 1.5,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade400,
-                                      thickness: 0.5,
-                                      height: 20,
-                                    ),
-                                  ],
-                                );
-                              } catch (e) {}
-                              return null;
-
-                              // List<Map<String, dynamic>> tempUserProfileList = [];
-                              // if (_searchText == '') {
-                              //   tempUserProfileList = userProfiles;
-                              //   print(userProfiles.length + 100);
-                              // } else {
-                              //   String searchText =
-                              //       _searchText.trim().toLowerCase();
-                              //   tempUserProfileList = userProfiles
-                              //       .where((element) => element['name']
-                              //           .toLowerCase()
-                              //           .contains(searchText))
-                              //       .toList();
-                              // }
-
-                              // // Xử lý không tìm ra kết quả
-                              // if (tempUserProfileList.isEmpty && index == 0) {
-                              //   return SingleChildScrollView(
-                              //     child: Container(
-                              //       margin: const EdgeInsets.symmetric(
-                              //           horizontal: 20),
-                              //       height: 350,
-                              //       child: Column(
-                              //         mainAxisAlignment:
-                              //             MainAxisAlignment.spaceEvenly,
-                              //         children: [
-                              //           Image.asset(
-                              //             'assets/no_result_search_icon.png',
-                              //             width: 250,
-                              //             height: 250,
-                              //             fit: BoxFit.contain,
-                              //           ),
-                              //           const Text(
-                              //             'Không tìm thấy kết quả',
-                              //             style: TextStyle(
-                              //               fontWeight: FontWeight.bold,
-                              //               fontSize: 15,
-                              //             ),
-                              //           ),
-                              //           const SizedBox(
-                              //             height: 10,
-                              //           ),
-                              //           const Text(
-                              //             'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
-                              //             textAlign: TextAlign.center,
-                              //             style: TextStyle(
-                              //               fontSize: 14,
-                              //               color: Colors.grey,
-                              //               height: 1.5,
-                              //             ),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   );
-                              // }
-                              // //--------------------------------
-                            },
-                          ),
-                        )
-                      else
-                        SingleChildScrollView(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: 1,
-                            itemBuilder: (context, index) {
-                              print('====0000');
-                              print(index);
-                              print(chatRoomList.length);
-                              print(chatRoomList[index].idDoctor);
-                              print(chatRoomList[index].idUser);
-                              Chat chatRoom = chatRoomList[1];
-
-                              Map<String, dynamic> user;
-                              try {
-                                user = userProfiles.firstWhere(
-                                  (element) =>
-                                      element['uid'] == chatRoom.idUser,
-                                );
-
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 8),
-                                      onTap: () {
-                                        goToChatRoomUser(user['uid']);
-                                      },
-                                      leading: CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                          user['imageURL'],
-                                        ),
-                                      ),
-                                      title: Text(
-                                        'Bệnh nhân ${user['name']}',
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          height: 1.5,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    Divider(
-                                      color: Colors.grey.shade400,
-                                      thickness: 0.5,
-                                      height: 20,
-                                    ),
-                                  ],
-                                );
-                              } catch (e) {}
-                              return null;
-
-                              // List<Map<String, dynamic>> tempUserProfileList = [];
-                              // if (_searchText == '') {
-                              //   tempUserProfileList = userProfiles;
-                              //   print(userProfiles.length + 100);
-                              // } else {
-                              //   String searchText =
-                              //       _searchText.trim().toLowerCase();
-                              //   tempUserProfileList = userProfiles
-                              //       .where((element) => element['name']
-                              //           .toLowerCase()
-                              //           .contains(searchText))
-                              //       .toList();
-                              // }
-
-                              // // Xử lý không tìm ra kết quả
-                              // if (tempUserProfileList.isEmpty && index == 0) {
-                              //   return SingleChildScrollView(
-                              //     child: Container(
-                              //       margin: const EdgeInsets.symmetric(
-                              //           horizontal: 20),
-                              //       height: 350,
-                              //       child: Column(
-                              //         mainAxisAlignment:
-                              //             MainAxisAlignment.spaceEvenly,
-                              //         children: [
-                              //           Image.asset(
-                              //             'assets/no_result_search_icon.png',
-                              //             width: 250,
-                              //             height: 250,
-                              //             fit: BoxFit.contain,
-                              //           ),
-                              //           const Text(
-                              //             'Không tìm thấy kết quả',
-                              //             style: TextStyle(
-                              //               fontWeight: FontWeight.bold,
-                              //               fontSize: 15,
-                              //             ),
-                              //           ),
-                              //           const SizedBox(
-                              //             height: 10,
-                              //           ),
-                              //           const Text(
-                              //             'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
-                              //             textAlign: TextAlign.center,
-                              //             style: TextStyle(
-                              //               fontSize: 14,
-                              //               color: Colors.grey,
-                              //               height: 1.5,
-                              //             ),
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   );
-                              // }
-                              // //--------------------------------
-                            },
-                          ),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            buildChatList(userRooms, true),
+                            buildChatList(doctorRooms, false),
+                          ],
                         ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-      ),
+        ),
+        if (isGoToChatRoom)
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+      ],
     );
   }
 
-  void goToChatRoomUser(String id) async {
+  Widget buildChatList(List<Map<String, dynamic>> rooms, bool isUser) {
+    if (rooms.isEmpty) {
+      return const Center(child: Text('Không có phòng chat nào.'));
+    }
+
+    return ListView.builder(
+      itemCount: rooms.length,
+      itemBuilder: (context, index) {
+        final chatRoom = rooms[index]['chat'];
+        final userData = rooms[index]['userData'];
+        final name = rooms[index]['name'];
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ListTile(
+            leading: CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.grey[200],
+              backgroundImage:
+                  (userData?['imageURL'] != null && userData?['imageURL'] != '')
+                      ? NetworkImage(userData!['imageURL'])
+                      : null,
+              child:
+                  (userData?['imageURL'] == null || userData?['imageURL'] == '')
+                      ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                      : null,
+            ),
+            title: Text(
+              isUser ? 'Người dùng: $name' : 'Bác sĩ: $name',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            subtitle: Text(
+              'ID phòng: ${chatRoom.idDoc}',
+              style: const TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+            onTap: () {
+              if (_isActive) {
+                isUser
+                    ? goToChatRoomUser(chatRoom.idUser, userData)
+                    : goToChatRoomDoctor(chatRoom.idUser, userData);
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> goToChatRoomUser(
+      String id, Map<String, dynamic>? userData) async {
     try {
-      var querySnapshot = await FirebaseFirestore.instance
+      setState(() {
+        isGoToChatRoom = true;
+      });
+      final mainProfileSnapshot = await _firestore
+          .collection('users')
+          .doc(id)
+          .collection('health_profiles')
+          .doc('main_profile')
+          .get();
+
+      final name = mainProfileSnapshot.data()?['name'] ?? 'Không rõ';
+
+      final querySnapshot = await _firestore
           .collection('chatroom')
           .where('idProfile', isEqualTo: id)
           .where('idDoctor', isEqualTo: _auth.currentUser!.uid)
           .where('idUser', isEqualTo: id)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Tài liệu đã tồn tại, lấy ID của tài liệu đầu tiên
+      if (querySnapshot.docs.isNotEmpty && _isActive) {
         String chatRoomId = querySnapshot.docs[0].id;
 
+        if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ChatRoom(
               chatRoomId: chatRoomId,
-              userMap: userProfiles[0],
+              userMap: userData ?? {'name': name},
               isUser: true,
             ),
           ),
         );
       }
-
-      print('Chatroom created successfully');
     } catch (e) {
-      print('Error creating or accessing chatroom: $e');
+      print('Lỗi khi vào phòng chat: $e');
+    } finally {
+      if (_isActive) {
+        setState(() {
+          isGoToChatRoom = false;
+        });
+      }
     }
   }
 
-  void goToChatRoomDoctor(DoctorInfo doctor) async {
+  Future<void> goToChatRoomDoctor(
+      String id, Map<String, dynamic>? userData) async {
     try {
-      var querySnapshot = await FirebaseFirestore.instance
+      setState(() {
+        isGoToChatRoom = true;
+      });
+      final userSnapshot = await _firestore.collection('users').doc(id).get();
+      final name = userSnapshot.data()?['name'] ?? 'Không rõ';
+
+      final querySnapshot = await _firestore
           .collection('chatroom')
-          .where('idProfile', isEqualTo: doctor.uid)
+          .where('idProfile', isEqualTo: id)
           .where('idDoctor', isEqualTo: _auth.currentUser!.uid)
-          .where('idUser', isEqualTo: doctor.uid)
+          .where('idUser', isEqualTo: id)
           .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Tài liệu đã tồn tại, lấy ID của tài liệu đầu tiên
+      if (querySnapshot.docs.isNotEmpty && _isActive) {
         String chatRoomId = querySnapshot.docs[0].id;
 
+        if (!mounted) return;
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => ChatRoom(
               chatRoomId: chatRoomId,
-              userMap: doctor.toMap(),
+              userMap: userData ?? {'name': name},
               isUser: false,
             ),
           ),
         );
       }
-
-      print('Chatroom created successfully');
     } catch (e) {
-      print('Error creating or accessing chatroom: $e');
+      print('Lỗi khi vào phòng chat: $e');
+    } finally {
+      if (_isActive) {
+        setState(() {
+          isGoToChatRoom = false;
+        });
+      }
     }
   }
 }
