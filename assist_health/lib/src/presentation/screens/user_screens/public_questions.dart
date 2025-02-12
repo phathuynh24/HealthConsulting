@@ -38,6 +38,11 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   bool showUserQuestions = false;
   bool isSaving = false;
 
+  // Load more
+  int itemsPerPage = 10;
+  int currentPage = 1;
+  bool isLoadingMore = false;
+
   void toggleLikeStatus(Question question) {
     FirebaseFirestore.instance.collection('questions').doc(question.id).update({
       'isLiked': question.isLiked,
@@ -336,13 +341,11 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                       currentUserId = user?.uid ?? '';
 
                       for (var document in documents) {
-                        final data = document.data()
-                            as Map<String, dynamic>?; // Ép kiểu dữ liệu
+                        final data = document.data() as Map<String, dynamic>?;
 
                         if (data != null) {
                           Timestamp timestampDate = data['date'];
                           DateTime date = timestampDate.toDate();
-
                           final List<dynamic> categories = data['categories'];
 
                           final question = Question(
@@ -357,7 +360,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                             date: date,
                             imageUrls: data.containsKey('imageUrls')
                                 ? List<String>.from(data['imageUrls'])
-                                : [], // Kiểm tra tồn tại của trường imageUrls
+                                : [],
                           );
 
                           questions.add(question);
@@ -375,165 +378,206 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
                                       selectedFilterCategories
                                           .contains(category))))
                           .toList();
+
                       filteredQuestions
                           .sort((a, b) => b.date!.compareTo(a.date!));
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: filteredQuestions.length,
-                        itemBuilder: (context, index) {
-                          String formattedDate = DateFormat('dd/MM/yyyy')
-                              .format(filteredQuestions[index].date!);
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => QuestionDetailScreen(
-                                    question: filteredQuestions[index],
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ListTile(
-                                        leading: CircleAvatar(
-                                          child: Icon(
-                                            Icons.person,
-                                            size: 30,
-                                            color:
-                                                Colors.purple.withOpacity(0.5),
-                                          ),
-                                        ),
-                                        title: Text(
-                                          '${filteredQuestions[index].gender}, ${filteredQuestions[index].age} tuổi',
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          formattedDate,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
+
+                      // Load more
+                      final displayedQuestions = filteredQuestions
+                          .take(currentPage * itemsPerPage)
+                          .toList();
+
+                      return Column(
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: displayedQuestions.length,
+                            itemBuilder: (context, index) {
+                              String formattedDate = DateFormat('dd/MM/yyyy')
+                                  .format(displayedQuestions[index].date!);
+
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => QuestionDetailScreen(
+                                        question: displayedQuestions[index],
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 16, bottom: 8),
-                                      child: Row(
+                                  );
+                                },
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ListTile(
+                                            leading: CircleAvatar(
+                                              child: Icon(
+                                                Icons.person,
+                                                size: 30,
+                                                color: Colors.purple
+                                                    .withOpacity(0.5),
+                                              ),
+                                            ),
+                                            title: Text(
+                                              '${displayedQuestions[index].gender}, ${displayedQuestions[index].age} tuổi',
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            subtitle: Text(
+                                              formattedDate,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 16, bottom: 8),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                CupertinoIcons.chat_bubble_text,
+                                                color: Colors.blue,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              FutureBuilder<int>(
+                                                future: _countAnswers(
+                                                    displayedQuestions[index]
+                                                        .id),
+                                                builder: (BuildContext context,
+                                                    AsyncSnapshot<int>
+                                                        snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const Text('...');
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Lỗi: ${snapshot.error}');
+                                                  } else {
+                                                    return Text(snapshot.data
+                                                        .toString());
+                                                  }
+                                                },
+                                              ),
+                                              const SizedBox(width: 5),
+                                              _buildActionButton(
+                                                  displayedQuestions[index],
+                                                  index),
+                                              _buildUserActionButton(
+                                                  displayedQuestions[index]),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          const Icon(
-                                            CupertinoIcons.chat_bubble_text,
-                                            color: Colors.blue,
+                                          Text(
+                                            'Chủ đề: ${displayedQuestions[index].title}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              height: 1.5,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 2,
                                           ),
-                                          const SizedBox(width: 4),
-                                          FutureBuilder<int>(
-                                            future: _countAnswers(
-                                                filteredQuestions[index].id),
-                                            builder: (BuildContext context,
-                                                AsyncSnapshot<int> snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return const Text('...');
-                                              } else if (snapshot.hasError) {
-                                                return Text(
-                                                    'Lỗi: ${snapshot.error}');
-                                              } else {
-                                                return Text(
-                                                    snapshot.data.toString());
-                                              }
-                                            },
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Nội dung câu hỏi: ${displayedQuestions[index].content}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              height: 1.5,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            maxLines: 3,
                                           ),
-                                          const SizedBox(width: 5),
-                                          _buildActionButton(
-                                              filteredQuestions[index], index),
-                                          _buildUserActionButton(
-                                              filteredQuestions[index]),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              children: displayedQuestions[
+                                                      index]
+                                                  .categories
+                                                  .map((category) => Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(right: 8),
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Themes
+                                                                .gradientLightClr,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                          ),
+                                                          child: Text(
+                                                            category,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                        ),
+                                                      ))
+                                                  .toList(),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
                                         ],
                                       ),
                                     ),
+                                    const Divider(),
                                   ],
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Chủ đề: ${filteredQuestions[index].title}',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          height: 1.5,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 2,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Nội dung câu hỏi: ${filteredQuestions[index].content}',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          height: 1.5,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        maxLines: 3,
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: filteredQuestions[index]
-                                              .categories
-                                              .map((category) => Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 8),
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8),
-                                                      decoration: BoxDecoration(
-                                                        color: Themes
-                                                            .gradientLightClr,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(5),
-                                                      ),
-                                                      child: Text(
-                                                        category,
-                                                        style: const TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                    ],
+                              );
+                            },
+                          ),
+                          if (displayedQuestions.length <
+                              filteredQuestions.length)
+                            isLoadingMore
+                                ? const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () async {
+                                      setState(() => isLoadingMore = true);
+                                      await Future.delayed(
+                                          const Duration(seconds: 1));
+                                      setState(() {
+                                        currentPage++;
+                                        isLoadingMore = false;
+                                      });
+                                    },
+                                    child: const Text('Tải thêm'),
                                   ),
-                                ),
-                                const Divider(),
-                              ],
-                            ),
-                          );
-                        },
+                        ],
                       );
                     },
                   ),

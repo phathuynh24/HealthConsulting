@@ -71,6 +71,68 @@ class ScheduleCard extends StatelessWidget {
                             color: Themes.gradientDeepClr,
                           ),
                         ),
+                        if (appointmentSchedule.status == 'Đã khám')
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 2, right: 8, top: 4, bottom: 4),
+                            decoration: BoxDecoration(
+                                color:
+                                    getStatusColor(appointmentSchedule.status!)
+                                        .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Row(
+                              children: [
+                                DotsIndicator(
+                                  dotsCount: 1,
+                                  decorator: DotsDecorator(
+                                    activeColor: getStatusColor(
+                                        appointmentSchedule.status!),
+                                    activeSize: const Size(10, 10),
+                                  ),
+                                ),
+                                Text(
+                                  appointmentSchedule.status!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: getStatusColor(
+                                        appointmentSchedule.status!),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (appointmentSchedule.status == 'Đã khám')
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 2, right: 8, top: 4, bottom: 4),
+                            decoration: BoxDecoration(
+                                color:
+                                    getStatusColor(appointmentSchedule.status!)
+                                        .withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Row(
+                              children: [
+                                DotsIndicator(
+                                  dotsCount: 1,
+                                  decorator: DotsDecorator(
+                                    activeColor: getStatusColor(
+                                        appointmentSchedule.status!),
+                                    activeSize: const Size(10, 10),
+                                  ),
+                                ),
+                                Text(
+                                  appointmentSchedule.status!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: getStatusColor(
+                                        appointmentSchedule.status!),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         Container(
                           padding: const EdgeInsets.only(
                               left: 2, right: 8, top: 4, bottom: 4),

@@ -431,7 +431,12 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                                 const SizedBox(
                                   width: 6,
                                 ),
-                                MySeparator(color: Colors.grey.shade400),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child:
+                                      MySeparator(color: Colors.grey.shade400),
+                                ),
                                 const SizedBox(
                                   width: 6,
                                 ),
@@ -928,7 +933,12 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                                   const SizedBox(
                                     width: 6,
                                   ),
-                                  MySeparator(color: Colors.grey.shade400),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: MySeparator(
+                                        color: Colors.grey.shade400),
+                                  ),
                                   const SizedBox(
                                     width: 6,
                                   ),

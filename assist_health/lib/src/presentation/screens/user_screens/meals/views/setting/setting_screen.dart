@@ -467,34 +467,6 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             ],
           ),
-        //   const SizedBox(height: 10),
-        //   _buildFeatureSection(
-        //     items: [
-        //       _buildFeatureItem(
-        //         icon: Icons.info_outline,
-        //         color: Colors.grey,
-        //         title: "Phiên bản",
-        //         subtitle: appVersion.isNotEmpty ? appVersion : "Đang tải...",
-        //         onTap: () {},
-        //       ),
-        //       _buildFeatureItem(
-        //         icon: Icons.logout,
-        //         color: Colors.redAccent,
-        //         title: "Đăng xuất",
-        //         onTap: () async {
-        //           await FirebaseAuth.instance.signOut();
-        //           if (!mounted) return;
-        //           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        //             MaterialPageRoute(
-        //                 builder: (context) => const LoginScreen()),
-        //             (route) => false,
-        //           );
-        //         },
-        //         showDivider: false,
-        //       ),
-        //     ],
-        //   ),
-        //   const SizedBox(height: 90),
         ],
       ),
     );

@@ -777,42 +777,42 @@ class _RegisterCallStep1 extends State<RegisterCallStep1> {
                         const SizedBox(
                           height: 3,
                         ),
-                        Container(
-                          width: 130,
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Themes.gradientDeepClr,
-                                Themes.gradientLightClr
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                CupertinoIcons.person_3_fill,
-                                size: 20,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'Còn $countSlot lượt',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        // Container(
+                        //   width: 130,
+                        //   padding: const EdgeInsets.all(6),
+                        //   decoration: BoxDecoration(
+                        //     gradient: const LinearGradient(
+                        //       colors: [
+                        //         Themes.gradientDeepClr,
+                        //         Themes.gradientLightClr
+                        //       ],
+                        //       begin: Alignment.centerLeft,
+                        //       end: Alignment.centerRight,
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(20),
+                        //   ),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       const Icon(
+                        //         CupertinoIcons.person_3_fill,
+                        //         size: 20,
+                        //         color: Colors.white,
+                        //       ),
+                        //       const SizedBox(
+                        //         width: 8,
+                        //       ),
+                        //       Text(
+                        //         'Còn $countSlot lượt',
+                        //         style: const TextStyle(
+                        //           fontSize: 13,
+                        //           fontWeight: FontWeight.w500,
+                        //           color: Colors.white,
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   ],

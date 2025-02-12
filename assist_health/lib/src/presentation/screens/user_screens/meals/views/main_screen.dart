@@ -1,8 +1,8 @@
 import "package:assist_health/src/presentation/screens/user_screens/meals/core/theme/app_colors.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/views/food_recognition/food_scan_screen.dart";
-import "package:assist_health/src/presentation/screens/user_screens/meals/views/food_suggestions/food_suggest_screen.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/views/home/home_screen.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/views/setting/setting_screen.dart";
+import "package:assist_health/src/widgets/user_navbar.dart";
 import "package:flutter/material.dart";
 import "package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart";
 
@@ -29,16 +29,6 @@ class MainScreen extends StatelessWidget {
             inactiveForegroundColor: Colors.grey,
           ),
         ),
-        // Food Suggest Screen
-        // PersistentTabConfig(
-        //   screen: const FoodSuggestScreen(),
-        //   item: ItemConfig(
-        //     icon: const Icon(Icons.restaurant_menu),
-        //     title: "Món ăn",
-        //     activeForegroundColor: AppColors.activeColor,
-        //     inactiveForegroundColor: Colors.grey,
-        //   ),
-        // ),
         // Scan Screen
         PersistentTabConfig(
           screen: const SizedBox(),
@@ -58,16 +48,6 @@ class MainScreen extends StatelessWidget {
             inactiveForegroundColor: Colors.transparent,
           ),
         ),
-        // Excercise Screen
-        // PersistentTabConfig(
-        //   screen: DailyWorkoutScreen(),
-        //   item: ItemConfig(
-        //     icon: const Icon(Icons.fitness_center),
-        //     title: "Thể dục",
-        //     activeForegroundColor: AppColors.activeColor,
-        //     inactiveForegroundColor: Colors.grey,
-        //   ),
-        // ),
         // Setting Screen
         PersistentTabConfig(
           screen: const SettingScreen(),
@@ -102,19 +82,30 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView(
-      backgroundColor: Colors.white,
-      tabs: _tabs(),
-      navBarBuilder: (navBarConfig) => Style13BottomNavBar(
-        navBarConfig: navBarConfig,
-        navBarDecoration: const NavBarDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-        ),
-      ),
-      navBarOverlap: const NavBarOverlap.full(),
-      onTabChanged: (index) {
+    return PopScope(
+      canPop: false, // Disable back button
+      onPopInvoked: (didPop) {
+        if (!didPop) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const UserNavBar()),
+            (route) => false,
+          );
+        }
       },
+      child: PersistentTabView(
+        backgroundColor: Colors.white,
+        tabs: _tabs(),
+        navBarBuilder: (navBarConfig) => Style13BottomNavBar(
+          navBarConfig: navBarConfig,
+          navBarDecoration: const NavBarDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+          ),
+        ),
+        navBarOverlap: const NavBarOverlap.full(),
+        onTabChanged: (index) {},
+      ),
     );
   }
 }

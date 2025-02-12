@@ -4,6 +4,7 @@ import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/others/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AdminPaymentManagementScreen extends StatefulWidget {
   const AdminPaymentManagementScreen({super.key});
@@ -24,11 +25,12 @@ class _AdminPaymentManagementScreenState
   String _status = 'Chờ duyệt';
   String _searchText = '';
 
+  final Map<String, String> _cachedUserNames = {};
+
   final List<String> _statusList = [
     'Chờ duyệt',
     'Đã duyệt',
     'Đã hủy',
-    'Thanh toán thất bại',
     'Đã hoàn tiền'
   ];
 
@@ -45,12 +47,26 @@ class _AdminPaymentManagementScreenState
   }
 
   Future<String> getUserName(String uid) async {
+    if (_cachedUserNames.containsKey(uid)) {
+      return _cachedUserNames[uid]!;
+    }
     DocumentSnapshot userDoc =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     if (userDoc.exists) {
-      return userDoc['name'] ?? 'Không rõ';
+      String name = userDoc['name'] ?? 'Không rõ';
+      _cachedUserNames[uid] = name;
+      return name;
     }
     return 'Không rõ';
+  }
+
+  String formatCurrency(int amount) {
+    final formatter = NumberFormat('#,###', 'vi_VN');
+    return formatter.format(amount);
+  }
+
+  String formatDate(DateTime date) {
+    return DateFormat('HH:mm:ss dd/MM/yyyy').format(date);
   }
 
   void showConfirmationDialog(AppointmentSchedule appointment) {
@@ -95,6 +111,7 @@ class _AdminPaymentManagementScreenState
               setState(() {
                 appointment.status = 'Đã hoàn tiền';
                 appointment.updateAppointmentStatus(appointment.status!);
+                appointment.updatePaymentStatus('Đã hoàn tiền');
               });
               Navigator.pop(context);
             },
@@ -118,8 +135,10 @@ class _AdminPaymentManagementScreenState
             Text('Người khám: ${appointment.userProfile!.name}'),
             Text('Mã phiếu: ${appointment.appointmentCode}'),
             Text('Số tiền: ${appointment.doctorInfo!.serviceFee} VNĐ'),
-            Text('Ngày tạo: ${appointment.paymentStartTime?.toString() ?? "-"}'),
-            Text('Nội dung chuyển khoản: ${appointment.transferContent ?? "Không có"}'),
+            Text(
+                'Ngày tạo: ${appointment.paymentStartTime?.toString() ?? "-"}'),
+            Text(
+                'Nội dung chuyển khoản: ${appointment.transferContent ?? "Không có"}'),
           ],
         ),
         actions: [
@@ -135,82 +154,164 @@ class _AdminPaymentManagementScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueAccent.withOpacity(0.1),
       appBar: AppBar(
-        title: const Text('Quản lý thanh toán'),
-        backgroundColor: Themes.gradientDeepClr,
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Tìm kiếm theo tên, mã phiếu...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _searchText = '';
-                      _searchController.clear();
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _searchText = value;
-                });
-              },
+        foregroundColor: Colors.white,
+        toolbarHeight: 80,
+        title: Column(
+          children: [
+            const Text(
+              'Quản lý thanh toán',
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.9),
             ),
-          ),
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _statusList.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      _buttonIndex = index;
-                      _status = _statusList[index];
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _buttonIndex == index
-                          ? Themes.gradientDeepClr
-                          : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _statusList[index],
-                        style: TextStyle(
-                          color: _buttonIndex == index
-                              ? Colors.white
-                              : Colors.black,
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: 38,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey.shade800.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: TextFormField(
+                controller: _searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(10),
+                  hintText: 'Tên BS, người khám, mã phiếu, NDCK...',
+                  hintStyle: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 15,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Colors.white70,
+                    size: 23,
+                  ),
+                  border: InputBorder.none,
+                  suffixIconConstraints:
+                      const BoxConstraints(maxHeight: 30, maxWidth: 30),
+                  suffixIcon: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _searchText = '';
+                        _searchController.text = _searchText;
+                      });
+                    },
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      margin: const EdgeInsets.only(
+                        right: 10,
+                      ),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white70,
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.clear,
+                          size: 15,
+                          color: Colors.blueGrey.shade700,
                         ),
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchText = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Themes.gradientDeepClr, Themes.gradientLightClr],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
           ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(45),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.blueGrey.withOpacity(0.8),
+                  width: 0.3,
+                ),
+              ),
+            ),
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _statusList.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            _buttonIndex = index;
+                            _status = _statusList[index];
+                          });
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(
+                              left: (index == 0) ? 10 : 0,
+                              right: (index == _statusList.length - 1) ? 10 : 0,
+                              top: 5),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: _buttonIndex == index
+                                ? Themes.gradientDeepClr
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _statusList[index],
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: _buttonIndex == index
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
           Expanded(
             child: StreamBuilder<List<AppointmentSchedule>>(
               stream: _appointmentScheduleController.stream,
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 if (snapshot.hasError) {
                   return Center(child: Text('Lỗi: ${snapshot.error}'));
                 }
@@ -229,64 +330,145 @@ class _AdminPaymentManagementScreenState
                             .contains(_searchText.toLowerCase()) ||
                         appointment.appointmentCode!
                             .toLowerCase()
+                            .contains(_searchText.toLowerCase()) ||
+                        (appointment.transferContent ?? '')
+                            .toLowerCase()
                             .contains(_searchText.toLowerCase()))
                     .toList();
+
+                filteredAppointments.sort((a, b) {
+                  if (a.status == 'Đã hủy' &&
+                      a.paymentStatus == 'Thanh toán thành công') {
+                    return -1;
+                  } else if (b.status == 'Đã hủy' &&
+                      b.paymentStatus == 'Thanh toán thành công') {
+                    return 1;
+                  }
+                  return b.paymentStartTime!.compareTo(a.paymentStartTime!);
+                });
 
                 return ListView.builder(
                   itemCount: filteredAppointments.length,
                   itemBuilder: (context, index) {
                     final appointment = filteredAppointments[index];
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        onTap: () => showAppointmentDetails(appointment),
-                        title: Text('Bác sĩ: ${appointment.doctorInfo!.name}'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            FutureBuilder<String>(
-                              future: getUserName(appointment.idDocUser!),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Text(
-                                      'Đang tải tên người dùng...');
-                                }
-                                if (snapshot.hasError) {
-                                  return const Text(
-                                      'Không lấy được tên người dùng');
-                                }
-                                return Text('Tài khoản user: ${snapshot.data}');
-                              },
-                            ),
-                            Text(
-                                'Người khám: ${appointment.userProfile!.name}'),
-                            Text('Mã phiếu: ${appointment.appointmentCode}'),
-                            Text(
-                                'Số tiền: ${appointment.doctorInfo!.serviceFee} VNĐ'),
-                            Text(
-                                'Ngày tạo: ${appointment.paymentStartTime?.toString() ?? "-"}'),
-                            Text(
-                                'Nội dung chuyển khoản: ${appointment.transferContent ?? "Không có"}'),
-                          ],
-                        ),
-                        trailing: appointment.status == 'Chờ duyệt'
-                            ? Column(
-                                children: [
-                                  ElevatedButton(
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 8.0),
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Bác sĩ: ${appointment.doctorInfo!.name}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Icon(
+                                appointment.status == 'Chờ duyệt'
+                                    ? Icons.hourglass_top
+                                    : appointment.status == 'Đã hủy'
+                                        ? Icons.cancel
+                                        : Icons.check_circle,
+                                color: appointment.status == 'Chờ duyệt'
+                                    ? Colors.orange
+                                    : appointment.status == 'Đã hủy'
+                                        ? Colors.red
+                                        : Colors.green,
+                                size: 28,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tài khoản user: ${_cachedUserNames[appointment.idDocUser!] ?? "Đang tải..."}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'Người khám: ${appointment.userProfile!.name}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'Mã phiếu: ${appointment.appointmentCode}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'Số tiền: ${formatCurrency(appointment.doctorInfo!.serviceFee)} VNĐ',
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.blue),
+                          ),
+                          Text(
+                            'Ngày tạo: ${appointment.paymentStartTime != null ? formatDate(appointment.paymentStartTime!) : "-"}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          Text(
+                            'Nội dung chuyển khoản: ${appointment.transferContent ?? "Không có"}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const Divider(height: 20, thickness: 1),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: appointment.status == 'Chờ duyệt'
+                                ? ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                    ),
                                     onPressed: () =>
                                         showConfirmationDialog(appointment),
-                                    child: const Text('Duyệt'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () =>
-                                        showRefundDialog(appointment),
-                                    child: const Text('Hoàn tiền'),
-                                  ),
-                                ],
-                              )
-                            : const Icon(Icons.check_circle,
-                                color: Colors.green),
+                                    child: const Text('Duyệt',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white)),
+                                  )
+                                : appointment.status == 'Đã hủy' &&
+                                        appointment.paymentStatus ==
+                                            'Thanh toán thành công'
+                                    ? ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                        ),
+                                        onPressed: () =>
+                                            showRefundDialog(appointment),
+                                        child: const Text('Hoàn tiền',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white)),
+                                      )
+                                    : const Text(
+                                        'Đã xử lý',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -303,8 +485,19 @@ class _AdminPaymentManagementScreenState
     return FirebaseFirestore.instance
         .collection('appointment_schedule')
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => AppointmentSchedule.fromJson(doc.data()))
-            .toList());
+        .asyncMap((snapshot) async {
+      List<AppointmentSchedule> appointments = snapshot.docs
+          .map((doc) => AppointmentSchedule.fromJson(doc.data()))
+          .toList();
+
+      for (var appointment in appointments) {
+        if (!_cachedUserNames.containsKey(appointment.idDocUser!)) {
+          _cachedUserNames[appointment.idDocUser!] =
+              await getUserName(appointment.idDocUser!);
+        }
+      }
+
+      return appointments;
+    });
   }
 }

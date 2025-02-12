@@ -316,7 +316,49 @@ class _ExaminationResultsScreenState extends State<ExaminationResultsScreen> {
                 width: 0.3,
               ))),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Nút gửi kết quả sau
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (widget.isFromCall) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DoctorNavBar()),
+                            (route) => false,
+                          );
+                        } else {
+                          Navigator.of(context).pop(true);
+                        }
+                      },
+                      child: Container(
+                        height: 50,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 15),
+                        margin: const EdgeInsets.only(left: 10, right: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: Colors.blue), // Thêm viền để khác biệt
+                          color: Colors.white, // Nền trắng để nhẹ nhàng hơn
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'Gửi sau',
+                            style: TextStyle(
+                              color: Colors
+                                  .blue, // Chữ màu xanh để đồng bộ với viền
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Nút gửi kết quả ngay
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
@@ -370,7 +412,7 @@ class _ExaminationResultsScreenState extends State<ExaminationResultsScreen> {
                         height: 50,
                         margin: const EdgeInsets.only(
                           left: 5,
-                          right: 5,
+                          right: 10,
                         ),
                         decoration: BoxDecoration(
                           color: Themes.gradientDeepClr,

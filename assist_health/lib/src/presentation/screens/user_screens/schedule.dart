@@ -365,9 +365,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         );
                       }
                       //--------------------------------
-                      if (appointmentSchedulesStatus[0].status == 'Chờ duyệt') {
-                        // startTimersForPending(appointmentSchedulesStatus);
-                      }
+                      // if (appointmentSchedulesStatus[0].status == 'Chờ duyệt') {
+                      // startTimersForPending(appointmentSchedulesStatus);
+                      // }
 
                       if (appointmentSchedulesStatus[0].status == 'Đã duyệt') {
                         checkOutOfDateApproved(appointmentSchedulesStatus);

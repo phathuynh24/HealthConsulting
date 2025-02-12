@@ -64,7 +64,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
           },
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_outlined),
+              icon: Icon(Icons.payment_rounded),
               label: "Thanh toán",
             ),
             BottomNavigationBarItem(

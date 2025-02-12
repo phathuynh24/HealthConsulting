@@ -1110,11 +1110,16 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                                     // Thực hiện hành động khi xác nhận
                                     setState(() {
                                       _appointmentSchedule!.status = 'Đã hủy';
-                                      _appointmentSchedule!.statusReasonCanceled =
+                                      _appointmentSchedule!
+                                              .statusReasonCanceled =
                                           'Khách hàng hủy';
                                       _appointmentSchedule!
                                           .updateAppointmentStatus(
                                               _appointmentSchedule!.status!);
+                                      _appointmentSchedule!
+                                          .updateAppointmentStatusReasonCanceled(
+                                              _appointmentSchedule!
+                                                  .statusReasonCanceled!);
                                       _buttonContext = 'Đặt khám lại';
                                     });
 
@@ -1168,51 +1173,62 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
                     child: GestureDetector(
                       onTap: () {
                         if (_buttonContext == 'Đặt khám lại') {
-  bool skipPayment = false;
-  AppointmentSchedule newAppointmentSchedule;
+                          bool skipPayment = false;
+                          AppointmentSchedule newAppointmentSchedule;
 
-  if (_appointmentSchedule!.status == 'Đã hủy') {
-    // Nếu phiếu đã hủy và chưa thanh toán hoặc thanh toán thất bại → Tạo phiếu mới
-    if (_appointmentSchedule!.paymentStatus == 'Chờ xác nhận' ||
-        _appointmentSchedule!.paymentStatus == 'Thanh toán thất bại') {
-      newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
-    } else {
-      // Nếu đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
-      skipPayment = true;
-      newAppointmentSchedule = _appointmentSchedule!;
-    }
-  } else if (_appointmentSchedule!.status == 'Quá hẹn') {
-    // Nếu quá hẹn và đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
-    if (_appointmentSchedule!.paymentStatus == 'Thanh toán thành công') {
-      skipPayment = true;
-      newAppointmentSchedule = _appointmentSchedule!;
-    } else {
-      // Chưa thanh toán → Tạo phiếu mới
-      newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
-    }
-  } else if (_appointmentSchedule!.status == 'Đã khám') {
-    // Đã khám → Luôn bỏ qua thanh toán, dùng phiếu cũ
-    skipPayment = true;
-    newAppointmentSchedule = _appointmentSchedule!;
-  } else {
-    // Trường hợp khác → Mặc định tạo phiếu mới
-    newAppointmentSchedule = AppointmentSchedule.createNewFromOld(_appointmentSchedule!);
-  }
+                          if (_appointmentSchedule!.status == 'Đã hủy') {
+                            // Nếu phiếu đã hủy và chưa thanh toán hoặc thanh toán thất bại → Tạo phiếu mới
+                            if (_appointmentSchedule!.paymentStatus ==
+                                    'Chờ xác nhận' ||
+                                _appointmentSchedule!.paymentStatus ==
+                                    'Thanh toán thất bại') {
+                              newAppointmentSchedule =
+                                  AppointmentSchedule.createNewFromOld(
+                                      _appointmentSchedule!);
+                            } else {
+                              // Nếu đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
+                              skipPayment = true;
+                              newAppointmentSchedule = _appointmentSchedule!;
+                            }
+                          } else if (_appointmentSchedule!.status ==
+                              'Quá hẹn') {
+                            // Nếu quá hẹn và đã thanh toán → Sử dụng phiếu cũ, bỏ qua thanh toán
+                            if (_appointmentSchedule!.paymentStatus ==
+                                'Thanh toán thành công') {
+                              skipPayment = true;
+                              newAppointmentSchedule = _appointmentSchedule!;
+                            } else {
+                              // Chưa thanh toán → Tạo phiếu mới
+                              newAppointmentSchedule =
+                                  AppointmentSchedule.createNewFromOld(
+                                      _appointmentSchedule!);
+                            }
+                          } else if (_appointmentSchedule!.status ==
+                              'Đã khám') {
+                            // Đã khám → Luôn tạo phiếu mới, bỏ qua phiếu cũ
+                            newAppointmentSchedule =
+                                AppointmentSchedule.createNewFromOld(
+                                    _appointmentSchedule!);
+                            skipPayment = false;
+                          } else {
+                            // Trường hợp khác → Mặc định tạo phiếu mới
+                            newAppointmentSchedule =
+                                AppointmentSchedule.createNewFromOld(
+                                    _appointmentSchedule!);
+                          }
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => RegisterCallStep1(
-        isEdit: true,
-        appointmentSchedule: newAppointmentSchedule,
-        doctorInfo: newAppointmentSchedule.doctorInfo!,
-        skipPayment: skipPayment,
-      ),
-    ),
-  );
-}
-
-
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterCallStep1(
+                                isEdit: true,
+                                appointmentSchedule: newAppointmentSchedule,
+                                doctorInfo: newAppointmentSchedule.doctorInfo!,
+                                skipPayment: skipPayment,
+                              ),
+                            ),
+                          );
+                        }
                         if (_buttonContext == 'Vào cuộc gọi') {
                           onJoin();
                         }

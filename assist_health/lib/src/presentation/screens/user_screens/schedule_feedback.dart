@@ -4,6 +4,7 @@ import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/models/other/feedback_doctor.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/widgets/custom_snackbar.dart';
 import 'package:assist_health/src/widgets/my_separator.dart';
 import 'package:assist_health/src/widgets/user_navbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -321,52 +322,103 @@ class _ScheduleFeedbackScreenState extends State<ScheduleFeedbackScreen> {
                 ],
               ),
             ),
-            bottomNavigationBar: GestureDetector(
-              onTap: () async {
-                setState(() {
-                  _isSaving = true;
-                });
-                await saveFeedback();
-                setState(() {
-                  _isSaving = false;
-                });
-                if (widget.isFromCall) {
-                  _appointmentSchedule!.idFeedback =
-                      _feedback!.idDoc.toString();
-                  _appointmentSchedule!.updateAppointmentFeedback(
-                      _appointmentSchedule!.idFeedback!);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UserNavBar()));
-                } else {
-                  Navigator.of(context).pop(_feedback!.idDoc);
-                }
-              },
-              child: Container(
-                height: 50,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 15,
-                ),
-                margin: const EdgeInsets.symmetric(
-                  vertical: 20,
-                  horizontal: 40,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Themes.gradientDeepClr,
-                ),
-                child: const Center(
-                  child: Text(
-                    'Gửi đánh giá',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+            bottomNavigationBar: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Nút "Lưu để đánh giá sau"
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (widget.isFromCall) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserNavBar()),
+                          (route) => false,
+                        );
+                      } else {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 15),
+                      margin: const EdgeInsets.only(
+                          bottom: 20, left: 20, right: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: Colors.blue), // Thêm viền để khác biệt
+                        color: Colors.white, // Nền trắng để nhẹ nhàng hơn
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Đánh giá sau',
+                          style: TextStyle(
+                            color:
+                                Colors.blue, // Chữ màu xanh để đồng bộ với viền
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+
+                // Nút "Xác nhận & Gửi đánh giá"
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        _isSaving = true;
+                      });
+                      await saveFeedback();
+                      setState(() {
+                        _isSaving = false;
+                      });
+                      if (widget.isFromCall) {
+                        _appointmentSchedule!.idFeedback =
+                            _feedback!.idDoc.toString();
+                        _appointmentSchedule!.updateAppointmentFeedback(
+                            _appointmentSchedule!.idFeedback!);
+                        CustomSnackbar.show(context, 'Đánh giá đã được gửi',
+                            isSuccess: true);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const UserNavBar()),
+                        );
+                      } else {
+                        Navigator.of(context).pop(_feedback!.idDoc);
+                      }
+                    },
+                    child: Container(
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 15),
+                      margin: const EdgeInsets.only(
+                          bottom: 20, left: 10, right: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Themes
+                            .gradientDeepClr, // Màu nổi bật để thu hút sự chú ý
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Gửi đánh giá',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           if (_isSaving)

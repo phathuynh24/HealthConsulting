@@ -702,7 +702,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       if (!isFavorite) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (route) => false, // Xóa toàn bộ lịch sử điều hướng
         );
       }
