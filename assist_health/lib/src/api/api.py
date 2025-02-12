@@ -8,10 +8,7 @@ app = Flask(__name__)
 
 # Constants
 # Window ACER NITRO 5
-# path = "D:/Nam_3/HK2/AI/NLP"
-
-# Macbook
-path = "/Users/phathuynhtien/Downloads/UIT/Model-Recommendation"
+path = "D:/Nam_3/HK2/AI/NLP"
 MODEL_1_PATH = f"{path}/Disease Diagnosis Model/Model_1/Model/"
 MODEL_2_PATH = f"{path}/Disease Diagnosis Model/Model_2/Model/model.pkl"
 SYMPTOM_CSV_FILE_PATH = f"{path}/Disease Diagnosis Model/Model_2/Dataset/Symptom-severity.csv"

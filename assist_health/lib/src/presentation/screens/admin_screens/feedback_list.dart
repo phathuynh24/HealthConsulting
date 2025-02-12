@@ -38,6 +38,65 @@ class _FeedbackListState extends State<FeedbackList> {
     return doctorName;
   }
 
+  void _deleteFeedback(BuildContext context, String feedbackId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Xác nhận xóa'),
+          content: const Text('Bạn có chắc chắn muốn xóa phản hồi này không?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext)
+                    .pop(); // Đóng hộp thoại mà không xóa
+              },
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, // Nút xóa màu đỏ
+              ),
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance
+                      .collection('feedback')
+                      .doc(feedbackId)
+                      .delete();
+
+                  // Kiểm tra widget còn mounted trước khi thao tác với context
+                  if (context.mounted) {
+                    Navigator.of(dialogContext)
+                        .pop(); // Đóng hộp thoại sau khi xóa
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Đã xóa phản hồi thành công.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } catch (error) {
+                  if (context.mounted) {
+                    Navigator.of(dialogContext)
+                        .pop(); // Đóng hộp thoại nếu có lỗi
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Xóa thất bại: $error'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text('Xóa'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,12 +222,24 @@ class _FeedbackListState extends State<FeedbackList> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Bác sĩ: ${doctorNames[feedbackDoctor.idDoctor] ?? "Không rõ"}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Bác sĩ: ${doctorNames[feedbackDoctor.idDoctor] ?? "Không rõ"}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () => _deleteFeedback(
+                                          context, feedbackDoctor.idDoc!),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(height: 5),
                                 Text(

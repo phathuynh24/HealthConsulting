@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:assist_health/src/presentation/screens/user_screens/meals/core/network/api_constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:translator/translator.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +18,7 @@ class EnterSymptomsBloc extends Bloc<EnterSymptomsEvent, EnterSymptomsState> {
 
         // Gửi yêu cầu HTTP đến API Flask để dự đoán
         final response = await http.post(
-          Uri.parse(Config.baseUrl + '/predict_1'),
+          Uri.parse('${ApiConstants.baseUrl}/predict_1'),
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
           },

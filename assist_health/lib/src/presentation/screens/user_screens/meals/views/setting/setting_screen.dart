@@ -103,8 +103,9 @@ class _SettingScreenState extends State<SettingScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        final docRef =
-            FirebaseFirestore.instance.collection(FirebaseConstants.usersCollection).doc(user.uid);
+        final docRef = FirebaseFirestore.instance
+            .collection(FirebaseConstants.usersCollection)
+            .doc(user.uid);
 
         // 🔄 Cập nhật dữ liệu mới vào Firestore
         await docRef.update({key: value});
@@ -152,7 +153,7 @@ class _SettingScreenState extends State<SettingScreen> {
         userData?['calories'] = newCalories.round();
       });
 
-      eventBus.fire(CaloUpdateEvent(newCalories.round()));
+      // eventBus.fire(CaloUpdateEvent(newCalories.round()));
 
       debugPrint('Đã tính lại calo: $newCalories');
     } catch (e) {
@@ -165,7 +166,9 @@ class _SettingScreenState extends State<SettingScreen> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final uid = user.uid;
-        final docRef = FirebaseFirestore.instance.collection(FirebaseConstants.usersCollection).doc(uid);
+        final docRef = FirebaseFirestore.instance
+            .collection(FirebaseConstants.usersCollection)
+            .doc(uid);
         final currentTimestamp = Timestamp.now();
         final todayDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
@@ -287,8 +290,10 @@ class _SettingScreenState extends State<SettingScreen> {
       if (user != null) {
         final uid = user.uid;
 
-        final docSnapshot =
-            await FirebaseFirestore.instance.collection(FirebaseConstants.usersCollection).doc(uid).get();
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection(FirebaseConstants.usersCollection)
+            .doc(uid)
+            .get();
 
         if (docSnapshot.exists) {
           final data = docSnapshot.data();

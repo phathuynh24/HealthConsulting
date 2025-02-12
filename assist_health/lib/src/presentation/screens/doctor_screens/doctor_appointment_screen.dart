@@ -12,12 +12,14 @@ class DoctorAppointmentScreen extends StatefulWidget {
   const DoctorAppointmentScreen({super.key});
 
   @override
-  State<DoctorAppointmentScreen> createState() => _DoctorAppointmentScreenState();
+  State<DoctorAppointmentScreen> createState() =>
+      _DoctorAppointmentScreenState();
 }
 
 class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final StreamController<List<AppointmentSchedule>> _appointmentController = StreamController<List<AppointmentSchedule>>.broadcast();
+  final StreamController<List<AppointmentSchedule>> _appointmentController =
+      StreamController<List<AppointmentSchedule>>.broadcast();
 
   int _selectedIndex = 0;
   String _status = 'Đã duyệt';
@@ -91,9 +93,12 @@ class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
                     },
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
                       decoration: BoxDecoration(
-                        color: _selectedIndex == index ? Themes.gradientDeepClr : Colors.white,
+                        color: _selectedIndex == index
+                            ? Themes.gradientDeepClr
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Colors.blueGrey),
                       ),
@@ -101,7 +106,9 @@ class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
                         child: Text(
                           _statusList[index],
                           style: TextStyle(
-                            color: _selectedIndex == index ? Colors.white : Colors.black,
+                            color: _selectedIndex == index
+                                ? Colors.white
+                                : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -124,51 +131,87 @@ class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
                         .where((appointment) => appointment.status == _status)
                         .toList();
 
+                    // Lọc theo tên hoặc mã cuộc hẹn (nếu có tìm kiếm)
                     if (_searchText.isNotEmpty) {
                       appointments = appointments
-                          .where((appointment) => appointment.userProfile!.name.toLowerCase().contains(_searchText.toLowerCase()) ||
-                              appointment.appointmentCode!.toLowerCase().contains(_searchText.toLowerCase()))
+                          .where((appointment) =>
+                              appointment.userProfile!.name
+                                  .toLowerCase()
+                                  .contains(_searchText.toLowerCase()) ||
+                              appointment.appointmentCode!
+                                  .toLowerCase()
+                                  .contains(_searchText.toLowerCase()))
                           .toList();
+                    }
+
+                    // ✅ Xử lý sắp xếp
+                    if (_status == 'Đã khám') {
+                      // Tách các cuộc hẹn chưa có kết quả (isResult == false) và đã có kết quả (isResult == true)
+                      List<AppointmentSchedule> noResultAppointments =
+                          appointments
+                              .where((appointment) =>
+                                  appointment.isResult == false)
+                              .toList();
+                      List<AppointmentSchedule> hasResultAppointments =
+                          appointments
+                              .where(
+                                  (appointment) => appointment.isResult == true)
+                              .toList();
+
+                      // Sắp xếp từng nhóm theo ngày gần nhất
+                      noResultAppointments.sort(
+                          (a, b) => b.selectedDate!.compareTo(a.selectedDate!));
+                      hasResultAppointments.sort(
+                          (a, b) => b.selectedDate!.compareTo(a.selectedDate!));
+
+                      // Gộp lại: chưa có kết quả lên đầu
+                      appointments = [
+                        ...noResultAppointments,
+                        ...hasResultAppointments
+                      ];
+                    } else {
+                      // Các trạng thái khác: sắp xếp tất cả chỉ theo ngày gần nhất
+                      appointments.sort(
+                          (a, b) => b.selectedDate!.compareTo(a.selectedDate!));
                     }
 
                     if (appointments.isEmpty) {
                       return SingleChildScrollView(
                         child: Center(
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 20),
-                              // height: 500,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/empty-box.png',
-                                    width: 250,
-                                    height: 250,
-                                    fit: BoxFit.contain,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/empty-box.png',
+                                  width: 250,
+                                  height: 250,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'Chưa có lịch khám ở mục này',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueGrey,
+                                    fontSize: 16,
                                   ),
-                                  const SizedBox(height: 12),
-                                  const Text(
-                                    'Chưa có lịch khám ở mục này',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueGrey,
-                                      fontSize: 16,
-                                    ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  'Lịch khám phù hợp sẽ được hiển thị tại đây.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blueGrey,
+                                    height: 1.5,
                                   ),
-                                  const SizedBox(height: 6),
-                                  const Text(
-                                    'Lịch khám phù hợp sẽ được hiển thị tại đây.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.blueGrey,
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
+                        ),
                       );
                     }
 
@@ -186,7 +229,8 @@ class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
                               ),
                             );
                           },
-                          child: DoctorScheduleCard(appointmentSchedule: appointments[index]),
+                          child: DoctorScheduleCard(
+                              appointmentSchedule: appointments[index]),
                         );
                       },
                     );

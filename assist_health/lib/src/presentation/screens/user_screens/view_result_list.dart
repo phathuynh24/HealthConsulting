@@ -137,221 +137,136 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
           child: Column(
             children: [
               StreamBuilder<List<Result>>(
-                  stream: _resultController.stream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Đã xảy ra lỗi: ${snapshot.error}');
-                    }
+                stream: _resultController.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Đã xảy ra lỗi: ${snapshot.error}');
+                  }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                    List<Result> sesults = snapshot.data!;
+                  List<Result> sesults = snapshot.data ?? [];
 
-                    // Nếu mục trống
-                    if (sesults.isEmpty) {
-                      return Center(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          height: 500,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                'assets/empty-box.png',
-                                width: 250,
-                                height: 250,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(
-                                height: 12,
-                              ),
-                              const Text(
-                                'Bạn chưa có kết quả khám',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueGrey,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 6,
-                              ),
-                              const Text(
-                                'Hãy chờ kết quả khám từ bác sĩ!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.blueGrey,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    //--------------------------------
+                  // Nếu không có dữ liệu
+                  if (sesults.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/empty-box.png',
+                              width: 250, height: 250),
+                          const SizedBox(height: 12),
+                          const Text('Bạn chưa có kết quả khám',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text('Hãy chờ kết quả khám từ bác sĩ!',
+                              textAlign: TextAlign.center),
+                        ],
+                      ),
+                    );
+                  }
 
-                    // Lọc theo search
-                    List<Result> sesultsSearch = [];
-                    if (_searchText == '') {
-                      sesultsSearch = sesults;
-                    } else {
-                      String searchText = _searchText.trim().toLowerCase();
-                      sesultsSearch = sesults
+                  // Lọc theo từ khóa tìm kiếm
+                  List<Result> sesultsSearch = _searchText.isEmpty
+                      ? sesults
+                      : sesults
                           .where((element) =>
-                              element.doctorName!
-                                  .toLowerCase()
-                                  .contains(searchText) ||
-                              element.nameProfile!
-                                  .toLowerCase()
-                                  .contains(searchText) ||
-                              element.appointmentCode!
-                                  .toLowerCase()
-                                  .contains(searchText))
+                              (element.doctorName
+                                      ?.toLowerCase()
+                                      .contains(_searchText.toLowerCase()) ??
+                                  false) ||
+                              (element.nameProfile
+                                      ?.toLowerCase()
+                                      .contains(_searchText.toLowerCase()) ??
+                                  false) ||
+                              (element.appointmentCode
+                                      ?.toLowerCase()
+                                      .contains(_searchText.toLowerCase()) ??
+                                  false))
                           .toList();
-                    }
-                    // Xử lý không tìm ra kết quả
-                    if (sesultsSearch.isEmpty) {
-                      return SingleChildScrollView(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 20),
-                          height: 350,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Image.asset(
-                                'assets/no_result_search_icon.png',
-                                width: 250,
-                                height: 250,
-                                fit: BoxFit.contain,
-                              ),
-                              const Text(
-                                'Không tìm thấy kết quả',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Text(
-                                'Rất tiếc, chúng tôi không tìm thấy kết quả mà bạn mong muốn, hãy thử lại xem sao.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    //--------------------------------
-                    sesultsSearch.sort((a, b) => b.timeResult!.compareTo(a.timeResult!)); // Sắp xếp giảm dần theo thời gian
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: sesultsSearch.length,
-                      itemBuilder: (context, index) {
-                        Result result = sesults[index];
-                        final formattedTimeResult =
-                            DateFormat('HH:mm dd-MM-yyyy')
-                                .format(result.timeResult!);
 
-                        return Container(
-                          margin: EdgeInsets.only(
-                            top: 15,
-                            bottom: (index == sesults.length - 1) ? 15 : 0,
-                            left: 5,
-                            right: 5,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 12,
-                          ),
+                  // Xử lý không tìm thấy kết quả
+                  if (sesultsSearch.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('assets/no_result_search_icon.png',
+                              width: 250, height: 250),
+                          const Text('Không tìm thấy kết quả',
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const Text('Hãy thử lại với từ khóa khác.',
+                              textAlign: TextAlign.center),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Sắp xếp theo ngày trả kết quả (gần nhất lên đầu)
+                  sesultsSearch.sort((a, b) {
+                    if (a.timeResult == null && b.timeResult == null) return 0;
+                    if (a.timeResult == null) return 1;
+                    if (b.timeResult == null) return -1;
+                    return b.timeResult!.compareTo(a.timeResult!);
+                  });
+
+                  // Hiển thị danh sách kết quả
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: sesultsSearch.length,
+                    itemBuilder: (context, index) {
+                      Result result = sesultsSearch[index];
+                      final formattedTimeResult = result.timeResult != null
+                          ? DateFormat('HH:mm dd-MM-yyyy')
+                              .format(result.timeResult!)
+                          : 'Chưa có kết quả';
+
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewResultsScreen(result: result)),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 10),
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.shade200,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3))
+                            ],
                           ),
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ViewResultsScreen(
-                                            result: result,
-                                          )));
-                            },
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          FontAwesomeIcons.briefcaseMedical,
-                                          color: Color(0xFF2EF76F),
-                                          size: 20,
-                                        ),
-                                        const SizedBox(
-                                          width: 8,
-                                        ),
-                                        Text(
-                                          result.appointmentCode!,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      'Bác sĩ: ${result.doctorName!}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      'Bệnh nhân: ${result.nameProfile!}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 8,
-                                    ),
-                                    Text(
-                                      'Ngày trả kết quả: $formattedTimeResult',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  'Mã phiếu: ${result.appointmentCode ?? 'Không xác định'}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 5),
+                              Text(
+                                  'Bác sĩ: ${result.doctorName ?? 'Không rõ'}'),
+                              Text(
+                                  'Bệnh nhân: ${result.nameProfile ?? 'Không rõ'}'),
+                              Text('Ngày trả kết quả: $formattedTimeResult'),
+                            ],
                           ),
-                        );
-                      },
-                    );
-                  }),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ],
           ),
         ),

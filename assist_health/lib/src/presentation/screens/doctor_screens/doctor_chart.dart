@@ -1,13 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
-
 import 'package:assist_health/src/models/other/appointment_schedule.dart';
 import 'package:assist_health/src/others/methods.dart';
 import 'package:assist_health/src/others/theme.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class DoctorChartScreen extends StatefulWidget {
   const DoctorChartScreen({super.key});
@@ -20,8 +20,14 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
   final StreamController<List<AppointmentSchedule>>
       _appointmentScheduleController =
       StreamController<List<AppointmentSchedule>>.broadcast();
+
   int _selectedYear = DateTime.now().year;
+  bool _isRangeSelected = false;
+  DateTimeRange? _selectedDateRange;
+  double _totalRevenue = 0.0;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  List<Map<String, dynamic>> _detailedRevenue = [];
 
   @override
   void initState() {
@@ -37,81 +43,21 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
           getAppointmentSchedulesByDoctor(currentUser.uid),
         );
       } else {
-        // Handle the case where the user is not signed in
         print('User is not signed in');
       }
     } catch (error) {
-      // Handle any errors that occur
       print('Error loading data: $error');
       showErrorMessage();
     }
   }
 
-  void showDataDialog(Map<String, double> monthlyRevenue) {
-    int total = 0;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Thống kê doanh thu hàng tháng',
-            textAlign: TextAlign.center,
-          ),
-          content: Column(
-            children: [
-              Column(
-                children: monthlyRevenue.entries.map(
-                  (entry) {
-                    total += entry.value.toInt();
-                    return Text(
-                      'Tháng ${entry.key}: +${formatNumber(entry.value.toInt())}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 2,
-                      ),
-                    );
-                  },
-                ).toList(),
-              ),
-              Divider(),
-              Text(
-                'Tổng doanh thu trong năm ${_selectedYear}: ${formatNumber(total)}',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.greenAccent.shade700,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              )
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Đóng'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void showErrorMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Failed to fetch data from Firestore. Please try again.'),
+        content: Text('Lỗi khi tải dữ liệu. Vui lòng thử lại.'),
         duration: Duration(seconds: 3),
       ),
     );
-  }
-
-  DateTime _getDateTime(String monthYear) {
-    final parts = monthYear.split('/');
-    final month = int.parse(parts[0]);
-    final year = int.parse(parts[1]);
-    return DateTime(year, month);
   }
 
   @override
@@ -139,34 +85,60 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
           stream: _appointmentScheduleController.stream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+              return Text('Lỗi: ${snapshot.error}');
             }
             if (snapshot.hasData) {
               List<AppointmentSchedule> appointmentSchedules = snapshot.data!;
               if (appointmentSchedules.isEmpty) {
                 return const SizedBox(
                   height: 600,
-                  child: Center(child: Text('No appointments available')),
+                  child: Center(child: Text('Không có dữ liệu')),
                 );
               }
-              Map<String, double> monthlyRevenue = {};
+
+              Map<int, double> monthlyRevenue = {};
+              Map<DateTime, double> dailyRevenue = {};
+              _totalRevenue = 0.0;
+              _detailedRevenue.clear();
+
               for (AppointmentSchedule appointment in appointmentSchedules) {
                 DateTime? paymentTime = appointment.paymentStartTime;
-                String monthYear = '${paymentTime?.month}/${paymentTime?.year}';
-                DateTime dateTime = _getDateTime(monthYear);
                 User? currentUser = _auth.currentUser;
-                if (dateTime.year == _selectedYear &&
-                    appointment.doctorInfo?.uid == currentUser?.uid) {
+
+                if (appointment.doctorInfo?.uid == currentUser?.uid &&
+                    appointment.status == 'Đã khám') {
                   num serviceFee = appointment.doctorInfo?.serviceFee ?? 0.0;
-                  monthlyRevenue[monthYear] =
-                      (monthlyRevenue[monthYear] ?? 0.0) + serviceFee;
+                  _totalRevenue += serviceFee.toDouble();
+
+                  if (_isRangeSelected && _selectedDateRange != null) {
+                    if (paymentTime != null &&
+                        paymentTime.isAfter(_selectedDateRange!.start) &&
+                        paymentTime.isBefore(_selectedDateRange!.end)) {
+                      DateTime onlyDate = DateTime(
+                          paymentTime.year, paymentTime.month, paymentTime.day);
+
+                      dailyRevenue[onlyDate] =
+                          (dailyRevenue[onlyDate] ?? 0.0) + serviceFee;
+
+                      _detailedRevenue.add({
+                        'date': paymentTime,
+                        'amount': serviceFee,
+                      });
+                    }
+                  } else if (paymentTime?.year == _selectedYear) {
+                    monthlyRevenue[paymentTime!.month] =
+                        (monthlyRevenue[paymentTime.month] ?? 0.0) + serviceFee;
+
+                    _detailedRevenue.add({
+                      'date': paymentTime,
+                      'amount': serviceFee,
+                    });
+                  }
                 }
               }
-              // Sắp xếp lại tháng
-              monthlyRevenue = Map.fromEntries(monthlyRevenue.entries.toList()
-                ..sort((a, b) =>
-                    _getDateTime(a.key).compareTo(_getDateTime(b.key))));
-              print('Monthly Revenue: $monthlyRevenue');
+
+              _detailedRevenue.sort((a, b) => b['date'].compareTo(a['date']));
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -175,18 +147,29 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
                         horizontal: 15, vertical: 10),
                     child: Row(
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            showDataDialog(monthlyRevenue);
+                        TextButton(
+                          onPressed: () async {
+                            DateTimeRange? picked = await showDateRangePicker(
+                              context: context,
+                              firstDate: DateTime(2023),
+                              lastDate: DateTime.now(),
+                            );
+
+                            if (picked != null) {
+                              setState(() {
+                                _selectedDateRange = picked;
+                                _isRangeSelected = true;
+                              });
+                            }
                           },
-                          child: const Text('Doanh thu các tháng trong năm'),
+                          child: const Text("Chọn khoảng thời gian"),
                         ),
-                        const SizedBox(width: 16),
                         const Spacer(),
                         DropdownButton<int>(
                           value: _selectedYear,
-                          items: List.generate(10, (index) {
-                            int year = DateTime.now().year - index + 2;
+                          items: List.generate(DateTime.now().year - 2023 + 1,
+                              (index) {
+                            int year = 2023 + index;
                             return DropdownMenuItem<int>(
                               value: year,
                               child: Text(year.toString()),
@@ -195,6 +178,7 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
                           onChanged: (year) {
                             setState(() {
                               _selectedYear = year!;
+                              _isRangeSelected = false;
                             });
                           },
                         ),
@@ -202,75 +186,75 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  Container(
-                    width: 400,
-                    height: 600,
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: LineChart(
-                      LineChartData(
-                        minX: 1,
-                        maxX: 12,
-                        minY: 0,
-                        maxY: monthlyRevenue.values.isNotEmpty
-                            ? monthlyRevenue.values
-                                .reduce((a, b) => a > b ? a : b)
-                            : 0,
-                        titlesData: const FlTitlesData(
-                          show: true,
-                          bottomTitles: AxisTitles(
-                            axisNameWidget: Text(
-                              'Tháng',
-                              style: TextStyle(fontSize: 15, height: 1.5),
-                            ),
-                            axisNameSize: 22,
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 25,
-                              interval: 1,
-                            ),
-                          ),
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 50,
-                            ),
-                          ),
-                          rightTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 50,
-                            ),
-                          ),
-                        ),
-                        gridData: const FlGridData(
-                          show: true,
-                        ),
-                        borderData: FlBorderData(
-                          border: Border.all(color: Colors.black),
-                        ),
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: monthlyRevenue.entries
-                                .where((entry) =>
-                                    _getDateTime(entry.key).year ==
-                                    _selectedYear)
-                                .map((entry) => FlSpot(
-                                      _getDateTime(entry.key).month.toDouble(),
-                                      entry.value.toDouble(),
-                                    ))
-                                .toList(),
-                            //custom
-                            isCurved: true,
-                            color: Colors.blue,
-                            barWidth: 4,
-                            belowBarData: BarAreaData(
-                                show: true,
-                                color: Colors.blue.withOpacity(0.3)),
-                            dotData: const FlDotData(show: true),
-                          ),
-                        ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Tổng doanh thu: ${_formatCurrency(_totalRevenue)}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: SfCartesianChart(
+                      primaryXAxis: _isRangeSelected
+                          ? DateTimeAxis(
+                              title: const AxisTitle(text: 'Ngày'),
+                              dateFormat: DateFormat('dd/MM'),
+                              intervalType: DateTimeIntervalType.days,
+                            )
+                          : NumericAxis(
+                              title: const AxisTitle(text: 'Tháng'),
+                            ),
+                      primaryYAxis: const NumericAxis(
+                        title: AxisTitle(text: 'Doanh thu (VNĐ)'),
+                      ),
+                      series: <CartesianSeries>[
+                        _isRangeSelected
+                            ? LineSeries<dynamic, dynamic>(
+                                dataSource: dailyRevenue.entries.toList(),
+                                xValueMapper: (entry, _) => entry.key,
+                                yValueMapper: (entry, _) => entry.value,
+                                markerSettings:
+                                    const MarkerSettings(isVisible: true),
+                                color: Colors.blue,
+                                name: 'Doanh thu',
+                              )
+                            : ColumnSeries<dynamic, dynamic>(
+                                dataSource: monthlyRevenue.entries.toList(),
+                                xValueMapper: (entry, _) => entry.key,
+                                yValueMapper: (entry, _) => entry.value,
+                                color: Colors.blue,
+                                name: 'Doanh thu',
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _detailedRevenue.length,
+                    itemBuilder: (context, index) {
+                      var item = _detailedRevenue[index];
+                      return ListTile(
+                        title: Text(DateFormat('dd/MM/yyyy HH:mm')
+                            .format(item['date'])),
+                        subtitle: Text(
+                          'Doanh thu: ${_formatCurrency(item['amount'].toDouble())}', // ✅ Đảm bảo kiểu double
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    },
                   ),
                 ],
               );
@@ -282,24 +266,7 @@ class _DoctorChartScreenState extends State<DoctorChartScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    // _appointmentScheduleController.close();
-    super.dispose();
-  }
-
-  String formatNumber(int number) {
-    if (number < 1000) {
-      return number.toString();
-    } else if (number < 1000000) {
-      double result = number / 1000;
-      return '${result.toStringAsFixed(1)} nghìn VNĐ';
-    } else if (number < 1000000000) {
-      double result = number / 1000000;
-      return '${result.toStringAsFixed(1)} triệu VNĐ';
-    } else {
-      double result = number / 1000000000;
-      return '${result.toStringAsFixed(1)} tỷ VNĐ';
-    }
+  String _formatCurrency(double amount) {
+    return NumberFormat.currency(locale: 'vi_VN', symbol: 'VNĐ').format(amount);
   }
 }

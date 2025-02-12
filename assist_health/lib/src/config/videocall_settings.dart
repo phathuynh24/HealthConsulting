@@ -1,4 +1,4 @@
 const appId = '10e4734379c545aba9242d4aeb9594b4';
 const channelName = 'video_call';
 const token =
-    '007eJxTYHgQ7/NE1GvademdB/Nqy7Lj4jtyrLe8yI+d/bul+17cuiYFBkODVBNzYxNjc8tkUxPTxKRESyMToxSTxNQkS1NLkyQTM7U16Q2BjAyTU5RYGBkgEMTnYijLTEnNj09OzMlhYAAAT8oh9A==';
+    '007eJxTYHgRmB1ZHttutU3PZj9zZVWJ77njW5R3ecdImfQnfzGeU6HAYGiQamJubGJsbplsamKamJRoaWRilGKSmJpkaWppkmQy/fia9IZARgaFW3MZGRkgEMTnYijLTEnNj09OzMlhYAAAqLcg4A==';

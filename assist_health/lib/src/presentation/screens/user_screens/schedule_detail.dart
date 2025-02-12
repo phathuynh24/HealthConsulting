@@ -1671,9 +1671,23 @@ class _ScheduleDetailState extends State<ScheduleDetail> {
               return const Center(child: CircularProgressIndicator());
             }
 
+            // ✅ Xử lý khi không tìm thấy feedback (đã bị xóa)
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text('Không tìm thấy tài liệu phản hồi');
+              return AlertDialog(
+                title: const Text('Phản hồi không tồn tại'),
+                content: const Text(
+                    'Phản hồi này đã bị xóa hoặc không còn tồn tại.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Đóng'),
+                  ),
+                ],
+              );
             }
+
             Map<String, dynamic> feedbackData = snapshot.data!.data()!;
             Timestamp rateDate = feedbackData['rateDate'];
 

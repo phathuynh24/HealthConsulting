@@ -1,4 +1,6 @@
 import 'package:assist_health/src/presentation/screens/user_screens/meals/core/calorie_calculator/calorie_calculator.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/core/events/calo_update_event.dart';
+import 'package:assist_health/src/presentation/screens/user_screens/meals/core/events/event_bus.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/core/firebase/firebase_constants.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/views/user_info_survey/current_weight_screen.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/views/user_info_survey/goal_weight_screen.dart';
@@ -134,6 +136,7 @@ class _WeightChangeSelectionScreenState
         await saveSurveyData(context, updatedSurveyData);
         if (mounted) {
           Navigator.pop(context, updatedSurveyData);
+          // eventBus.fire(CaloUpdateEvent(0));
         }
       } else {
         final updatedData = await Navigator.push(

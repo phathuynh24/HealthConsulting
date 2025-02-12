@@ -18,13 +18,15 @@ class FoodDetailScreen extends StatefulWidget {
   final String imageUrl;
   final bool isFavorite;
   final bool isEditing;
+  final bool isHidenSave;
 
   const FoodDetailScreen(
       {super.key,
       required this.meal,
       required this.imageUrl,
       this.isFavorite = false,
-      this.isEditing = false});
+      this.isEditing = false,
+      this.isHidenSave = false});
 
   @override
   State<FoodDetailScreen> createState() => _FoodDetailScreenState();
@@ -86,13 +88,19 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         'serving': _serving,
       });
 
-      // Thông báo thành công
-      CustomSnackbar.show(context, "Đã cập nhật món ăn!", isSuccess: true);
-
-      // Quay lại và trả dữ liệu cập nhật để màn hình trước load lại dữ liệu
-      Navigator.pop(context, true);
+      // ✅ Kiểm tra widget có còn tồn tại trước khi gọi context
+      if (mounted) {
+        CustomSnackbar.show(context, "Đã cập nhật món ăn!", isSuccess: true);
+      }
     } catch (e) {
-      CustomSnackbar.show(context, "Lỗi khi cập nhật: $e", isSuccess: false);
+      if (mounted) {
+        CustomSnackbar.show(context, "Lỗi khi cập nhật: $e", isSuccess: false);
+      }
+    }
+
+    // ✅ Đóng màn hình sau khi cập nhật xong (nếu widget vẫn tồn tại)
+    if (mounted) {
+      Navigator.pop(context, true);
     }
   }
 
@@ -124,28 +132,29 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               },
             ),
             actions: [
-              ElevatedButton.icon(
-                onPressed: () async {
-                  if (isFavorite) {
-                    await _removeFavoriteMeal();
-                  } else {
-                    _showSaveMealDialog();
-                  }
-                },
-                icon: Icon(
-                  isFavorite ? Icons.bookmark : Icons.bookmark_border,
-                  color: Colors.white,
+              if (!widget.isHidenSave)
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    if (isFavorite) {
+                      await _removeFavoriteMeal();
+                    } else {
+                      _showSaveMealDialog();
+                    }
+                  },
+                  icon: Icon(
+                    isFavorite ? Icons.bookmark : Icons.bookmark_border,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    isFavorite ? "Đã lưu" : "Lưu",
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isFavorite ? Colors.red : Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
-                label: Text(
-                  isFavorite ? "Đã lưu" : "Lưu",
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isFavorite ? Colors.red : Colors.green,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
               const SizedBox(width: 16.0),
             ],
           ),
@@ -418,8 +427,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                   _buildMealSelectionDialog(context),
                             );
 
-                            if (selectedMeal == null || selectedMeal.isEmpty)
+                            if (selectedMeal == null || selectedMeal.isEmpty) {
                               return;
+                            }
 
                             setState(() {
                               isLoggedMeal = true;
@@ -524,9 +534,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (BuildContext context) {
+      builder: (BuildContext bottomSheetContext) {
+        // Sử dụng `bottomSheetContext` để tránh conflict
         return Padding(
-          padding: MediaQuery.of(context).viewInsets,
+          padding: MediaQuery.of(bottomSheetContext).viewInsets,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -553,7 +564,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_mealNameController.text.isEmpty) {
-                      if (context.mounted) {
+                      if (mounted) {
                         CustomSnackbar.show(
                             context, 'Vui lòng nhập tên món ăn!',
                             isSuccess: false);
@@ -563,6 +574,17 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
                     String? errorMessage;
                     bool isSaved = false;
+
+                    // ✅ Đóng hộp thoại ngay lập tức trước khi gọi async
+                    if (mounted) {
+                      Navigator.pop(context);
+                    }
+
+                    if (mounted) {
+                      setState(() {
+                        isLoggedMeal = true;
+                      });
+                    }
 
                     try {
                       await saveMealData(
@@ -577,20 +599,25 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       isSaved = true;
                     } catch (e) {
                       errorMessage = 'Lỗi khi lưu: $e';
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          isLoggedMeal = false;
+                        });
+                      }
                     }
 
-                    if (!context.mounted) return;
-
-                    // Đóng bottom sheet sau khi hoàn tất async
-                    Navigator.pop(context);
+                    if (!mounted) return; // ✅ Kiểm tra tránh lỗi context
 
                     if (isSaved) {
-                      setState(() {
-                        isFavorite = true;
-                      });
-                      CustomSnackbar.show(
-                          context, 'Món ăn đã được lưu vào danh sách',
-                          isSuccess: true);
+                      if (mounted) {
+                        setState(() {
+                          isFavorite = true;
+                        });
+                        CustomSnackbar.show(
+                            context, 'Món ăn đã được lưu vào danh sách',
+                            isSuccess: true);
+                      }
                     } else if (errorMessage != null) {
                       CustomSnackbar.show(context, errorMessage,
                           isSuccess: false);
@@ -635,7 +662,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
       if (meal.isFavorite) {
         finalImageUrl = meal.imageUrl;
       } else {
-         // Upload image to Firebase Storage
+        // Upload image to Firebase Storage
         String fileName = '${userId}_$docId.jpeg';
         final storageRef =
             FirebaseStorage.instance.ref().child('meal_images/$fileName');
@@ -723,31 +750,43 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
       String userId = user.uid;
 
-      // Find the favorite meal
+      // Tìm món ăn yêu thích
       var snapshot = await FirebaseFirestore.instance
           .collection('favorite_meals')
           .where('userId', isEqualTo: userId)
           .where('originalName', isEqualTo: widget.meal.name)
           .get();
 
-      for (var doc in snapshot.docs) {
-        await FirebaseFirestore.instance
-            .collection('favorite_meals')
-            .doc(doc.id)
-            .delete();
-      }
+      if (snapshot.docs.isNotEmpty) {
+        for (var doc in snapshot.docs) {
+          await FirebaseFirestore.instance
+              .collection('favorite_meals')
+              .doc(doc.id)
+              .delete();
+        }
 
-      // Update UI
-      setState(() {
-        isFavorite = false;
-      });
-      CustomSnackbar.show(context, 'Món ăn đã được xoá khỏi danh sách!',
-          isSuccess: true);
+        // ✅ Kiểm tra widget còn tồn tại trước khi cập nhật UI
+        if (mounted) {
+          setState(() {
+            isFavorite = false;
+          });
+
+          CustomSnackbar.show(context, 'Món ăn đã được xoá khỏi danh sách!',
+              isSuccess: true);
+        }
+      } else {
+        if (mounted) {
+          CustomSnackbar.show(
+              context, 'Không tìm thấy món ăn trong danh sách yêu thích!',
+              isSuccess: false);
+        }
+      }
     } catch (e) {
-      // Show error message
-      CustomSnackbar.show(
-          context, 'Đã xảy ra lỗi khi xoá món ăn khỏi danh sách!',
-          isSuccess: false);
+      if (mounted) {
+        CustomSnackbar.show(
+            context, 'Đã xảy ra lỗi khi xoá món ăn khỏi danh sách!',
+            isSuccess: false);
+      }
     }
   }
 

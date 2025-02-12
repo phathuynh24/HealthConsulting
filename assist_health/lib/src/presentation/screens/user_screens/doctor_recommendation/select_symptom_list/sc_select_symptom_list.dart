@@ -182,7 +182,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
             return Column(
               children: [
                 Container(
-                  height: 320,
+                  height: 200,
                   child: Stack(
                     children: [
                       Positioned(
@@ -190,15 +190,15 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                         left: 0,
                         right: 0,
                         child: Container(
-                          height: 260,
-                          padding: EdgeInsets.all(20),
+                          height: 200,
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.only(
+                            borderRadius: const BorderRadius.only(
                               bottomLeft: Radius.circular(40),
                               bottomRight: Radius.circular(40),
                             ),
-                            image: DecorationImage(
+                            image: const DecorationImage(
                               image: AssetImage(
                                   'assets/recommendation/bg_gradient1.png'),
                               fit: BoxFit.cover,
@@ -213,11 +213,11 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                           ),
                           child: Column(
                             children: [
-                              SizedBox(height: 26),
+                              const SizedBox(height: 26),
                               Container(
                                 height: 90,
-                                margin: EdgeInsets.symmetric(horizontal: 12),
-                                padding: EdgeInsets.all(8),
+                                margin: const EdgeInsets.symmetric(horizontal: 12),
+                                padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(50),
@@ -253,7 +253,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(50),
                                             ),
-                                            padding: EdgeInsets.all(14),
+                                            padding: const EdgeInsets.all(14),
                                             child: Text(
                                               'Danh sách',
                                               style: TextStyle(
@@ -292,7 +292,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                                               borderRadius:
                                                   BorderRadius.circular(50),
                                             ),
-                                            padding: EdgeInsets.all(14),
+                                            padding: const EdgeInsets.all(14),
                                             child: Text(
                                               'Đã chọn',
                                               style: TextStyle(
@@ -311,18 +311,18 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                             ],
                           ),
                         ),
                       ),
                       Positioned(
-                        bottom: 0,
+                        bottom: 20,
                         left: 0,
                         right: 0,
                         child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 30),
-                          padding: EdgeInsets.all(16),
+                          margin: const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
@@ -336,69 +336,63 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                           ),
                           child: Column(
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.greenAccent.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        // _symptomsBloc.add(
-                                        //     QueryChanged(query.toLowerCase()));
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 10,
-                                          right: 5,
-                                        ),
-                                        child: Icon(Icons.search,
-                                            color: Colors.blueAccent.shade700),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Container(
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            hintText: 'Tìm kiếm triệu chứng...',
-                                            hintStyle: TextStyle(
-                                              color: Colors.blueAccent.shade700,
-                                              fontSize: 14,
-                                            ),
-                                            border: InputBorder.none,
-                                          ),
-                                          style: TextStyle(
-                                            color: Colors.blueAccent.shade700,
-                                            fontSize: 14,
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              query = value;
-                                            });
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    IconButton(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      onPressed: () {
-                                        _selectedSymptoms_Vi.clear();
-                                        _selectedSymptoms_En.clear();
-                                        symptomsSelected['symptoms_Vi']
-                                            ?.clear();
-                                        symptomsSelected['symptoms_En']
-                                            ?.clear();
-                                        setState(() {});
-                                      },
-                                      icon: Icon(Icons.refresh),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 20),
+                              // Container(
+                              //   padding: const EdgeInsets.all(10),
+                              //   decoration: BoxDecoration(
+                              //     color: Colors.greenAccent.withOpacity(0.2),
+                              //     borderRadius: BorderRadius.circular(20),
+                              //   ),
+                              //   child: Row(
+                              //     children: [
+                              //       Padding(
+                              //         padding: const EdgeInsets.only(
+                              //           left: 10,
+                              //           right: 5,
+                              //         ),
+                              //         child: Icon(Icons.search,
+                              //             color: Colors.blueAccent.shade700),
+                              //       ),
+                              //       Expanded(
+                              //         child: Container(
+                              //           child: TextField(
+                              //             decoration: InputDecoration(
+                              //               hintText: 'Tìm kiếm triệu chứng...',
+                              //               hintStyle: TextStyle(
+                              //                 color: Colors.blueAccent.shade700,
+                              //                 fontSize: 14,
+                              //               ),
+                              //               border: InputBorder.none,
+                              //             ),
+                              //             style: TextStyle(
+                              //               color: Colors.blueAccent.shade700,
+                              //               fontSize: 14,
+                              //             ),
+                              //             onChanged: (value) {
+                              //               setState(() {
+                              //                 query = value.toLowerCase();
+                              //               });
+                              //             },
+                              //           ),
+                              //         ),
+                              //       ),
+                              //       IconButton(
+                              //         padding: const EdgeInsets.symmetric(
+                              //             horizontal: 10),
+                              //         onPressed: () {
+                              //           _selectedSymptoms_Vi.clear();
+                              //           _selectedSymptoms_En.clear();
+                              //           symptomsSelected['symptoms_Vi']
+                              //               ?.clear();
+                              //           symptomsSelected['symptoms_En']
+                              //               ?.clear();
+                              //           setState(() {});
+                              //         },
+                              //         icon: const Icon(Icons.refresh),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              // const SizedBox(height: 20),
                               Container(
                                 width: double.infinity,
                                 padding:
@@ -419,26 +413,26 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: BlocBuilder<SelectSymptomListBloc,
                       SelectSymptomListState>(
                     builder: (context, state) {
                       if (state is SelectSymptomListLoading) {
-                        return Center(
+                        return const Center(
                           child: CircularProgressIndicator(),
                         );
                       } else if (state is SelectSymptomListLoaded) {
                         if (state.symptoms['symptoms_Vi']?.length == 0) {
-                          return Center(
+                          return const Center(
                             child: Text('No symptoms found'),
                           );
                         }
                         print(state.symptoms['symptoms_Vi']?.length ?? 0);
                         return ListView.builder(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: state.symptoms['symptoms_Vi']?.length ?? 0,
                           itemBuilder: (context, index) {
                             final symptom_Vi =
@@ -454,7 +448,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                                 if (_selectedSymptoms_Vi.length == 17) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(
+                                      content: const Text(
                                         'Không thể chọn quá 17 biểu hiện bệnh.',
                                         style: TextStyle(
                                           color: Colors.white,
@@ -496,21 +490,21 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
                           },
                         );
                       } else if (state is SelectSymptomListDiagnosed) {
-                        Future.delayed(Duration(milliseconds: 500), () {
+                        Future.delayed(const Duration(milliseconds: 500), () {
                           setState(() {
                             isDiagnosed = true;
                           });
                         });
                         diagnosis = jsonDecode(state.diagnosis);
-                        return Center(
+                        return const Center(
                           child: Text('Diagnosed Successfully'),
                         );
                       } else if (state is SelectSymptomListError) {
-                        return Center(
+                        return const Center(
                           child: Text('Failed to load symptoms'),
                         );
                       } else {
-                        return Center(
+                        return const Center(
                           child: Text('Unknown state'),
                         );
                       }
@@ -538,7 +532,7 @@ class _SelectSymptomListScreenState extends State<SelectSymptomListScreen> {
             if (_selectedSymptoms_Vi.length < 5) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
+                  content: const Text(
                     'Vui lòng chọn ít nhất 5 biểu hiện bệnh.',
                     style: TextStyle(
                       color: Colors.white,

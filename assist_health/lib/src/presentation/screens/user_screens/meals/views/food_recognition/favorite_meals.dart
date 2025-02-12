@@ -283,6 +283,7 @@ class _FavoriteMealsScreenState extends State<FavoriteMealsScreen> {
                           ),
                           imageUrl: imageUrl,
                           isFavorite: true,
+                          isHidenSave: true,
                         ),
                       ),
                     );

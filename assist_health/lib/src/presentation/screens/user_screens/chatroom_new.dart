@@ -64,7 +64,7 @@ class _ChatRoomNewState extends State<ChatRoomNew> {
 
       var ref =
           FirebaseStorage.instance.ref().child('images').child("$fileName.jpg");
-      
+
       SettableMetadata metadata = SettableMetadata(
         contentType: 'image/jpeg',
       );
@@ -137,44 +137,58 @@ class _ChatRoomNewState extends State<ChatRoomNew> {
               .doc(widget.doctorInfo.uid)
               .snapshots(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.data!.exists) {
               var userData = snapshot.data!.data() as Map<String, dynamic>;
-              String name = widget.doctorInfo.name;
+              String currentUid = FirebaseAuth.instance.currentUser!.uid;
+              String name = '';
+
+              // Kiểm tra vai trò của người dùng
               if (userData['role'] == 'admin') {
                 name = 'Chăm Sóc Khách Hàng';
+              } else if (currentUid == widget.doctorInfo.uid) {
+                // Nếu là bác sĩ (UID trùng), hiển thị tên hồ sơ bệnh nhân
+                name = widget.userProfile.name;
+              } else {
+                // Nếu là user (UID khác), hiển thị tên bác sĩ
+                name = userData['name'];
               }
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HealthProfileDetailScreen(
-                            profile: widget.userProfile, // Hồ sơ cần truyền
-                            isUserOfProfile: false, // Trạng thái quyền sở hữu
-                            isDoctorViewing: true, // Trạng thái xem của bác sĩ
+                      // Mở trang chi tiết hồ sơ bệnh nhân nếu là bác sĩ
+                      if (currentUid == widget.doctorInfo.uid) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HealthProfileDetailScreen(
+                              profile: widget.userProfile,
+                              isUserOfProfile: false,
+                              isDoctorViewing: true,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     },
                     child: Text(
-                      (name != 'Chăm Sóc Khách Hàng')
-                          ? 'Bệnh nhân: ${widget.userProfile.name}'
-                          : name,
+                      (userData['role'] == 'admin')
+                          ? name
+                          : (currentUid == widget.doctorInfo.uid)
+                              ? 'Hồ sơ bệnh nhân: $name'
+                              : 'Bác sĩ: $name',
                       style: const TextStyle(
-                          fontSize: 16, height: 1.7, color: Colors.white),
+                        fontSize: 16,
+                        height: 1.7,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  // Text(
-                  //   'Bệnh nhân: ${widget.userProfile.name}',
-                  //   style: const TextStyle(fontSize: 12),
-                  // ),
                 ],
               );
             } else {
-              return Container();
+              return const Center(child: CircularProgressIndicator());
             }
           },
         ),

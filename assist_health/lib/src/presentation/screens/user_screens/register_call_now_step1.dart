@@ -49,7 +49,7 @@ class _RegisterCallNowStep1State extends State<RegisterCallNowStep1> {
     _userProfileStreamController = StreamController<DocumentSnapshot>();
     _transferContent = _generateTransferContent();
     _linkQRCode =
-        'https://img.vietqr.io/image/sacombank-070119955066-compact.jpg?amount=${_doctorInfo!.serviceFee}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
+        'https://img.vietqr.io/image/bidv-6801195207-compact.jpg?amount=${_doctorInfo!.serviceFee}&addInfo=${_transferContent!}&accountName=HUYNH TIEN PHAT';
   }
 
   @override

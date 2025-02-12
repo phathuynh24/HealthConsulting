@@ -16,10 +16,6 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
   final String doctorId = FirebaseAuth.instance.currentUser!.uid;
   double? selectedRating;
 
-  void _deleteFeedback(String feedbackId) {
-    FirebaseFirestore.instance.collection('feedback').doc(feedbackId).delete();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,10 +178,6 @@ class _DoctorFeedbackScreenState extends State<DoctorFeedbackScreen> {
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _deleteFeedback(feedbackDoc.id),
                           ),
                         ],
                       ),

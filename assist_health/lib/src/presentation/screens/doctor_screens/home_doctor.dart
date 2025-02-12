@@ -301,31 +301,27 @@ class _HomeDoctorState extends State<HomeDoctor> {
                     stream: _appointmentScheduleController!.stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        // Xử lý lỗi nếu có
                         return Text('Đã xảy ra lỗi: ${snapshot.error}');
                       }
 
                       if (snapshot.hasData) {
                         int countAppointment = 0;
                         int total = 0;
+                        DateTime now = DateTime.now();
+                        int currentMonth = now.month;
+                        int currentYear = now.year;
 
                         for (var element in snapshot.data!) {
-                          if (isDateInCurrentMonth(element.selectedDate!)) {
+                          // ✅ Chỉ tính phiếu có trạng thái "Đã khám" và nằm trong tháng hiện tại
+                          if (element.status == 'Đã khám' &&
+                              element.selectedDate!.month == currentMonth &&
+                              element.selectedDate!.year == currentYear) {
                             total += element.doctorInfo!.serviceFee;
+                            countAppointment++;
                           }
                         }
 
-                        snapshot.data!.where((element) {
-                          if (element.status != 'Đã hủy' &&
-                              element.status != 'Chờ duyệt' &&
-                              compareDates(
-                                  DateTime.now(), element.selectedDate!)) {
-                            countAppointment++;
-
-                            return true;
-                          }
-                          return false;
-                        }).toList();
+                        // ✅ Không cần lọc lại danh sách, countAppointment đã được tính chính xác
 
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10),

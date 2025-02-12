@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:assist_health/src/presentation/screens/user_screens/meals/core/firebase/firebase_constants.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/core/network/api_constants.dart';
 import 'package:assist_health/src/presentation/screens/user_screens/meals/core/theme/app_theme.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class FoodSuggestScreen extends StatefulWidget {
   const FoodSuggestScreen({super.key});
@@ -321,9 +324,9 @@ class _FoodSuggestScreenState extends State<FoodSuggestScreen>
     }
   }
 
-  Future<void> fetchCalories() async {
+  Future<void> fetchTodayRemainingCalories() async {
     try {
-      User? user = FirebaseAuth.instance.currentUser;
+      final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
 
       final userDoc = await FirebaseFirestore.instance
@@ -331,14 +334,61 @@ class _FoodSuggestScreenState extends State<FoodSuggestScreen>
           .doc(user.uid)
           .get();
 
-      setState(() {
-        tdeeCalories = (userDoc.data()?['calories'] ?? 2000).toDouble();
-        _calorieController.text = tdeeCalories.toStringAsFixed(0);
+      final userData = userDoc.data();
+      final createdAt = (userData?['createdAt'] as Timestamp).toDate();
+
+      // ✅ Xác định ngày hôm nay
+      final DateTime today = DateTime.now();
+      final String todayKey = DateFormat('yyyy-MM-dd').format(today);
+
+      // ✅ Chặn nếu ngày hôm nay trước ngày tạo tài khoản
+      if (today.isBefore(createdAt)) {
+        if (mounted) {
+          CustomSnackbar.show(
+              context, "Không có dữ liệu trước ngày tạo tài khoản!",
+              isSuccess: false);
+        }
+        return;
+      }
+
+      // ✅ Lấy calo mục tiêu của hôm nay
+      double goalCalories = (userData?['calories'] ?? 2000).toDouble();
+
+      // ✅ Lấy dữ liệu bữa ăn đã log hôm nay
+      final mealsSnapshot = await FirebaseFirestore.instance
+          .collection('logged_meals')
+          .where('userId', isEqualTo: user.uid)
+          .where('loggedAt', isEqualTo: todayKey)
+          .get();
+
+      List<Map<String, dynamic>> meals =
+          mealsSnapshot.docs.map((doc) => doc.data()).toList();
+
+      // ✅ Tính tổng calo đã tiêu thụ (`consumedCalories`)
+      int consumedCalories = meals.fold(0, (int sum, item) {
+        final calories = item['calories'];
+
+        if (calories is int) {
+          return sum + calories;
+        } else if (calories is double) {
+          return sum + calories.round();
+        } else {
+          return sum;
+        }
       });
+
+      // ✅ Tính lượng calo còn lại, đảm bảo ít nhất là 200
+      double remainingCalories = max(200, goalCalories - consumedCalories);
+
+      // ✅ Cập nhật `tdeeCalories` và `TextController`
+      if (mounted) {
+        setState(() {
+          tdeeCalories = remainingCalories;
+          _calorieController.text = tdeeCalories.toStringAsFixed(0);
+        });
+      }
     } catch (e) {
-      if (!mounted) return;
-      CustomSnackbar.show(context, 'Lỗi khi lấy calories: $e',
-          isSuccess: false);
+      debugPrint('Lỗi khi lấy lượng calo còn lại: $e');
     }
   }
 
@@ -361,7 +411,7 @@ class _FoodSuggestScreenState extends State<FoodSuggestScreen>
     _tabController = TabController(length: 2, vsync: this);
     tdeeCalories = 2000;
     fetchSavedRecipes();
-    fetchCalories();
+    fetchTodayRemainingCalories();
     fetchUserGoal();
   }
 
@@ -502,7 +552,7 @@ class _FoodSuggestScreenState extends State<FoodSuggestScreen>
           const SizedBox(width: 10),
           ElevatedButton(
             onPressed: () async {
-              await fetchCalories(); // Lấy calories từ Firestore
+              await fetchTodayRemainingCalories();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 34, 0, 255),

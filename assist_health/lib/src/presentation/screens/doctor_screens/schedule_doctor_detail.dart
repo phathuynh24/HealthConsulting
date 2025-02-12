@@ -1587,21 +1587,47 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
           builder: (BuildContext context,
               AsyncSnapshot<DocumentSnapshot<Map<String, dynamic>>> snapshot) {
             if (snapshot.hasError) {
-              return Text('Có lỗi xảy ra: ${snapshot.error}');
+              return AlertDialog(
+                title: const Text('Lỗi'),
+                content: Text('Có lỗi xảy ra: ${snapshot.error}'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Đóng'),
+                  ),
+                ],
+              );
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
 
+            // ✅ Xử lý khi không tìm thấy feedback (đã bị xóa)
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Text('Không tìm thấy tài liệu phản hồi');
+              return AlertDialog(
+                title: const Text('Phản hồi không tồn tại'),
+                content: const Text(
+                    'Phản hồi này đã bị xóa hoặc không còn tồn tại.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Đóng'),
+                  ),
+                ],
+              );
             }
+
             Map<String, dynamic> feedbackData = snapshot.data!.data()!;
             Timestamp rateDate = feedbackData['rateDate'];
 
             String formattedDate =
                 DateFormat('dd/MM/yyyy').format(rateDate.toDate());
+
             return AlertDialog(
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1615,11 +1641,9 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(
-                    height: 5,
-                  ),
+                  const SizedBox(height: 5),
                   RatingBar.builder(
-                    initialRating: feedbackData['rating'],
+                    initialRating: feedbackData['rating'].toDouble(),
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: true,
@@ -1633,9 +1657,7 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                     ignoreGestures: true,
                     onRatingUpdate: (rating) {},
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Text(
                     feedbackData['content'],
                     style: const TextStyle(
@@ -1643,9 +1665,7 @@ class _ScheduleDoctorDetailState extends State<ScheduleDoctorDetail> {
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Text(
                     formattedDate,
                     style: const TextStyle(

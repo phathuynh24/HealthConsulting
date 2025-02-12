@@ -242,7 +242,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                           SizedBox(width: 100, child: Text('Ngân hàng:')),
                           Expanded(
                               child: Text(
-                            'NH TMCP Sài Gòn Thương Tín (Sacombank)',
+                            'BIDV - Ngân hàng TMCP Đầu tư và Phát triển Việt Nam',
                             textAlign: TextAlign.right,
                           ))
                         ],
@@ -261,8 +261,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                             child: GestureDetector(
                               onTap: () {
                                 // Xử lý sự kiện sao chép số tài khoản
-                                const data =
-                                    ClipboardData(text: '0711995629966');
+                                const data = ClipboardData(text: '6801195207');
                                 Clipboard.setData(data);
                                 showToastMessage(
                                     context, 'Số tài khoản đã được sao chép');
@@ -271,7 +270,7 @@ class _RegisterCallStep3 extends State<RegisterCallStep3> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '0711995629966',
+                                    '6801195207',
                                     style: TextStyle(
                                       color: Themes.gradientDeepClr,
                                       fontWeight: FontWeight.w500,

@@ -300,15 +300,15 @@ class _MessageScreenState extends State<MessageScreen> {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        Text(
-                                          'Thứ 2 -Thứ 7: 8h30 - 17h30',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            height: 1.2,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
+                                        // Text(
+                                        //   'Thứ 2 -Thứ 7: 8h30 - 17h30',
+                                        //   style: TextStyle(
+                                        //     color: Colors.black,
+                                        //     height: 1.2,
+                                        //     fontSize: 14,
+                                        //     fontWeight: FontWeight.normal,
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),

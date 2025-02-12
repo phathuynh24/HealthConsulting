@@ -12,6 +12,7 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
@@ -23,6 +24,8 @@ class DoctorScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String formattedDate = DateFormat('HH:mm:ss, dd/MM/yyyy')
+    .format(appointmentSchedule.selectedDate!);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -117,6 +120,32 @@ class DoctorScheduleCard extends StatelessWidget {
                         ),
                         Text(
                           appointmentSchedule.appointmentCode!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ngày khám',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        Text(
+                          formattedDate,
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,

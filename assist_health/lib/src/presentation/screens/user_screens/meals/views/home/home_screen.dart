@@ -39,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
     loadDataForDate(selectedDate);
 
     eventBus.on<CaloUpdateEvent>().listen((event) {
-      setState(() {
-        goalCalories = event.calo;
-      });
+      // setState(() {
+      //   goalCalories = event.calo;
+      // });
       loadDataForDate(selectedDate);
     });
   }
@@ -433,7 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -477,6 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     meal: MealModel.fromMap(meal),
                     imageUrl: imageUrl,
                     isEditing: true,
+                    isHidenSave: true,
                   ),
                 ),
               );
@@ -487,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 4),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -522,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Calories: $calories kcal",
+                        "Calories: ${calories.toStringAsFixed(1)} kcal",
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       Text(

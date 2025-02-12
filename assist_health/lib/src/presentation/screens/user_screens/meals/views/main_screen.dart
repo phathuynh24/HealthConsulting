@@ -1,3 +1,5 @@
+import "package:assist_health/src/presentation/screens/user_screens/meals/core/events/calo_update_event.dart";
+import "package:assist_health/src/presentation/screens/user_screens/meals/core/events/event_bus.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/core/theme/app_colors.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/views/food_recognition/food_scan_screen.dart";
 import "package:assist_health/src/presentation/screens/user_screens/meals/views/home/home_screen.dart";
@@ -104,7 +106,9 @@ class MainScreen extends StatelessWidget {
           ),
         ),
         navBarOverlap: const NavBarOverlap.full(),
-        onTabChanged: (index) {},
+        onTabChanged: (index) {
+          eventBus.fire(CaloUpdateEvent(2000));
+        },
       ),
     );
   }

@@ -415,10 +415,10 @@ class _AdminPaymentManagementScreenState
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Bác sĩ: ${appointment.doctorInfo!.name}',
+                                'Tài khoản: ${_cachedUserNames[appointment.idDocUser!] ?? "Đang tải..."}',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
                                   fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Icon(
@@ -438,11 +438,14 @@ class _AdminPaymentManagementScreenState
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Tài khoản user: ${_cachedUserNames[appointment.idDocUser!] ?? "Đang tải..."}',
-                            style: const TextStyle(fontSize: 14),
+                            'Bác sĩ: ${appointment.doctorInfo!.name}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                           Text(
-                            'Người khám: ${appointment.userProfile!.name}',
+                            'Hồ sơ: ${appointment.userProfile!.name}',
                             style: const TextStyle(fontSize: 14),
                           ),
                           Text(

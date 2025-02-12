@@ -29,10 +29,12 @@ class _ChatRoomState extends State<ChatRoom> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<File>? imageFiles = [];
+  String name = 'Đang tải...';
 
   @override
   void initState() {
     super.initState();
+    _loadUserData();
   }
 
   Future getImages() async {
@@ -110,7 +112,50 @@ class _ChatRoomState extends State<ChatRoom> {
           .collection('chats')
           .add(messages);
     } else {
-      print("Enter Some Text");
+      debugPrint("Enter Some Text");
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final userSnapshot =
+          await _firestore.collection("users").doc(widget.userMap['uid']).get();
+
+      if (userSnapshot.exists) {
+        final userData = userSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          if (userData['role'] == 'admin') {
+            name = 'Chăm Sóc Khách Hàng';
+          } else if (userData['role'] == 'user') {
+            final profileSnapshot = await _firestore
+                .collection("users")
+                .doc(widget.userMap['uid'])
+                .collection("health_profiles")
+                .doc("main_profile")
+                .get();
+
+            if (profileSnapshot.exists) {
+              final profileData =
+                  profileSnapshot.data() as Map<String, dynamic>?;
+              name = profileData?['name'] ?? 'Không rõ';
+            } else {
+              name = 'Không rõ';
+            }
+          } else {
+            name = userData['name'] ?? 'Không rõ';
+          }
+        }
+      } else {
+        name = 'Không tìm thấy dữ liệu';
+      }
+    } catch (e) {
+      name = 'Lỗi khi tải dữ liệu';
+    }
+
+    // Cập nhật lại giao diện sau khi load xong dữ liệu
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -121,7 +166,7 @@ class _ChatRoomState extends State<ChatRoom> {
         Text(
           (name != 'Chăm Sóc Khách Hàng')
               ? (widget.isUser)
-                  ? 'Bệnh nhân $name'
+                  ? 'Người dùng $name'
                   : 'Bác sĩ $name'
               : name,
           style: const TextStyle(fontSize: 18),
@@ -146,59 +191,7 @@ class _ChatRoomState extends State<ChatRoom> {
           ),
         ),
         foregroundColor: Colors.white,
-        title: StreamBuilder<DocumentSnapshot>(
-          stream: _firestore
-              .collection("users")
-              .doc(widget.userMap['uid'])
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasData && snapshot.data!.exists) {
-              var userData = snapshot.data!.data() as Map<String, dynamic>?;
-              String name = widget.userMap['name'] ?? 'Không rõ';
-
-              if (userData != null) {
-                if (userData['role'] == 'admin') {
-                  name = 'Chăm Sóc Khách Hàng';
-                } else if (userData['role'] == 'user') {
-                  // Lấy tên từ main_profile nếu là user
-                  return FutureBuilder<DocumentSnapshot>(
-                    future: _firestore
-                        .collection("users")
-                        .doc(widget.userMap['uid'])
-                        .collection("health_profiles")
-                        .doc("main_profile")
-                        .get(),
-                    builder: (context, profileSnapshot) {
-                      if (profileSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (profileSnapshot.hasData &&
-                          profileSnapshot.data!.exists) {
-                        var profileData = profileSnapshot.data!.data()
-                            as Map<String, dynamic>?;
-                        name = profileData?['name'] ?? 'Không rõ';
-                      }
-
-                      return _buildTitle(name);
-                    },
-                  );
-                }
-              }
-
-              return _buildTitle(name);
-            } else if (snapshot.hasError) {
-              return const Text('Lỗi khi tải dữ liệu');
-            } else {
-              return const Text('Không tìm thấy dữ liệu');
-            }
-          },
-        ),
+        title: _buildTitle(name),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -293,7 +286,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 borderRadius: BorderRadius.circular(15),
                 color: isSentByMe
                     ? Colors.blue
-                    : Color.fromARGB(
+                    : const Color.fromARGB(
                         255, 231, 223, 223), // Customize the colors here
               ),
               child: Text(
