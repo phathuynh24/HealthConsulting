@@ -39,7 +39,7 @@ class _PublicQuestionsScreenState extends State<PublicQuestionsScreen> {
   bool isSaving = false;
 
   // Load more
-  int itemsPerPage = 10;
+  int itemsPerPage = 5;
   int currentPage = 1;
   bool isLoadingMore = false;
 

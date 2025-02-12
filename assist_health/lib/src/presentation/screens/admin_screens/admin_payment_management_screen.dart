@@ -84,7 +84,9 @@ class _AdminPaymentManagementScreenState
             onPressed: () {
               setState(() {
                 appointment.status = 'Đã duyệt';
+                appointment.paymentStatus = 'Thanh toán thành công';
                 appointment.updateAppointmentStatus(appointment.status!);
+                appointment.updatePaymentStatus(appointment.paymentStatus!);
               });
               Navigator.pop(context);
             },

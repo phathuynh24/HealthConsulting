@@ -137,7 +137,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
           child: Column(
             children: [
               StreamBuilder<List<Result>>(
-                  stream: _resultController!.stream,
+                  stream: _resultController.stream,
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
                       return Text('Đã xảy ra lỗi: ${snapshot.error}');
@@ -168,7 +168,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                                 height: 12,
                               ),
                               const Text(
-                                'Bạn chưa có lịch khám ở mục này',
+                                'Bạn chưa có kết quả khám',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.blueGrey,
@@ -179,7 +179,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                                 height: 6,
                               ),
                               const Text(
-                                'Lịch khám của bạn sẽ được hiển thị tại đây.',
+                                'Hãy chờ kết quả khám từ bác sĩ!',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 14,
@@ -256,6 +256,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                     sesultsSearch.sort((a, b) => b.timeResult!.compareTo(a.timeResult!)); // Sắp xếp giảm dần theo thời gian
                     return ListView.builder(
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: sesultsSearch.length,
                       itemBuilder: (context, index) {
                         Result result = sesults[index];
@@ -336,7 +337,7 @@ class _ViewResultListScreenState extends State<ViewResultListScreen> {
                                       height: 8,
                                     ),
                                     Text(
-                                      'Ngày trả kết quả: ${formattedTimeResult}',
+                                      'Ngày trả kết quả: $formattedTimeResult',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         color: Colors.black54,
